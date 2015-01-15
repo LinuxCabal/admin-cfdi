@@ -1,0 +1,2311 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface>
+  <object class="tk.Frame" id="mainwindow">
+    <property name="height">500</property>
+    <property name="width">700</property>
+    <layout>
+      <property name="column">0</property>
+      <property name="propagate">True</property>
+      <property name="row">0</property>
+      <rows>
+        <row id="0">
+          <property name="pad">5</property>
+        </row>
+      </rows>
+      <columns>
+        <column id="0">
+          <property name="pad">5</property>
+        </column>
+      </columns>
+    </layout>
+    <child>
+      <object class="ttk.Notebook" id="main_notebook">
+        <property name="width">700</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="propagate">True</property>
+          <property name="row">0</property>
+          <property name="sticky">nswe</property>
+        </layout>
+        <child>
+          <object class="ttk.Notebook.Tab" id="tab_1">
+            <property name="compound">top</property>
+            <property name="state">normal</property>
+            <property name="text" translatable="yes">Descarga SAT</property>
+            <child>
+              <object class="ttk.Frame" id="frame_1">
+                <property name="height">500</property>
+                <property name="padding">10</property>
+                <property name="width">700</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                  <rows>
+                    <row id="0">
+                      <property name="pad">0</property>
+                    </row>
+                    <row id="1">
+                      <property name="pad">0</property>
+                    </row>
+                  </rows>
+                  <columns>
+                    <column id="0">
+                      <property name="minsize">0</property>
+                      <property name="pad">0</property>
+                    </column>
+                    <column id="1">
+                      <property name="pad">0</property>
+                    </column>
+                    <column id="2">
+                      <property name="pad">0</property>
+                    </column>
+                  </columns>
+                </layout>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_1">
+                    <property name="text" translatable="yes">Datos de acceso</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Label" id="label_razon_social">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Razón Social </property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_user">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">RFC </property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_password">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padx">2</property>
+                        <property name="pady">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Clave CIEC </property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_folder">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Descargar en </property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_razon_social">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="textvariable">string:razon_social</property>
+                        <property name="width">30</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_user_sat">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="textvariable">string:user_sat</property>
+                        <property name="width">30</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_password">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="show">•</property>
+                        <property name="textvariable">string:password</property>
+                        <property name="width">30</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_target_sat">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:target_sat</property>
+                        <property name="width">27</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_folder">
+                        <property name="command">button_select_folder_click</property>
+                        <property name="image">folder.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Listbox" id="listbox_contribuyentes">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="height">6</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="selectborderwidth">1</property>
+                        <property name="selectmode">single</property>
+                        <property name="width">38</property>
+                        <bind add="True" handler="listbox_contribuyentes_click" sequence="&lt;ButtonRelease-1&gt;" />
+                        <bind add="True" handler="listbox_contribuyentes_double_click" sequence="&lt;Double-Button-1&gt;" />
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="padx">5</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.LabelFrame" id="LabelFrame_9">
+                        <property name="borderwidth">0</property>
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">7</property>
+                          <property name="ipady">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                          <property name="sticky">nswe</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Button" id="button_save_emisor">
+                            <property name="command">button_save_emisor_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">save.gif</property>
+                            <property name="justify">center</property>
+                            <property name="text" translatable="yes">Guardar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="padx">145</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="button_delete_emisor">
+                            <property name="command">button_delete_emisor_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">delete.gif</property>
+                            <property name="text" translatable="yes">Eliminar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_2">
+                    <property name="text" translatable="yes">Tipo de Consulta</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="pady">10</property>
+                      <property name="propagate">True</property>
+                      <property name="row">2</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_invoice_send">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Facturas Emitidas</property>
+                        <property name="value">1</property>
+                        <property name="variable">int:type_invoice</property>
+                        <property name="width">16</property>
+                        <bind add="True" handler="radio_type_query" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">1</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_invoice_receive">
+                        <property name="background">#ffffca</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Facturas Recibidas</property>
+                        <property name="value">2</property>
+                        <property name="variable">int:type_invoice</property>
+                        <property name="width">16</property>
+                        <bind add="True" handler="radio_type_query" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="columnspan">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_current_user">
+                        <property name="anchor">w</property>
+                        <property name="font">{Sans} 10 {bold}</property>
+                        <property name="foreground">#0021fe</property>
+                        <property name="justify">left</property>
+                        <property name="text" translatable="yes">Selecciona un usuario</property>
+                        <property name="textvariable">string:current_user</property>
+                        <property name="width">35</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_3">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Opciones de Busqueda</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">3</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_search_uuid">
+                        <property name="text" translatable="yes">Buscar por folio fiscal (UUID)</property>
+                        <property name="value">1</property>
+                        <property name="variable">int:type_search</property>
+                        <bind add="True" handler="radio_type_search" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_uuid">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="textvariable">string:search_uuid</property>
+                        <property name="width">55</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">6</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_search_date">
+                        <property name="background">#ffffca</property>
+                        <property name="text" translatable="yes">Buscar por fecha de emisión</property>
+                        <property name="value">2</property>
+                        <property name="variable">int:type_search</property>
+                        <bind add="True" handler="radio_type_search" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_year">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Año </property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Combobox" id="combo_year">
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:search_year</property>
+                        <property name="width">8</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_month">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="justify">left</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Mes</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Combobox" id="combo_month">
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:search_month</property>
+                        <property name="width">8</property>
+                        <bind add="True" handler="combo_month_click" sequence="&lt;&lt;ComboboxSelected&gt;&gt;" />
+                        <layout>
+                          <property name="column">4</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_day">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="justify">left</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Día</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">5</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Combobox" id="combo_day">
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:search_day</property>
+                        <property name="width">8</property>
+                        <layout>
+                          <property name="column">6</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_rfc">
+                        <property name="anchor">e</property>
+                        <property name="borderwidth">2</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">RFC Emisor</property>
+                        <property name="textvariable">string:info_rfc</property>
+                        <property name="width">15</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_rfc">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="textvariable">string:search_rfc</property>
+                        <property name="width">25</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_month">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="justify">right</property>
+                        <property name="text" translatable="yes">Descargar mes completo por día</property>
+                        <property name="variable">int:sat_month</property>
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="columnspan">4</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_4">
+                    <property name="borderwidth">0</property>
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="pady">10</property>
+                      <property name="propagate">True</property>
+                      <property name="row">4</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="button_download_sat">
+                        <property name="command">button_download_sat_click</property>
+                        <property name="compound">left</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="image">down.gif</property>
+                        <property name="text" translatable="yes">Descargar</property>
+                        <property name="width">10</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Notebook.Tab" id="tab_2">
+            <property name="compound">top</property>
+            <property name="state">normal</property>
+            <property name="text" translatable="yes">Descarga Correo</property>
+            <child>
+              <object class="ttk.Frame" id="frame_2">
+                <property name="height">500</property>
+                <property name="padding">10</property>
+                <property name="width">700</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                  <property name="sticky">nswe</property>
+                </layout>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_5">
+                    <property name="text" translatable="yes">Servidores de Correo IMAP</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Label" id="label_mail_server">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Servidor IMAP</property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_mail_port">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Puerto </property>
+                        <property name="width">10</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_mail_user">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padx">2</property>
+                        <property name="pady">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Usuario </property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_mail_password">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Contraseña </property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_download_mail">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Descargar en</property>
+                        <property name="width">12</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_mail_server">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="textvariable">string:mail_server</property>
+                        <property name="width">30</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Spinbox" id="spin_port">
+                        <property name="from_">1</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="increment">1</property>
+                        <property name="textvariable">int:mail_port</property>
+                        <property name="to">1000</property>
+                        <property name="width">9</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_ssl">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="justify">right</property>
+                        <property name="text" translatable="yes">SSL/TSL</property>
+                        <property name="variable">int:mail_ssl</property>
+                        <property name="width">5</property>
+                        <bind add="True" handler="check_ssl_click" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">50</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_mail_user">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="textvariable">string:mail_user</property>
+                        <property name="width">30</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_mail_password">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="show">•</property>
+                        <property name="textvariable">string:mail_password</property>
+                        <property name="width">30</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_mail_target">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:mail_target</property>
+                        <property name="width">27</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_folder_mail">
+                        <property name="command">button_select_folder_mail_click</property>
+                        <property name="image">folder.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Listbox" id="listbox_mail_servers">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="height">7</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="selectborderwidth">1</property>
+                        <property name="selectmode">single</property>
+                        <property name="width">38</property>
+                        <bind add="True" handler="listbox_mail_servers_click" sequence="&lt;Double-Button-1&gt;" />
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="padx">5</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.LabelFrame" id="LabelFrame_8">
+                        <property name="borderwidth">0</property>
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">7</property>
+                          <property name="ipady">3</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                          <property name="sticky">nswe</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Button" id="button_save_mail_server">
+                            <property name="command">button_save_mail_server_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">save.gif</property>
+                            <property name="justify">center</property>
+                            <property name="text" translatable="yes">Guardar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="padx">145</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="button_delete_mail_server">
+                            <property name="command">button_delete_mail_server_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">delete.gif</property>
+                            <property name="text" translatable="yes">Eliminar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_6">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Opciones</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipady">5</property>
+                      <property name="pady">10</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_mail_subfolder">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Buscar en subcarpetas de INBOX</property>
+                        <property name="variable">int:mail_subfolder</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">40</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_mail_name">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Mantener nombres de archivos originales</property>
+                        <property name="variable">int:mail_name</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">40</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_mail_delete1">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Borrar si el correo no tiene archivos anexos</property>
+                        <property name="variable">int:mail_delete1</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">40</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_mail_delete2">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Borrar después de descargar los archivos anexos</property>
+                        <property name="variable">int:mail_delete2</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">40</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_7">
+                    <property name="borderwidth">0</property>
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="pady">10</property>
+                      <property name="propagate">True</property>
+                      <property name="row">4</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="button_download_mail">
+                        <property name="command">button_download_mail_click</property>
+                        <property name="compound">left</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="image">down.gif</property>
+                        <property name="text" translatable="yes">Descargar</property>
+                        <property name="width">10</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Notebook.Tab" id="tab_3">
+            <property name="compound">top</property>
+            <property name="state">normal</property>
+            <property name="text" translatable="yes">Organizar XML</property>
+            <child>
+              <object class="ttk.Frame" id="frame_3">
+                <property name="height">200</property>
+                <property name="padding">10</property>
+                <property name="width">200</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                </layout>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_10">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Usuarios y Directorios</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipadx">2</property>
+                      <property name="ipady">5</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="label_organizate_user">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Usuario</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_folder_source_xml">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Origen</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_folder_target_xml">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Destino</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_xml_user">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">normal</property>
+                        <property name="textvariable">string:xml_user</property>
+                        <property name="width">40</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_xml_source">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:xml_source</property>
+                        <property name="width">36</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">1</property>
+                          <property name="padx">5</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_xml_target">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:xml_target</property>
+                        <property name="width">36</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">1</property>
+                          <property name="padx">5</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="rowspan">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_xml_copy">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Copiar archivos</property>
+                        <property name="variable">int:xml_copy</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_folder_source_xml">
+                        <property name="command">button_select_folder_source_xml_click</property>
+                        <property name="image">folder.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_folder_target_xml">
+                        <property name="command">button_select_folder_target_xml_click</property>
+                        <property name="image">folder.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Listbox" id="listbox_users_xml">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="height">7</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="selectborderwidth">1</property>
+                        <property name="selectmode">single</property>
+                        <property name="width">33</property>
+                        <bind add="True" handler="listbox_users_xml_click" sequence="&lt;ButtonRelease-1&gt;" />
+                        <bind add="True" handler="listbox_users_xml_double_click" sequence="&lt;Double-Button-1&gt;" />
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.LabelFrame" id="LabelFrame_19">
+                        <property name="borderwidth">0</property>
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">7</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                          <property name="sticky">nswe</property>
+                          <rows>
+                            <row id="0">
+                              <property name="minsize">0</property>
+                            </row>
+                          </rows>
+                        </layout>
+                        <child>
+                          <object class="tk.Button" id="button_save_xml_user">
+                            <property name="command">button_save_xml_user_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">save.gif</property>
+                            <property name="justify">center</property>
+                            <property name="text" translatable="yes">Guardar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="padx">145</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="button_delete_xml_user">
+                            <property name="command">button_delete_xml_user_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">delete.gif</property>
+                            <property name="text" translatable="yes">Eliminar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_11">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Organizar Por</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipadx">2</property>
+                      <property name="ipady">5</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="label_current_user_xml">
+                        <property name="anchor">w</property>
+                        <property name="font">{Sans} 10 {bold}</property>
+                        <property name="foreground">#0021fe</property>
+                        <property name="justify">left</property>
+                        <property name="text" translatable="yes">Selecciona un usuario</property>
+                        <property name="textvariable">string:current_user_xml</property>
+                        <property name="width">25</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_only_date">
+                        <property name="anchor">w</property>
+                        <property name="text" translatable="yes">Solo año y mes</property>
+                        <property name="value">1</property>
+                        <property name="variable">int:xml_organizate</property>
+                        <property name="width">12</property>
+                        <bind add="True" handler="radio_organizate_xml" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_emisor">
+                        <property name="anchor">w</property>
+                        <property name="text" translatable="yes">Emisor, año y mes</property>
+                        <property name="value">2</property>
+                        <property name="variable">int:xml_organizate</property>
+                        <property name="width">14</property>
+                        <bind add="True" handler="radio_organizate_xml" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_receptor">
+                        <property name="anchor">w</property>
+                        <property name="text" translatable="yes">Receptor, año y mes</property>
+                        <property name="value">3</property>
+                        <property name="variable">int:xml_organizate</property>
+                        <property name="width">16</property>
+                        <bind add="True" handler="radio_organizate_xml" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_12">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Renombrar archivos</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipadx">2</property>
+                      <property name="ipady">5</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">2</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_original">
+                        <property name="anchor">w</property>
+                        <property name="text" translatable="yes">Usar original</property>
+                        <property name="value">1</property>
+                        <property name="variable">int:xml_rename</property>
+                        <property name="width">12</property>
+                        <bind add="True" handler="radio_rename_xml" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_uuid">
+                        <property name="anchor">w</property>
+                        <property name="text" translatable="yes">Por UUID</property>
+                        <property name="value">2</property>
+                        <property name="variable">int:xml_rename</property>
+                        <property name="width">10</property>
+                        <bind add="True" handler="radio_rename_xml" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_template">
+                        <property name="anchor">e</property>
+                        <property name="text" translatable="yes">Usar plantilla</property>
+                        <property name="value">3</property>
+                        <property name="variable">int:xml_rename</property>
+                        <property name="width">10</property>
+                        <bind add="True" handler="radio_rename_xml" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="entry_template_name">
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="text" translatable="yes">{serie}{folio:06d}_{fecha}_{receptor_rfc}</property>
+                        <property name="textvariable">string:template_name</property>
+                        <property name="width">40</property>
+                        <layout>
+                          <property name="column">4</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_13">
+                    <property name="borderwidth">0</property>
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="pady">10</property>
+                      <property name="propagate">True</property>
+                      <property name="row">4</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="button_organizate_xml">
+                        <property name="command">button_organizate_xml_click</property>
+                        <property name="compound">left</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="image">xml.gif</property>
+                        <property name="text" translatable="yes">Organizar</property>
+                        <property name="width">10</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Notebook.Tab" id="tab_4">
+            <property name="text" translatable="yes">Generar PDF</property>
+            <child>
+              <object class="ttk.Frame" id="frame_4">
+                <property name="height">200</property>
+                <property name="padding">10</property>
+                <property name="width">200</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                </layout>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_20">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Usuarios, Directorios y Plantillas</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipadx">2</property>
+                      <property name="ipady">2</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="label_pdf_user">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Usuario</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_folder_source_pdf">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Origen</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_folder_target_pdf">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Destino</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_pdf_user">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">normal</property>
+                        <property name="textvariable">string:pdf_user</property>
+                        <property name="width">40</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_pdf_source">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:pdf_source</property>
+                        <property name="width">36</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_pdf_target">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:pdf_target</property>
+                        <property name="width">36</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_ods">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">ODS</property>
+                        <property name="value">1</property>
+                        <property name="variable">int:template_type</property>
+                        <bind add="True" handler="radio_template_type" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Radiobutton" id="radio_json">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">JSON</property>
+                        <property name="value">2</property>
+                        <property name="variable">int:template_type</property>
+                        <bind add="True" handler="radio_template_type" sequence="&lt;ButtonRelease-1&gt;" />
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_pdf_print">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="state">disabled</property>
+                        <property name="text" translatable="yes">Imprimir archivos</property>
+                        <property name="variable">int:pdf_print</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_template_ods">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:template_ods</property>
+                        <property name="width">36</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_template_json">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:template_json</property>
+                        <property name="width">36</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_folder_source_pdf">
+                        <property name="command">button_select_folder_source_pdf_click</property>
+                        <property name="image">folder.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_folder_target_pdf">
+                        <property name="command">button_select_folder_target_pdf_click</property>
+                        <property name="image">folder.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_template_ods">
+                        <property name="command">button_select_template_ods_click</property>
+                        <property name="image">calc.gif</property>
+                        <property name="state">disabled</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_template_json">
+                        <property name="command">button_select_template_json_click</property>
+                        <property name="image">csv.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Listbox" id="listbox_users_pdf">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="height">10</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="selectborderwidth">1</property>
+                        <property name="selectmode">single</property>
+                        <property name="width">33</property>
+                        <bind add="True" handler="listbox_users_pdf_click" sequence="&lt;Double-Button-1&gt;" />
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">6</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.LabelFrame" id="LabelFrame_21">
+                        <property name="borderwidth">0</property>
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">7</property>
+                          <property name="pady">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">7</property>
+                          <property name="sticky">nswe</property>
+                          <rows>
+                            <row id="0">
+                              <property name="minsize">0</property>
+                            </row>
+                          </rows>
+                        </layout>
+                        <child>
+                          <object class="tk.Button" id="button_save_pdf_user">
+                            <property name="command">button_save_pdf_user_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">save.gif</property>
+                            <property name="justify">center</property>
+                            <property name="text" translatable="yes">Guardar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="padx">145</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="button_delete_pdf_user">
+                            <property name="command">button_delete_pdf_user_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">delete.gif</property>
+                            <property name="text" translatable="yes">Eliminar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="Labelframe_1">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Usuario seleccionado</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="label_current_user_pdf">
+                        <property name="anchor">w</property>
+                        <property name="font">{Sans} 10 {bold}</property>
+                        <property name="foreground">#0021fe</property>
+                        <property name="justify">left</property>
+                        <property name="pady">10</property>
+                        <property name="textvariable">string:current_user_pdf</property>
+                        <property name="width">40</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="padx">10</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_16">
+                    <property name="borderwidth">0</property>
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="pady">20</property>
+                      <property name="propagate">True</property>
+                      <property name="row">2</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="button_generate_pdf">
+                        <property name="command">button_generate_pdf_click</property>
+                        <property name="compound">left</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="image">pdf.gif</property>
+                        <property name="text" translatable="yes">Generar PDF</property>
+                        <property name="width">10</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Notebook.Tab" id="tab_5">
+            <property name="text" translatable="yes">Reporte y validación</property>
+            <child>
+              <object class="ttk.Frame" id="frame_5">
+                <property name="height">200</property>
+                <property name="padding">10</property>
+                <property name="width">200</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                </layout>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_14">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Usuarios y Directorios</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipadx">2</property>
+                      <property name="ipady">2</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="label_report_user">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Usuario</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_folder_report_source">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Origen</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_report_user">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">normal</property>
+                        <property name="textvariable">string:report_user</property>
+                        <property name="width">40</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="columnspan">2</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_report_source">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="state">readonly</property>
+                        <property name="textvariable">string:report_source</property>
+                        <property name="width">36</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="button_select_folder_report_source">
+                        <property name="command">button_select_folder_report_source_click</property>
+                        <property name="image">folder.gif</property>
+                        <property name="width">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Listbox" id="listbox_users_report">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="height">4</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="selectborderwidth">1</property>
+                        <property name="selectmode">single</property>
+                        <property name="width">33</property>
+                        <bind add="True" handler="listbox_users_report_click" sequence="&lt;ButtonRelease-1&gt;" />
+                        <bind add="True" handler="listbox_users_report_double_click" sequence="&lt;Double-Button-1&gt;" />
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.LabelFrame" id="LabelFrame_15">
+                        <property name="borderwidth">0</property>
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">7</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">7</property>
+                          <property name="sticky">nswe</property>
+                          <rows>
+                            <row id="0">
+                              <property name="minsize">0</property>
+                            </row>
+                          </rows>
+                        </layout>
+                        <child>
+                          <object class="tk.Button" id="button_save_report_user">
+                            <property name="command">button_save_report_user_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">save.gif</property>
+                            <property name="justify">center</property>
+                            <property name="text" translatable="yes">Guardar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="padx">145</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="button_delete_report_user">
+                            <property name="command">button_delete_report_user_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">delete.gif</property>
+                            <property name="text" translatable="yes">Eliminar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_22">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Usuarios y Reportes</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipadx">2</property>
+                      <property name="ipady">2</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="label_report_user_current">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Usuario</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_current_user_report">
+                        <property name="anchor">w</property>
+                        <property name="font">{Sans} 10 {bold}</property>
+                        <property name="foreground">#0021fe</property>
+                        <property name="justify">left</property>
+                        <property name="textvariable">string:current_user_report</property>
+                        <property name="width">35</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label_report_title">
+                        <property name="anchor">e</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="padding">2</property>
+                        <property name="relief">flat</property>
+                        <property name="text" translatable="yes">Titulo</property>
+                        <property name="width">7</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="label_fields">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="text" translatable="yes">Campos</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="text_report_title">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="textvariable">string:report_title</property>
+                        <property name="width">40</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Text" id="text_report_fields">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="height">3</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="width">40</property>
+                        <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
+                        <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Listbox" id="listbox_reports">
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="height">5</property>
+                        <property name="highlightcolor">#ff5500</property>
+                        <property name="selectborderwidth">1</property>
+                        <property name="selectmode">single</property>
+                        <property name="width">33</property>
+                        <bind add="True" handler="listbox_reports_double_click" sequence="&lt;Double-Button-1&gt;" />
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.LabelFrame" id="LabelFrame_23">
+                        <property name="borderwidth">0</property>
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">7</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">7</property>
+                          <property name="sticky">nswe</property>
+                          <rows>
+                            <row id="0">
+                              <property name="minsize">0</property>
+                            </row>
+                          </rows>
+                        </layout>
+                        <child>
+                          <object class="tk.Button" id="button_save_report_title">
+                            <property name="command">button_save_report_title_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">save.gif</property>
+                            <property name="justify">center</property>
+                            <property name="text" translatable="yes">Guardar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="padx">145</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="button_delete_report_title">
+                            <property name="command">button_delete_report_title_click</property>
+                            <property name="compound">left</property>
+                            <property name="font">{Sans} 10 {}</property>
+                            <property name="image">delete.gif</property>
+                            <property name="text" translatable="yes">Eliminar</property>
+                            <property name="width">10</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_17">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">Opciones</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="ipadx">2</property>
+                      <property name="ipady">2</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">2</property>
+                      <property name="sticky">nswe</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_validate_fac">
+                        <property name="text" translatable="yes">Validar CFDI (facturas)</property>
+                        <property name="variable">int:validate_fac</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="ipadx">30</property>
+                          <property name="pady">5</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Checkbutton" id="check_validate_sat">
+                        <property name="text" translatable="yes">Validar en el SAT</property>
+                        <property name="variable">int:validate_sat</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="ipadx">30</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.LabelFrame" id="LabelFrame_18">
+                    <property name="borderwidth">0</property>
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="pady">5</property>
+                      <property name="propagate">True</property>
+                      <property name="row">3</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="button_generate_report">
+                        <property name="command">button_generate_report_click</property>
+                        <property name="compound">left</property>
+                        <property name="font">{Sans} 10 {}</property>
+                        <property name="image">report.gif</property>
+                        <property name="text" translatable="yes">Generar Reporte</property>
+                        <property name="width">10</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="tk.LabelFrame" id="label_frame_comun">
+        <property name="borderwidth">0</property>
+        <property name="height">200</property>
+        <property name="pady">15</property>
+        <property name="width">200</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="propagate">True</property>
+          <property name="row">1</property>
+          <property name="sticky">nswe</property>
+        </layout>
+        <child>
+          <object class="tk.Label" id="label_info">
+            <property name="anchor">w</property>
+            <property name="font">{Sans} 10 {bold}</property>
+            <property name="foreground">#c00000</property>
+            <property name="relief">ridge</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Info...</property>
+            <property name="textvariable">string:msg_user</property>
+            <property name="width">20</property>
+            <layout>
+              <property name="column">0</property>
+              <property name="padx">5</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Progressbar" id="progressbar">
+            <property name="length">350</property>
+            <property name="mode">determinate</property>
+            <property name="orient">horizontal</property>
+            <property name="takefocus">false</property>
+            <property name="value">0</property>
+            <layout>
+              <property name="column">1</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="button_exit">
+            <property name="command">button_exit_click</property>
+            <property name="compound">left</property>
+            <property name="font">{Sans} 10 {}</property>
+            <property name="image">exit.gif</property>
+            <property name="text" translatable="yes">Salir</property>
+            <property name="width">10</property>
+            <layout>
+              <property name="column">2</property>
+              <property name="padx">20</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
