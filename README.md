@@ -1,6 +1,6 @@
 ## admin-cfdi ##
 @pakage admin-cfdi<br/>
-@author [Maurico Baeza](https://facturalibre.net/servicios/) <br/>
+@author [Maurico Baeza](https://github.com/mauriciobaeza) <br/>
 @date 04/12/2014<br/>
 @version 0.2.2<br/>
 
@@ -28,7 +28,7 @@ Pequeño sistema para administrar CFDIs, facturas electrónicas de México. Entr
 
 ## Instalación ##
 
-Si tienes instalado correctamente Python 3.4, puede instalar con Pip
+Si tienes instalado correctamente Python 3.4, puedes instalar con Pip
 <pre><code>
 sudo pip install selenium pygubu
 </code></pre>
@@ -51,6 +51,3 @@ sudo apt-get install python3-pip python3-tk
 sudo pip3 install selenium pygubu
 python3 admincfdi.py
 </code></pre>
-
-
-
