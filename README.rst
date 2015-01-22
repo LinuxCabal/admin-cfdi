@@ -2,7 +2,7 @@ admin-cfdi
 ==========
 
 :Autores:
-    `Maurico Baeza`
+    `Maurico Baeza`_
 
 :Fecha:
     04/12/2014
