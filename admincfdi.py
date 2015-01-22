@@ -427,12 +427,16 @@ class Application(pygubu.TkApplication):
                     month = int(data['search_month'])
                     dates = self.util.get_dates(year, month)
                     txt = browser.find_element_by_id(self.g.SAT['date_from'])
-                    browser.execute_script(
-                        'arguments[0].removeAttribute("disabled");', txt)
+                    arg = "document.getElementsByName('{}')[0]." \
+                        "removeAttribute('disabled');".format(
+                        self.g.SAT['date_from_name'])
+                    browser.execute_script(arg)
                     txt.send_keys(dates[0])
                     txt = browser.find_element_by_id(self.g.SAT['date_to'])
-                    browser.execute_script(
-                        'arguments[0].removeAttribute("disabled");', txt)
+                    arg = "document.getElementsByName('{}')[0]." \
+                        "removeAttribute('disabled');".format(
+                        self.g.SAT['date_to_name'])
+                    browser.execute_script(arg)
                     txt.send_keys(dates[1])
                 # Recibidas
                 else:
