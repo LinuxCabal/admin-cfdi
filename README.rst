@@ -75,7 +75,7 @@ Si usas Windows, asegúrate de abrir el script con el ejecutable pythonw.exe loc
 
 ::
 
-    pip install seleniumn pygubu
+    pip install selenium pygubu
 
 
 Ligas
