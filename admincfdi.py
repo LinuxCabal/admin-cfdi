@@ -392,6 +392,31 @@ class Application(pygubu.TkApplication):
             'text/xml, application/octet-stream, application/xml')
         profile.set_preference(
             'browser.download.dir', data['user_sat']['target_sat'])
+        # mrE - desactivar telemetry
+        profile.set_preference(
+            'toolkit.telemetry.prompted', 2)
+        profile.set_preference(
+            'toolkit.telemetry.rejected', True)
+        profile.set_preference(
+            'toolkit.telemetry.enabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.service.enabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.uploadEnabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.service.firstRun', False)
+        profile.set_preference(
+            'datareporting.healthreport.logging.consoleEnabled', False)
+        profile.set_preference(
+            'datareporting.policy.dataSubmissionEnabled', False)
+        profile.set_preference(
+            'datareporting.policy.dataSubmissionPolicyResponseType', 'accepted-info-bar-dismissed')
+        #profile.set_preference(
+        #    'datareporting.policy.dataSubmissionPolicyAccepted'; False) # este me marca error, why?
+        #oculta la gran flecha animada al descargar
+        profile.set_preference(
+            'browser.download.animateNotifications', False)        
+        #             
         try:
             browser = webdriver.Firefox(profile)
             self._set('msg_user', 'Conectando...', True)
