@@ -12,7 +12,7 @@ Pequeño sistema para administrar CFDIs, facturas electrónicas de México. Entr
 
 ## Requerimientos:
 
-- Python 3.4
+- Python 3.2+
 - Tk si usas Linux, si usas Windows ya lo integra Python
 - Firefox para la automatización de la descarga del SAT
 - Selenium para la automatización de la descarga del SAT
