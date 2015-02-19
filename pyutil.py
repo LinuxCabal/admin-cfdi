@@ -25,7 +25,6 @@ import email
 import hashlib
 import shutil
 import subprocess
-from subprocess import DEVNULL
 import tempfile
 import signal
 import pyqrcode
@@ -36,6 +35,10 @@ from tkinter.filedialog import askdirectory
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from pysimplesoap.client import SoapClient, SoapFault
+try:
+    from subprocess import DEVNULL
+except ImportError:
+    DEVNULL = open(os.devnull, 'wb')
 
 
 WIN = 'win32'
@@ -516,6 +519,9 @@ class Util(object):
         data['receptor_nombre'] = ''
         if 'nombre' in node.attrib:
             data['receptor_nombre'] = node.attrib['nombre'].replace('/', '_')
+        node = xml.find('{}Complemento/{}TimbreFiscalDigital'.format(
+            pre, PRE['TIMBRE']))
+        data['uuid'] = node.attrib['UUID']
         if format1:
             try:
                 name = format1.format(**data)
@@ -1368,9 +1374,9 @@ class CFDIPDF(object):
             data += '\n\nCuenta Predial Número: %s' % n.attrib['numero']
         iedu = c.find(self.tree['iedu'])
         if iedu is not None:
-            data += u'\n\nAlumno: %s\nCURP: %s' % (
+            data += '\n\nAlumno: %s\nCURP: %s' % (
                 iedu.attrib['nombreAlumno'], iedu.attrib['CURP'])
-            data += u'\nAcuerdo de incorporación ante la SEP %s %s' % (
+            data += '\nAcuerdo de incorporación ante la SEP %s %s' % (
                 iedu.attrib['nivelEducativo'], iedu.attrib['autRVOE'])
         return data
 
