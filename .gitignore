@@ -1,0 +1,5 @@
+*.pyc
+*.ini
+*.log
+=======
+docs/_build
