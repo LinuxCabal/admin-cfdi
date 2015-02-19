@@ -29,6 +29,7 @@ import tempfile
 import signal
 import pyqrcode
 from datetime import datetime
+from string import Template
 from xml.etree import ElementTree as ET
 import tkinter as tk
 from tkinter.filedialog import askdirectory
@@ -652,7 +653,8 @@ class Util(object):
                 info.append(options['fields_report'].format(**new_data).split('|'))
             return tuple(info)
 
-        info = options['fields_report'].format(**data).split('|')
+        tmpl = Template(options['fields_report'].replace('{', '${'))
+        info = tmpl.safe_substitute(**data).split('|')
         if options['validate_fac']:
             cfdi = ValidCFDI(path, g)
             if cfdi.verify_cfdi():
