@@ -415,8 +415,7 @@ class Application(pygubu.TkApplication):
         #    'datareporting.policy.dataSubmissionPolicyAccepted'; False) # este me marca error, why?
         #oculta la gran flecha animada al descargar
         profile.set_preference(
-            'browser.download.animateNotifications', False)        
-        #             
+            'browser.download.animateNotifications', False)
         try:
             browser = webdriver.Firefox(profile)
             self._set('msg_user', 'Conectando...', True)
@@ -500,7 +499,6 @@ class Application(pygubu.TkApplication):
                                 p = l.find_element_by_xpath(
                                     '..').find_element_by_xpath('..')
                                 sb2 = p.get_attribute('id')
-                                #~ print (sb, sb2)
                                 if sb in sb2:
                                     link = l
                                     break
@@ -1541,16 +1539,14 @@ class Application(pygubu.TkApplication):
         pb = self._get_object('progressbar')
         pb['maximum'] = total
         pb.start()
-        #~ j = 0
         for i, f in enumerate(files):
             pb['value'] = i + 1
             msg = 'Archivo {} de {}'.format(i + 1, total)
             self._set('msg_user', msg)
             self.parent.update_idletasks()
             line_csv = self._make_report(f, data)
-            if line_csv:
-                lines.append(line_csv)
-                #~ j += 1
+            for l in line_csv:
+                lines.append(l)
         pb['value'] = 0
         pb.stop()
         path_csv = self.util.get_path_temp(

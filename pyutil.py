@@ -613,13 +613,44 @@ class Util(object):
         data['FechaTimbrado'] = node.attrib['FechaTimbrado'].replace('T', ' ')
         data['fecha'] = data['fecha'].replace('T', ' ')
 
-        atr = ('serie', 'folio', 'Moneda', 'TipoCambio', 'validacion',
-            'validacion_sat', 'totalImpuestosRetenidos',
-            'totalImpuestosTrasladados', 'descuento', 'traslado_iva_0',
-            'traslado_iva_16', 'retencion_iva', 'retencion_isr')
+        fields_details = (
+            'noIdentificacion',
+            'descripcion',
+            'unidad',
+            'cantidad',
+            'valorUnitario',
+            'importe'
+        )
+        details = []
+        if any(d in options['fields_report'] for d in fields_details):
+            node = xml.find('{}Conceptos'.format(PRE[ver]))
+            for n in node.getchildren():
+                details.append(n.attrib.copy())
+        atr = (
+            'serie',
+            'folio',
+            'Moneda',
+            'TipoCambio',
+            'validacion',
+            'validacion_sat',
+            'totalImpuestosRetenidos',
+            'totalImpuestosTrasladados',
+            'descuento',
+            'traslado_iva_0',
+            'traslado_iva_16',
+            'retencion_iva',
+            'retencion_isr',
+        ) + fields_details
         for a in atr:
             if not a in data:
                 data[a] = ''
+        if details:
+            info = []
+            for d in details:
+                new_data = data.copy()
+                new_data.update(d)
+                info.append(options['fields_report'].format(**new_data).split('|'))
+            return tuple(info)
 
         info = options['fields_report'].format(**data).split('|')
         if options['validate_fac']:
@@ -640,7 +671,7 @@ class Util(object):
                 info.append(sat.msg)
             else:
                 info.append(sat.error)
-        return tuple(info)
+        return tuple((info,))
 
     def save_csv(self, data, path=''):
         if not path:
