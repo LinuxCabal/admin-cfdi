@@ -2,6 +2,24 @@
 Desarrollo
 ==========
 
+Estructura
+==========
+
+La aplicación consta de los siguientes archivos:
+
+- admincfdi.py Implementa la interfase gráfica y
+  es la aplicación principal.
+
+- values.py Tiene la clase Global que centraliza
+  valores que se usan en los otros módulos.  Por
+  ejemplo, las URLs y valores id de la página web
+  de CFDIs del SAT están en el atributo SAT,
+  es un diccionario que es usado
+  en la descarga de CFDIs.
+
+- pyutil.py Tiene varias clases que implementan
+  utilerías usadas por los otros módulos.
+
 Descarga de facturas del SAT
 ============================
 
