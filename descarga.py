@@ -1,5 +1,6 @@
 import argparse
 import time
+import datetime
 from unittest.mock import Mock
 from unittest.mock import MagicMock
 
@@ -29,6 +30,20 @@ def process_command_line_arguments():
     parser.add_argument('--carpeta-destino',
                         help=help, default=default_carpeta_destino)
 
+    today = datetime.date.today()
+    help = 'Año. El valor por omisión es el año en curso'
+    parser.add_argument('--año',
+                        help=help, default=str(today.year))
+
+    help = 'Mes. El valor por omisión es el mes en curso'
+    parser.add_argument('--mes',
+                        help=help, default='{:02d}'.format(today.month))
+
+    help = "Día. El valor por omisión es '00', " \
+           'significa no usar el día en la búsqueda'
+    parser.add_argument('--día',
+                        help=help, default='00')
+
     args=parser.parse_args()
     return args
 
@@ -47,9 +62,9 @@ def main():
                             'password': pwd},
             'search_uuid': '',
             'search_rfc': '',
-            'search_year': '2014',
-            'search_month': '10',
-            'search_day': '00',
+            'search_year': args.año,
+            'search_month': args.mes,
+            'search_day': args.día,
             'sat_month': ''
             }
 
