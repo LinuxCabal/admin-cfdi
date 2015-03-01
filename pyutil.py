@@ -1653,8 +1653,18 @@ class CFDIPDF(object):
 
 class DescargaSAT(object):
 
-    def __init__(this, data, app):
-        self = app
+    def __init__(self, data, app):
+        self.app = app
+        self._download_sat(data)
+
+    def _download_sat(self, data):
+        '''Descarga CFDIs del SAT a una carpeta local
+
+        Es copia sin refactorizar de _download_sat()
+        en admincfdi.Application'''
+
+        self = self.app
+
         self._set('msg_user', 'Abriendo Firefox...', True)
         page_query = self.g.SAT['page_receptor']
         if data['type_invoice'] == 1:
