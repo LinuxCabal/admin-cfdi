@@ -30,6 +30,18 @@ def process_command_line_arguments():
     parser.add_argument('--carpeta-destino',
                         help=help, default=default_carpeta_destino)
 
+    help = 'Descargar facturas emitidas. ' \
+           'Por omisión se descargan facturas recibidas'
+    parser.add_argument('--facturas-emitidas',
+                        action='store_const', const=1,
+                        help=help, default=2)
+
+    help = 'UUID. Por omisión no se usa en la búsqueda. ' \
+           'Esta opción tiene precedencia sobre las demás ' \
+           'opciones de búsqueda.'
+    parser.add_argument('--uuid',
+                        help=help, default='')
+
     today = datetime.date.today()
     help = 'Año. El valor por omisión es el año en curso'
     parser.add_argument('--año',
@@ -55,12 +67,12 @@ def main():
     page_cfdi = 'https://portalcfdi.facturaelectronica.sat.gob.mx/{}'
 
     rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
-    data = {'type_invoice': 0, # recibidas
-            'type_search': 0,  # por fecha
+    data = {'type_invoice': args.facturas_emitidas,
+            'type_search': 1 * (args.uuid != ''),
             'user_sat': {'target_sat': args.carpeta_destino,
                             'user_sat': rfc,
                             'password': pwd},
-            'search_uuid': '',
+            'search_uuid': args.uuid,
             'search_rfc': '',
             'search_year': args.año,
             'search_month': args.mes,
