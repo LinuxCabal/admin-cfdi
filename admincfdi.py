@@ -658,7 +658,7 @@ class Application(pygubu.TkApplication):
           que se seleccionaron, con las llaves
           ``user_sat``, ``password`` y ``target_sat``.
         - type_invoice: La selección hecha en
-          *Tipo de consulta*: 0 facturas recibidas,
+          *Tipo de consulta*: 2 facturas recibidas,
           1 facturas emitidas
         - type_search: La selección hecha en *Tipo
           de búsqueda*: 0 por fecha,
