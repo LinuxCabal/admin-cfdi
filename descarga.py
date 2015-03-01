@@ -1,3 +1,4 @@
+import argparse
 import time
 from unittest.mock import Mock
 from unittest.mock import MagicMock
@@ -11,7 +12,29 @@ def _set(widget_name, message, flag=True):
 def sleep(sec=1):
     time.sleep(sec)
 
+def process_command_line_arguments():
+    parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
+
+    default_archivo_credenciales = 'pwd'
+    help = 'Archivo con credenciales para el SAT. ' \
+           'RFC y CIEC en el primer renglón y ' \
+           'separadas por un espacio. ' \
+           'El predeterminado es %(default)s'
+    parser.add_argument('--archivo-de-credenciales',
+                        help=help, default=default_archivo_credenciales)
+
+    default_carpeta_destino = 'cfdi'
+    help = 'Carpeta local para guardar los CFDIs descargados ' \
+           'El predeterminado es %(default)s'
+    parser.add_argument('--carpeta-destino',
+                        help=help, default=default_carpeta_destino)
+
+    args=parser.parse_args()
+    return args
+
 def main():
+    args = process_command_line_arguments()
+
     page_init = 'https://cfdiau.sat.gob.mx/nidp/app/login?id=SATUPCFDiCon&' \
     'sid=0&option=credential&sid=0'
     page_cfdi = 'https://portalcfdi.facturaelectronica.sat.gob.mx/{}'
