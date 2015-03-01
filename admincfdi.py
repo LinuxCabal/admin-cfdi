@@ -635,10 +635,13 @@ class Application(pygubu.TkApplication):
 
         Las validaciones son:
 
-        - Al menos un par RFC y CIEC ha sido registrado
-        - Un par RFC y CIEC está seleccionado
+        - Al menos una tríada RFC, CIEC y carpeta
+          destino ha sido registrada
+        - Una tríada RFC, CIEC y carpeta destino
+          está seleccionada
         - La UUID no es nula y tiene 36 caracteres,
-          si se seleccionó búsqueda por UUID
+          si se seleccionó *Buscar por folio
+          fiscal (UUID)*
         - El RFC del emisor tiene 12 o 13
           caracteres, si se proporciona
 
