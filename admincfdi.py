@@ -648,17 +648,31 @@ class Application(pygubu.TkApplication):
         y se regresa (False, {})
 
         Si las validaciones pasan, se construye un
-        diccionario ``data`` con estas llaves:
+        diccionario ``data`` con estas llaves y valores:
 
-        - user_sat
-        - type_invoice
-        - type_search
-        - search_uuid
-        - search_rfc
-        - search_year
-        - search_month
-        - search_day
-        - sat_month
+        - user_sat: un diccionario con el
+          RFC, la CIEC y la carpeta destino
+          que se seleccionaron, con las llaves
+          ``user_sat``, ``password`` y ``target_sat``.
+        - type_invoice: La selección hecha en
+          *Tipo de consulta*: 0 facturas recibidas,
+          1 facturas emitidas
+        - type_search: La selección hecha en *Tipo
+          de búsqueda*: 0 por fecha,
+          1 por folio fiscal (UUID)
+        - search_uuid: el valor llenado para *UUID*,
+          es cadena vacía por omisión
+        - search_rfc: el valor llenado en *RFC Emisor*,
+          es cadena vacía por omisión
+        - search_year: el valor seleccionado en *Año*
+          como cadena, es el año en curso por omisión
+        - search_month: el valor seleccionado en *Mes*
+          como cadena, es el mes en curso por omisión
+        - search_day: el valor seleccionado en *Día*
+          como cadena, es '00' por omisión o si sat_month
+          es verdadero.
+        - sat_month: Representa la caja a la izquierda de
+          *Descargar mes completo por día*.
 
         La función regresa (True, data)
         '''
