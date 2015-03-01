@@ -39,10 +39,10 @@ def main():
     'sid=0&option=credential&sid=0'
     page_cfdi = 'https://portalcfdi.facturaelectronica.sat.gob.mx/{}'
 
-    rfc, pwd = open('pwd').readline()[:-1].split()
+    rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
     data = {'type_invoice': 0, # recibidas
             'type_search': 0,  # por fecha
-            'user_sat': {'target_sat': 'cfdi',
+            'user_sat': {'target_sat': args.carpeta_destino,
                             'user_sat': rfc,
                             'password': pwd},
             'search_uuid': '',
