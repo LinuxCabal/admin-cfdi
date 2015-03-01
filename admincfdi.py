@@ -631,6 +631,38 @@ class Application(pygubu.TkApplication):
         return
 
     def _validate_download_sat(self):
+        '''Valida requisitos y crea datos para descarga
+
+        Las validaciones son:
+
+        - Al menos un par RFC y CIEC ha sido registrado
+        - Un par RFC y CIEC está seleccionado
+        - La UUID no es nula y tiene 36 caracteres,
+          si se seleccionó búsqueda por UUID
+        - El RFC del emisor tiene 12 o 13
+          caracteres, si se proporciona
+
+        Si falta alguna de estas condiciones,
+        se abre un diálogo con un texto informativo
+        y un botón 'OK' en el ambiente gráfico
+        y se regresa (False, {})
+
+        Si las validaciones pasan, se construye un
+        diccionario ``data`` con estas llaves:
+
+        - user_sat
+        - type_invoice
+        - type_search
+        - search_uuid
+        - search_rfc
+        - search_year
+        - search_month
+        - search_day
+        - sat_month
+
+        La función regresa (True, data)
+        '''
+
         data = {}
         if not self.users_sat:
             msg = 'Agrega un RFC y contraseña a consultar'
