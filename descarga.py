@@ -20,6 +20,14 @@ def get_dates(year, month):
     d2 = '{}/{:02d}/{}'.format(days, month, year)
     return d1, d2
 
+def get_days(year, month):
+    import calendar
+    if isinstance(year, str):
+        year = int(year)
+    if isinstance(month, str):
+        month = int(month)
+    return calendar.monthrange(year, month)[1]
+
 def process_command_line_arguments():
     parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
 
@@ -102,6 +110,7 @@ def main():
     app._get_object.return_value = pb
     app.util.sleep = sleep
     app.util.get_dates.side_effect = get_dates
+    app.util.get_days.side_effect = get_days
 
     app.g.SAT = {
         'ftp': 'ftp2.sat.gob.mx',
