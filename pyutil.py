@@ -1871,3 +1871,55 @@ class DescargaSAT(object):
                 browser.close()
         app._set('msg_user', 'Desconectado...')
         return
+
+    def _download_sat_month(self, data, browser):
+        '''Descarga CFDIs del SAT a una carpeta local
+
+        Es copia sin refactorizar de _download_sat_month()
+        en admincfdi.Application'''
+
+        self = self.app
+
+        year = int(data['search_year'])
+        month = int(data['search_month'])
+        days_month = self.util.get_days(year, month) + 1
+        days = ['%02d' % x for x in range(1, days_month)]
+        for d in days:
+            combo = browser.find_element_by_id(self.g.SAT['day'])
+            sb = combo.get_attribute('sb')
+            combo = browser.find_element_by_id('sbToggle_{}'.format(sb))
+            combo.click()
+            self.util.sleep(2)
+            if data['search_month'] == d:
+                links = browser.find_elements_by_link_text(d)
+                for l in links:
+                    p = l.find_element_by_xpath(
+                        '..').find_element_by_xpath('..')
+                    sb2 = p.get_attribute('id')
+                    if sb in sb2:
+                        link = l
+                        break
+            else:
+                link = browser.find_element_by_link_text(d)
+            link.click()
+            self.util.sleep(2)
+            browser.find_element_by_id(self.g.SAT['submit']).click()
+            self.util.sleep(3)
+            docs = browser.find_elements_by_name(self.g.SAT['download'])
+            if docs:
+                t = len(docs)
+                pb = self._get_object('progressbar')
+                pb['maximum'] = t
+                pb.start()
+                for i, v in enumerate(docs):
+                    msg = 'Factura {} de {}'.format(i+1, t)
+                    pb['value'] = i + 1
+                    self._set('msg_user', msg, True)
+                    download = self.g.SAT['page_cfdi'].format(
+                        v.get_attribute('onclick').split("'")[1])
+                    browser.get(download)
+                    self.util.sleep()
+                pb['value'] = 0
+                pb.stop()
+                self.util.sleep()
+        return
