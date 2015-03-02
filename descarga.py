@@ -49,6 +49,10 @@ def process_command_line_arguments():
     parser.add_argument('--uuid',
                         help=help, default='')
 
+    help = 'RFC del emisor. Por omisión no se usa en la búsqueda.'
+    parser.add_argument('--rfc-emisor',
+                        help=help, default='')
+
     today = datetime.date.today()
     help = 'Año. El valor por omisión es el año en curso'
     parser.add_argument('--año',
@@ -80,7 +84,7 @@ def main():
                             'user_sat': rfc,
                             'password': pwd},
             'search_uuid': args.uuid,
-            'search_rfc': '',
+            'search_rfc': args.rfc_emisor,
             'search_year': args.año,
             'search_month': args.mes,
             'search_day': args.día,
