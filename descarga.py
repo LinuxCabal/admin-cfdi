@@ -67,6 +67,10 @@ def process_command_line_arguments():
     parser.add_argument('--día',
                         help=help, default='00')
 
+    help = 'Mes completo por día. Por omisión no se usa en la búsqueda.'
+    parser.add_argument('--mes-completo', action='store_const', const=True,
+                        help=help, default=False)
+
     args=parser.parse_args()
     return args
 
@@ -88,7 +92,7 @@ def main():
             'search_year': args.año,
             'search_month': args.mes,
             'search_day': args.día,
-            'sat_month': ''
+            'sat_month': args.mes_completo
             }
 
     app = Mock()
