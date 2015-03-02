@@ -83,25 +83,10 @@ def process_command_line_arguments():
     return args
 
 def main():
-    args = process_command_line_arguments()
 
     page_init = 'https://cfdiau.sat.gob.mx/nidp/app/login?id=SATUPCFDiCon&' \
     'sid=0&option=credential&sid=0'
     page_cfdi = 'https://portalcfdi.facturaelectronica.sat.gob.mx/{}'
-
-    rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
-    data = {'type_invoice': args.facturas_emitidas,
-            'type_search': 1 * (args.uuid != ''),
-            'user_sat': {'target_sat': args.carpeta_destino,
-                            'user_sat': rfc,
-                            'password': pwd},
-            'search_uuid': args.uuid,
-            'search_rfc': args.rfc_emisor,
-            'search_year': args.año,
-            'search_month': args.mes,
-            'search_day': args.día,
-            'sat_month': args.mes_completo
-            }
 
     app = Mock()
     app._set.side_effect = _set
@@ -139,6 +124,21 @@ def main():
         'page_receptor': page_cfdi.format('ConsultaReceptor.aspx'),
         'page_emisor': page_cfdi.format('ConsultaEmisor.aspx'),
         }
+
+    args = process_command_line_arguments()
+    rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
+    data = {'type_invoice': args.facturas_emitidas,
+            'type_search': 1 * (args.uuid != ''),
+            'user_sat': {'target_sat': args.carpeta_destino,
+                            'user_sat': rfc,
+                            'password': pwd},
+            'search_uuid': args.uuid,
+            'search_rfc': args.rfc_emisor,
+            'search_year': args.año,
+            'search_month': args.mes,
+            'search_day': args.día,
+            'sat_month': args.mes_completo
+            }
     descarga = DescargaSAT(data, app)
 
 
