@@ -13,6 +13,13 @@ def _set(widget_name, message, flag=True):
 def sleep(sec=1):
     time.sleep(sec)
 
+def get_dates(year, month):
+    import calendar
+    days = calendar.monthrange(year, month)[1]
+    d1 = '01/{:02d}/{}'.format(month, year)
+    d2 = '{}/{:02d}/{}'.format(days, month, year)
+    return d1, d2
+
 def process_command_line_arguments():
     parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
 
@@ -86,6 +93,7 @@ def main():
     pb = MagicMock()
     app._get_object.return_value = pb
     app.util.sleep = sleep
+    app.util.get_dates.side_effect = get_dates
 
     app.g.SAT = {
         'ftp': 'ftp2.sat.gob.mx',
