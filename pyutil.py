@@ -1654,6 +1654,7 @@ class CFDIPDF(object):
 class DescargaSAT(object):
 
     def __init__(self, data, app):
+        self.util = Util()
         self.app = app
         self._download_sat(data)
 
@@ -1712,10 +1713,10 @@ class DescargaSAT(object):
             txt = browser.find_element_by_name(app.g.SAT['password'])
             txt.send_keys(data['user_sat']['password'])
             txt.submit()
-            app.util.sleep(3)
+            self.util.sleep(3)
             app._set('msg_user', 'Conectado...', True)
             browser.get(page_query)
-            app.util.sleep(3)
+            self.util.sleep(3)
             app._set('msg_user', 'Buscando...', True)
             if data['type_search'] == 1:
                 txt = browser.find_element_by_id(app.g.SAT['uuid'])
@@ -1725,7 +1726,7 @@ class DescargaSAT(object):
                 # Descargar por fecha
                 opt = browser.find_element_by_id(app.g.SAT['date'])
                 opt.click()
-                app.util.sleep()
+                self.util.sleep()
                 if data['search_rfc']:
                     if data['type_search'] == 1:
                         txt = browser.find_element_by_id(app.g.SAT['receptor'])
@@ -1736,7 +1737,7 @@ class DescargaSAT(object):
                 if data['type_invoice'] == 1:
                     year = int(data['search_year'])
                     month = int(data['search_month'])
-                    dates = app.util.get_dates(year, month)
+                    dates = self.util.get_dates(year, month)
                     txt = browser.find_element_by_id(app.g.SAT['date_from'])
                     arg = "document.getElementsByName('{}')[0]." \
                         "removeAttribute('disabled');".format(
@@ -1758,27 +1759,27 @@ class DescargaSAT(object):
                     combo = browser.find_element_by_id(
                         'sbToggle_{}'.format(combo.get_attribute('sb')))
                     combo.click()
-                    app.util.sleep(2)
+                    self.util.sleep(2)
                     link = browser.find_element_by_link_text(
                         data['search_year'])
                     link.click()
-                    app.util.sleep(2)
+                    self.util.sleep(2)
                     combo = browser.find_element_by_id(app.g.SAT['month'])
                     combo = browser.find_element_by_id(
                         'sbToggle_{}'.format(combo.get_attribute('sb')))
                     combo.click()
-                    app.util.sleep(2)
+                    self.util.sleep(2)
                     link = browser.find_element_by_link_text(
                         data['search_month'])
                     link.click()
-                    app.util.sleep(2)
+                    self.util.sleep(2)
                     if data['search_day'] != '00':
                         combo = browser.find_element_by_id(app.g.SAT['day'])
                         sb = combo.get_attribute('sb')
                         combo = browser.find_element_by_id(
                             'sbToggle_{}'.format(sb))
                         combo.click()
-                        app.util.sleep()
+                        self.util.sleep()
                         if data['search_month'] == data['search_day']:
                             links = browser.find_elements_by_link_text(
                                 data['search_day'])
@@ -1793,13 +1794,13 @@ class DescargaSAT(object):
                             link = browser.find_element_by_link_text(
                                 data['search_day'])
                         link.click()
-                        app.util.sleep()
+                        self.util.sleep()
 
             browser.find_element_by_id(app.g.SAT['submit']).click()
             sec = 3
             if data['type_invoice'] != 1 and data['search_day'] == '00':
                 sec = 15
-            app.util.sleep(sec)
+            self.util.sleep(sec)
             # Bug del SAT
             if data['type_invoice'] != 1 and data['search_day'] != '00':
                 combo = browser.find_element_by_id(app.g.SAT['day'])
@@ -1807,7 +1808,7 @@ class DescargaSAT(object):
                 combo = browser.find_element_by_id(
                     'sbToggle_{}'.format(sb))
                 combo.click()
-                app.util.sleep(2)
+                self.util.sleep(2)
                 if data['search_month'] == data['search_day']:
                     links = browser.find_elements_by_link_text(
                         data['search_day'])
@@ -1822,9 +1823,9 @@ class DescargaSAT(object):
                     link = browser.find_element_by_link_text(
                         data['search_day'])
                 link.click()
-                app.util.sleep(2)
+                self.util.sleep(2)
                 browser.find_element_by_id(app.g.SAT['submit']).click()
-                app.util.sleep(sec)
+                self.util.sleep(sec)
             elif data['type_invoice'] == 2 and data['sat_month']:
                 return self._download_sat_month(data, browser)
 
@@ -1855,7 +1856,7 @@ class DescargaSAT(object):
                     browser.get(download)
                 pb['value'] = 0
                 pb.stop()
-                app.util.sleep()
+                self.util.sleep()
             else:
                 app._set('msg_user', 'Sin facturas...', True)
         except Exception as e:
@@ -1881,14 +1882,14 @@ class DescargaSAT(object):
 
         year = int(data['search_year'])
         month = int(data['search_month'])
-        days_month = app.util.get_days(year, month) + 1
+        days_month = self.util.get_days(year, month) + 1
         days = ['%02d' % x for x in range(1, days_month)]
         for d in days:
             combo = browser.find_element_by_id(app.g.SAT['day'])
             sb = combo.get_attribute('sb')
             combo = browser.find_element_by_id('sbToggle_{}'.format(sb))
             combo.click()
-            app.util.sleep(2)
+            self.util.sleep(2)
             if data['search_month'] == d:
                 links = browser.find_elements_by_link_text(d)
                 for l in links:
@@ -1901,9 +1902,9 @@ class DescargaSAT(object):
             else:
                 link = browser.find_element_by_link_text(d)
             link.click()
-            app.util.sleep(2)
+            self.util.sleep(2)
             browser.find_element_by_id(app.g.SAT['submit']).click()
-            app.util.sleep(3)
+            self.util.sleep(3)
             docs = browser.find_elements_by_name(app.g.SAT['download'])
             if docs:
                 t = len(docs)
@@ -1917,8 +1918,8 @@ class DescargaSAT(object):
                     download = app.g.SAT['page_cfdi'].format(
                         v.get_attribute('onclick').split("'")[1])
                     browser.get(download)
-                    app.util.sleep()
+                    self.util.sleep()
                 pb['value'] = 0
                 pb.stop()
-                app.util.sleep()
+                self.util.sleep()
         return
