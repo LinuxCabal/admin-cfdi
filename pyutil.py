@@ -1654,11 +1654,13 @@ class CFDIPDF(object):
 
 class DescargaSAT(object):
 
-    def __init__(self, data, app, status_callback=print):
+    def __init__(self, data, app, status_callback=print,
+            download_callback=print):
         self.g = Global()
         self.util = Util()
         self.app = app
         self.status = status_callback
+        self.progress = download_callback
         self._download_sat(data)
 
     def _download_sat(self, data):
@@ -1847,18 +1849,14 @@ class DescargaSAT(object):
             if found:
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
                 t = len(docs)
-                pb = app._get_object('progressbar')
-                pb['maximum'] = t
-                pb.start()
                 for i, v in enumerate(docs):
                     msg = 'Factura {} de {}'.format(i+1, t)
-                    pb['value'] = i + 1
+                    self.progress(i + 1, t)
                     self.status(msg)
                     download = self.g.SAT['page_cfdi'].format(
                         v.get_attribute('onclick').split("'")[1])
                     browser.get(download)
-                pb['value'] = 0
-                pb.stop()
+                self.progress(0, t)
                 self.util.sleep()
             else:
                 self.status('Sin facturas...')
@@ -1911,18 +1909,14 @@ class DescargaSAT(object):
             docs = browser.find_elements_by_name(self.g.SAT['download'])
             if docs:
                 t = len(docs)
-                pb = app._get_object('progressbar')
-                pb['maximum'] = t
-                pb.start()
                 for i, v in enumerate(docs):
                     msg = 'Factura {} de {}'.format(i+1, t)
-                    pb['value'] = i + 1
+                    self.progress(i + 1, t)
                     self.status(msg)
                     download = self.g.SAT['page_cfdi'].format(
                         v.get_attribute('onclick').split("'")[1])
                     browser.get(download)
                     self.util.sleep()
-                pb['value'] = 0
-                pb.stop()
+                self.progress(0, t)
                 self.util.sleep()
         return

@@ -2,15 +2,11 @@ import argparse
 import time
 import datetime
 from unittest.mock import Mock
-from unittest.mock import MagicMock
 
 from pyutil import DescargaSAT
 
 
 app = Mock()
-
-pb = MagicMock()
-app._get_object.return_value = pb
 
 def process_command_line_arguments():
     parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
