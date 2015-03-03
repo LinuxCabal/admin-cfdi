@@ -1654,19 +1654,16 @@ class CFDIPDF(object):
 
 class DescargaSAT(object):
 
-    def __init__(self, data, app, status_callback=print,
+    def __init__(self, data, status_callback=print,
             download_callback=print):
         self.g = Global()
         self.util = Util()
-        self.app = app
         self.status = status_callback
         self.progress = download_callback
         self._download_sat(data)
 
     def _download_sat(self, data):
         'Descarga CFDIs del SAT a una carpeta local'
-
-        app = self.app
 
         self.status('Abriendo Firefox...')
         page_query = self.g.SAT['page_receptor']
@@ -1878,8 +1875,6 @@ class DescargaSAT(object):
         '''Descarga CFDIs del SAT a una carpeta local
 
         Todos los CFDIs del mes selecionado'''
-
-        app = self.app
 
         year = int(data['search_year'])
         month = int(data['search_month'])

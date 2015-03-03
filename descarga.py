@@ -1,12 +1,9 @@
 import argparse
 import time
 import datetime
-from unittest.mock import Mock
 
 from pyutil import DescargaSAT
 
-
-app = Mock()
 
 def process_command_line_arguments():
     parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
@@ -78,7 +75,7 @@ def main():
             'search_day': args.día,
             'sat_month': args.mes_completo
             }
-    descarga = DescargaSAT(data, app)
+    descarga = DescargaSAT(data)
 
 
 if __name__ == '__main__':
