@@ -18,6 +18,7 @@ from pyutil import Util
 from pyutil import Mail
 from pyutil import LibO
 from pyutil import CFDIPDF
+from pyutil import DescargaSAT
 from values import Global
 
 
@@ -367,11 +368,21 @@ class Application(pygubu.TkApplication):
         self.util.combo_values(combo, days, 0)
         return
 
+    def msg_user(self, msg):
+        self._set('msg_user', msg, True)
+
+    def progress(self, value, maximum):
+        pb = self._get_object('progressbar')
+        pb['value'] = value
+        pb['maximum'] = maximum
+        self.parent.update_idletasks()
+
     def button_download_sat_click(self):
         ok, data = self._validate_download_sat()
         if not ok:
             return
-        self._download_sat(data)
+        DescargaSAT(data, status_callback=self.msg_user,
+                    download_callback=self.progress)
         return
 
     def _download_sat(self, data):
