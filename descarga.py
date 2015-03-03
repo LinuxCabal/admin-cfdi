@@ -7,11 +7,7 @@ from unittest.mock import MagicMock
 from pyutil import DescargaSAT
 
 
-def _set(widget_name, message, flag=True):
-    print(message)
-
 app = Mock()
-app._set.side_effect = _set
 
 pb = MagicMock()
 app._get_object.return_value = pb

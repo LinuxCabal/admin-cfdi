@@ -1654,10 +1654,11 @@ class CFDIPDF(object):
 
 class DescargaSAT(object):
 
-    def __init__(self, data, app):
+    def __init__(self, data, app, status_callback=print):
         self.g = Global()
         self.util = Util()
         self.app = app
+        self.status = status_callback
         self._download_sat(data)
 
     def _download_sat(self, data):
@@ -1665,7 +1666,7 @@ class DescargaSAT(object):
 
         app = self.app
 
-        app._set('msg_user', 'Abriendo Firefox...', True)
+        self.status('Abriendo Firefox...')
         page_query = self.g.SAT['page_receptor']
         if data['type_invoice'] == 1:
             page_query = self.g.SAT['page_emisor']
@@ -1708,7 +1709,7 @@ class DescargaSAT(object):
             'browser.download.animateNotifications', False)
         try:
             browser = webdriver.Firefox(profile)
-            app._set('msg_user', 'Conectando...', True)
+            self.status('Conectando...')
             browser.get(self.g.SAT['page_init'])
             txt = browser.find_element_by_name(self.g.SAT['user'])
             txt.send_keys(data['user_sat']['user_sat'])
@@ -1716,10 +1717,10 @@ class DescargaSAT(object):
             txt.send_keys(data['user_sat']['password'])
             txt.submit()
             self.util.sleep(3)
-            app._set('msg_user', 'Conectado...', True)
+            self.status('Conectado...')
             browser.get(page_query)
             self.util.sleep(3)
-            app._set('msg_user', 'Buscando...', True)
+            self.status('Buscando...')
             if data['type_search'] == 1:
                 txt = browser.find_element_by_id(self.g.SAT['uuid'])
                 txt.click()
@@ -1852,7 +1853,7 @@ class DescargaSAT(object):
                 for i, v in enumerate(docs):
                     msg = 'Factura {} de {}'.format(i+1, t)
                     pb['value'] = i + 1
-                    app._set('msg_user', msg, True)
+                    self.status(msg)
                     download = self.g.SAT['page_cfdi'].format(
                         v.get_attribute('onclick').split("'")[1])
                     browser.get(download)
@@ -1860,19 +1861,19 @@ class DescargaSAT(object):
                 pb.stop()
                 self.util.sleep()
             else:
-                app._set('msg_user', 'Sin facturas...', True)
+                self.status('Sin facturas...')
         except Exception as e:
             print (e)
         finally:
             try:
-                app._set('msg_user', 'Desconectando...', True)
+                self.status('Desconectando...')
                 link = browser.find_element_by_partial_link_text('Cerrar Sesi')
                 link.click()
             except:
                 pass
             finally:
                 browser.close()
-        app._set('msg_user', 'Desconectado...')
+        self.status('Desconectado...')
         return
 
     def _download_sat_month(self, data, browser):
@@ -1916,7 +1917,7 @@ class DescargaSAT(object):
                 for i, v in enumerate(docs):
                     msg = 'Factura {} de {}'.format(i+1, t)
                     pb['value'] = i + 1
-                    app._set('msg_user', msg, True)
+                    self.status(msg)
                     download = self.g.SAT['page_cfdi'].format(
                         v.get_attribute('onclick').split("'")[1])
                     browser.get(download)
