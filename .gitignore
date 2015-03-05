@@ -1,5 +1,6 @@
 *.pyc
 *.ini
 *.log
+*.swp
 =======
 docs/_build
