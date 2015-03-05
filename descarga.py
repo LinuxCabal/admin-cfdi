@@ -53,7 +53,7 @@ def process_command_line_arguments():
                         help=help, default='00')
 
     help = 'Mes completo por día. Por omisión no se usa en la búsqueda.'
-    parser.add_argument('--mes-completo', action='store_const', const=True,
+    parser.add_argument('--mes-completo-por-día', action='store_const', const=True,
                         help=help, default=False)
 
     args=parser.parse_args()
@@ -73,7 +73,7 @@ def main():
             'search_year': args.año,
             'search_month': args.mes,
             'search_day': args.día,
-            'sat_month': args.mes_completo
+            'sat_month': args.mes_completo_por_día
             }
     descarga = DescargaSAT(data)
 
