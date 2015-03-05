@@ -1,6 +1,7 @@
 import argparse
 import time
 import datetime
+import os
 
 from pyutil import DescargaSAT
 
@@ -8,7 +9,7 @@ from pyutil import DescargaSAT
 def process_command_line_arguments():
     parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
 
-    default_archivo_credenciales = 'pwd'
+    default_archivo_credenciales = os.path.join('credenciales.conf')
     help = 'Archivo con credenciales para el SAT. ' \
            'RFC y CIEC en el primer renglón y ' \
            'separadas por un espacio. ' \
