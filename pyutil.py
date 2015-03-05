@@ -15,7 +15,6 @@ import os
 import sys
 import re
 import csv
-import glob
 import json
 import ftplib
 import time
@@ -341,10 +340,11 @@ class Util(object):
         return target
 
     def get_files(self, path, ext='*.xml'):
-        files = []
-        for folder,_,_ in os.walk(path):
-            files.extend(glob.glob(os.path.join(folder, ext.lower())))
-        return tuple(files)
+        xmls = []
+        for folder, _, files in os.walk(path):
+            pattern = re.compile('\.xml', re.IGNORECASE)
+            xmls += [os.path.join(folder,f) for f in files if pattern.search(f)]
+        return tuple(xmls)
 
     def join(self, *paths):
         return os.path.join(*paths)
