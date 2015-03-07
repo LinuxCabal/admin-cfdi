@@ -2,6 +2,7 @@ import argparse
 import time
 import datetime
 import os
+import getpass
 
 from pyutil import DescargaSAT
 
@@ -68,7 +69,11 @@ def process_command_line_arguments():
 def main():
 
     args = process_command_line_arguments()
-    rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
+    if args.solicitar_credenciales:
+        rfc = input('RFC: ')
+        pwd = getpass.getpass('CIEC: ')
+    else:
+        rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
     data = {'type_invoice': args.facturas_emitidas,
             'type_search': 1 * (args.uuid != ''),
             'user_sat': {'target_sat': args.carpeta_destino,
