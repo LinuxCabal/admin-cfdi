@@ -17,6 +17,11 @@ def process_command_line_arguments():
     parser.add_argument('--archivo-de-credenciales',
                         help=help, default=default_archivo_credenciales)
 
+    help = 'Solicitar credenciales para el SAT al inicio. '
+    parser.add_argument('--solicitar-credenciales',
+                        action='store_const', const=True,
+                        help=help, default=False)
+
     default_carpeta_destino = 'cfdi'
     help = 'Carpeta local para guardar los CFDIs descargados ' \
            'El predeterminado es %(default)s'
