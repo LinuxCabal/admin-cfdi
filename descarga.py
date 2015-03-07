@@ -23,7 +23,8 @@ def process_command_line_arguments():
                         action='store_const', const=True,
                         help=help, default=False)
 
-    default_carpeta_destino = 'cfdi'
+    default_carpeta_destino = os.path.join(
+            os.environ.get('HOME'), 'cfdi-descarga')
     help = 'Carpeta local para guardar los CFDIs descargados ' \
            'El predeterminado es %(default)s'
     parser.add_argument('--carpeta-destino',
