@@ -55,8 +55,7 @@ def process_command_line_arguments():
     parser.add_argument('--mes',
                         help=help, default='{:02d}'.format(today.month))
 
-    help = "Día. El valor por omisión es '00', " \
-           'significa no usar el día en la búsqueda'
+    help = 'Día. Por omisión no se usa en la búsqueda.'
     parser.add_argument('--día',
                         help=help, default='00')
 
