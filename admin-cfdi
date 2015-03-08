@@ -381,8 +381,9 @@ class Application(pygubu.TkApplication):
         ok, data = self._validate_download_sat()
         if not ok:
             return
-        DescargaSAT(data, status_callback=self.msg_user,
-                    download_callback=self.progress)
+        DescargaSAT(status_callback=self.msg_user,
+                    download_callback=self.progress,
+                    **data)
         return
 
     def _validate_download_sat(self):
@@ -472,16 +473,19 @@ class Application(pygubu.TkApplication):
             search_day = '00'
         else:
             search_day = self._get('search_day')
+        user = self.users_sat[current_user]
         data = {
-            'user_sat': self.users_sat[current_user],
-            'type_invoice': self._get('type_invoice'),
+            'facturas_emitidas': self._get('type_invoice'),
             'type_search': opt,
-            'search_uuid': uuid,
-            'search_rfc': rfc,
-            'search_year': self._get('search_year'),
-            'search_month': self._get('search_month'),
-            'search_day': search_day,
-            'sat_month': sat_month,
+            'rfc': user['user_sat'],
+            'ciec': user['password'],
+            'carpeta_destino': user['target_sat'],
+            'uuid': uuid,
+            'rfc_emisor': rfc,
+            'año': self._get('search_year'),
+            'mes': self._get('search_month'),
+            'día': search_day,
+            'mes_completo_por_día': sat_month,
         }
 
         return True, data

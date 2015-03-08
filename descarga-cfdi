@@ -88,19 +88,19 @@ def main():
         pwd = getpass.getpass('CIEC: ')
     else:
         rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
-    data = {'type_invoice': args.facturas_emitidas,
+    data = {'facturas_emitidas': args.facturas_emitidas,
             'type_search': 1 * (args.uuid != ''),
-            'user_sat': {'target_sat': args.carpeta_destino,
-                            'user_sat': rfc,
-                            'password': pwd},
-            'search_uuid': args.uuid,
-            'search_rfc': args.rfc_emisor,
-            'search_year': args.año,
-            'search_month': args.mes,
-            'search_day': args.día,
-            'sat_month': args.mes_completo_por_día
+            'rfc': rfc,
+            'ciec': pwd,
+            'carpeta_destino': args.carpeta_destino,
+            'uuid': args.uuid,
+            'rfc_emisor': args.rfc_emisor,
+            'año': args.año,
+            'mes': args.mes,
+            'día': args.día,
+            'mes_completo_por_día': args.mes_completo_por_día
             }
-    descarga = DescargaSAT(data)
+    descarga = DescargaSAT(**data)
 
 
 if __name__ == '__main__':
