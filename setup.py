@@ -11,8 +11,9 @@ setup(name='Admin-CFDI',
       author='Mauricio Baeza',
       author_email='correopublico@mauriciobaeza.org',
       url='https://facturalibre.net/servicios/',
+      packages=find_packages(),
       install_requires=['pygubu', 'selenium', 'pyqrcode', 'pysimplesoap'],
-      py_modules=['pyutil', 'values', 'template'],
-      scripts=['admincfdi.py'])
+      package_data = {'': ['img/*.png', 'img/*.gif', 'ui/*']},
+      scripts=['admin-cfdi'])
 
 # vim: ts=4 et sw=4

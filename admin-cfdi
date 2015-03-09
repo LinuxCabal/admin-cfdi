@@ -14,12 +14,8 @@
 import tkinter as tk
 import pygubu
 from selenium import webdriver
-from pyutil import Util
-from pyutil import Mail
-from pyutil import LibO
-from pyutil import CFDIPDF
-from pyutil import DescargaSAT
-from values import Global
+from admincfdi.pyutil import Util, Mail, LibO, CFDIPDF
+from admincfdi.values import Global
 
 
 class Application(pygubu.TkApplication):
