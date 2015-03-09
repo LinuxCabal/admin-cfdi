@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+''' Setup for Admin CFDI '''
+
 from distutils.core import setup
 
 setup(name='Admin-CFDI',
