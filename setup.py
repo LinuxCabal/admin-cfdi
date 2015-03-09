@@ -11,6 +11,7 @@ setup(name='Admin-CFDI',
       author='Mauricio Baeza',
       author_email='correopublico@mauriciobaeza.org',
       url='https://facturalibre.net/servicios/',
+      install_requires=['pygubu', 'selenium'],
       py_modules=['pyutil', 'values', 'template'],
       scripts=['admincfdi.py'])
 
