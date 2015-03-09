@@ -51,11 +51,11 @@ LINUX = 'linux'
 
 if sys.platform == WIN:
     from win32com.client import Dispatch
-elif sys.platform == LINUX:
-    import uno
-    from com.sun.star.beans import PropertyValue
-    from com.sun.star.beans.PropertyState import DIRECT_VALUE
-    from com.sun.star.awt import Size
+#elif sys.platform == LINUX:
+#    import uno
+#    from com.sun.star.beans import PropertyValue
+#    from com.sun.star.beans.PropertyState import DIRECT_VALUE
+#    from com.sun.star.awt import Size
 
 
 class SAT(object):
