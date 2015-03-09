@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 ''' Setup for Admin CFDI '''
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(name='Admin-CFDI',
       version='0.2.6',
