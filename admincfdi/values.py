@@ -23,7 +23,7 @@ class Global(object):
     OS = sys.platform
     MAIN = 'mainwindow'
     TITLE = 'Admin CFDI - Factura Libre'
-    CWD = os.getcwd()
+    CWD = os.path.dirname(__file__)
     PATHS = {
         'current': CWD,
         'img': os.path.join(CWD, 'img'),
