@@ -1,6 +1,8 @@
 import argparse
 import time
 import datetime
+import os
+import getpass
 
 from pyutil import DescargaSAT
 
@@ -8,7 +10,7 @@ from pyutil import DescargaSAT
 def process_command_line_arguments():
     parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
 
-    default_archivo_credenciales = 'pwd'
+    default_archivo_credenciales = 'credenciales.conf'
     help = 'Archivo con credenciales para el SAT. ' \
            'RFC y CIEC en el primer renglón y ' \
            'separadas por un espacio. ' \
@@ -16,7 +18,13 @@ def process_command_line_arguments():
     parser.add_argument('--archivo-de-credenciales',
                         help=help, default=default_archivo_credenciales)
 
-    default_carpeta_destino = 'cfdi'
+    help = 'Solicitar credenciales para el SAT al inicio. '
+    parser.add_argument('--solicitar-credenciales',
+                        action='store_const', const=True,
+                        help=help, default=False)
+
+    default_carpeta_destino = os.path.join(
+            os.environ.get('HOME'), 'cfdi-descarga')
     help = 'Carpeta local para guardar los CFDIs descargados ' \
            'El predeterminado es %(default)s'
     parser.add_argument('--carpeta-destino',
@@ -47,13 +55,12 @@ def process_command_line_arguments():
     parser.add_argument('--mes',
                         help=help, default='{:02d}'.format(today.month))
 
-    help = "Día. El valor por omisión es '00', " \
-           'significa no usar el día en la búsqueda'
+    help = 'Día. Por omisión no se usa en la búsqueda.'
     parser.add_argument('--día',
                         help=help, default='00')
 
     help = 'Mes completo por día. Por omisión no se usa en la búsqueda.'
-    parser.add_argument('--mes-completo', action='store_const', const=True,
+    parser.add_argument('--mes-completo-por-día', action='store_const', const=True,
                         help=help, default=False)
 
     args=parser.parse_args()
@@ -62,7 +69,11 @@ def process_command_line_arguments():
 def main():
 
     args = process_command_line_arguments()
-    rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
+    if args.solicitar_credenciales:
+        rfc = input('RFC: ')
+        pwd = getpass.getpass('CIEC: ')
+    else:
+        rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
     data = {'type_invoice': args.facturas_emitidas,
             'type_search': 1 * (args.uuid != ''),
             'user_sat': {'target_sat': args.carpeta_destino,
@@ -73,7 +84,7 @@ def main():
             'search_year': args.año,
             'search_month': args.mes,
             'search_day': args.día,
-            'sat_month': args.mes_completo
+            'sat_month': args.mes_completo_por_día
             }
     descarga = DescargaSAT(data)
 
