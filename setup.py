@@ -14,6 +14,6 @@ setup(name='Admin-CFDI',
       packages=find_packages(),
       install_requires=['pygubu', 'selenium', 'pyqrcode', 'pysimplesoap'],
       package_data = {'': ['img/*.png', 'img/*.gif', 'ui/*']},
-      scripts=['admin-cfdi'])
+      scripts=['admin-cfdi','descarga-cfdi'])
 
 # vim: ts=4 et sw=4
