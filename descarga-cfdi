@@ -4,7 +4,7 @@ import datetime
 import os
 import getpass
 
-from pyutil import DescargaSAT
+from admincfdi.pyutil import DescargaSAT
 
 
 def process_command_line_arguments():
