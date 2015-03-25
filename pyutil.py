@@ -37,6 +37,7 @@ from tkinter import messagebox
 from pysimplesoap.client import SoapClient, SoapFault
 from selenium import webdriver
 from values import Global
+from fpdf import FPDF
 try:
     from subprocess import DEVNULL
 except ImportError:
@@ -332,6 +333,10 @@ class Util(object):
         else:
             return data[index]
 
+    def replace_extension(self, path, new_ext):
+        path, _, name, _ = self.get_path_info(path)
+        return self.join(path, name + new_ext)
+
     def path_join(self, *paths):
         return os.path.join(*paths)
 
@@ -341,10 +346,10 @@ class Util(object):
             target = path.replace('/', '\\')
         return target
 
-    def get_files(self, path, ext='*.xml'):
+    def get_files(self, path, ext='xml'):
         xmls = []
         for folder, _, files in os.walk(path):
-            pattern = re.compile('\.xml', re.IGNORECASE)
+            pattern = re.compile('\.{}'.format(ext), re.IGNORECASE)
             xmls += [os.path.join(folder,f) for f in files if pattern.search(f)]
         return tuple(xmls)
 
@@ -1915,3 +1920,764 @@ class DescargaSAT(object):
                 self.progress(0, t)
                 self.util.sleep()
         return
+
+
+class CSVPDF(FPDF):
+    """
+        Genera un PDF a partir de un CSV
+    """
+    G = Global()
+    TITULO1 = {
+        '2.0': 'Datos CFD',
+        '2.2': 'Datos CFD',
+        '3.0': 'Datos CFDI',
+        '3.2': 'Datos CFDI'
+    }
+    TITULO2 = {
+        '2.0': 'Año Aprobación:',
+        '2.2': 'Año Aprobación:',
+        '3.0': 'Serie CSD SAT:',
+        '3.2': 'Serie CSD SAT:'
+    }
+    TITULO3 = {
+        '2.0': 'N° Aprobación:',
+        '2.2': 'N° Aprobación:',
+        '3.0': 'Folio Fiscal:',
+        '3.2': 'Folio Fiscal:'
+    }
+    SPACE = 8
+    LIMIT_MARGIN = 260
+    DECIMALES = 2
+
+    def __init__(self, path_xml, status_callback=print):
+        super().__init__(format='Letter')
+        self.status = status_callback
+        try:
+            self.xml = ET.parse(path_xml).getroot()
+            self.status('Generando: {}'.format(path_xml))
+        except Exception as e:
+            self.xml = None
+            self.status('Error al parsear: {}'.format(path_xml))
+            self.status(str(e))
+        self.compress = False
+        self.error = ''
+        self.set_auto_page_break(True, margin=15)
+        self.SetRightMargin = 15
+        self.SetTopMargin = 5
+        self.set_draw_color(50, 50, 50)
+        self.set_title('Factura Libre')
+        self.set_author('www.facturalibre.net')
+        self.line_width = 0.1
+        self.alias_nb_pages()
+        self.pos_size = {'x': 0, 'y': 0, 'w': 0, 'h': 0}
+        self.y_detalle = 80
+        self.data = {}
+        self.elements = {}
+        decimales = self.DECIMALES
+        if self.xml:
+            self.version = self.xml.attrib['version']
+            self.cadena = self._get_cadena(path_xml, self.version)
+            self._parse_csv()
+            decimales = len(self.xml.attrib['total'].split('.')[1])
+        self.currency = '{0:,.%sf}' % decimales
+        self.monedas = {
+            'peso': ('peso', '$', 'm.n.'),
+            'pesos': ('peso', '$', 'm.n.'),
+            'mxn': ('peso', '$', 'm.n.'),
+            'mxp': ('peso', '$', 'm.n.'),
+            'euro': ('euro', '€', '€'),
+            'euros': ('euro', '€', '€'),
+            'dolar': ('dolar', '$', 'usd'),
+            'dolares': ('dolar', '$', 'usd'),
+            'usd': ('dolar', '$', 'usd'),
+        }
+        self.timbre = ''
+
+    def make_pdf(self):
+        self.add_page()
+        self._set_detalle(self.G.PREFIX[self.version])
+        self._set_totales(self.G.PREFIX[self.version])
+        self._set_comprobante2(self.G.PREFIX[self.version])
+        return
+
+    def header(self):
+        self._set_emisor(self.G.PREFIX[self.version])
+        self._set_receptor(self.G.PREFIX[self.version])
+        self._set_comprobante(self.G.PREFIX[self.version])
+        self._set_encabezados_detalle()
+        pass
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Helvetica', '', 8)
+        self.set_text_color(*self._rgb(0))
+        self.cell(0, 10, 'Página %s de {nb}' % self.page_no(), 0, 0, 'R')
+        self.set_x(10)
+        s = 'Factura elaborada con software libre '
+        self.cell(0, 10, s, 0, 0, 'L')
+        self.set_x(10 + self.get_string_width(s))
+        self.set_text_color(*self._rgb(6291456))
+        self.cell(0, 10, 'www.facturalibre.net', 0, 0, 'L',
+            link='www.facturalibre.net')
+
+    def _verify_margin(self, h=0):
+        mb = self.y + h
+        if mb > self.LIMIT_MARGIN:
+            self.add_page()
+            self.set_y(self.y_detalle)
+        return
+
+    def _set_leyendas(self, pre):
+        com = self.xml.find('%sComplemento' % pre)
+        if com is None:
+            return
+        nodo = com.find('%sLeyendasFiscales' % self.G.PREFIX['LEYENDAS'])
+        if nodo is None:
+            return
+        for leyenda in list(nodo):
+            if 'disposicionFiscal' in leyenda.attrib:
+                self.elements['fiscal1_titulo']['y'] = self.y
+                self.elements['fiscal1']['y'] = self.y
+                self._write_text('fiscal1_titulo')
+                self._write_text('fiscal1', leyenda.attrib['disposicionFiscal'])
+            if 'norma' in leyenda.attrib:
+                self.elements['fiscal2_titulo']['y'] = self.y
+                self.elements['fiscal2']['y'] = self.y
+                self._write_text('fiscal2_titulo')
+                self._write_text('fiscal2', leyenda.attrib['norma'])
+            self.elements['fiscal_leyenda']['y'] = self.y + 5
+            self._write_text('fiscal_leyenda', leyenda.attrib['textoLeyenda'])
+        self.ln(self.SPACE)
+        return
+
+    def _set_donataria(self, pre):
+        com = self.xml.find('%sComplemento' % pre)
+        if com is None: return
+        nodo = com.find('%sDonatarias' % self.G.PREFIX['DONATARIA'])
+        if nodo is None: return
+        self.elements['dona_aut_titulo']['y'] = self.y
+        self.elements['dona_aut']['y'] = self.y
+        self._write_text('dona_aut_titulo')
+        self._write_text('dona_aut', nodo.attrib['noAutorizacion'])
+        self.elements['dona_fecha_titulo']['y'] = self.y
+        self.elements['dona_fecha']['y'] = self.y
+        self._write_text('dona_fecha_titulo')
+        self._write_text('dona_fecha', nodo.attrib['fechaAutorizacion'])
+        self.elements['dona_leyenda']['y'] = self.y + 5
+        self._write_text('dona_leyenda', nodo.attrib['leyenda'])
+        self.ln(self.SPACE)
+        return
+
+    def _set_comprobante2(self, pre):
+        fields = (
+            ('Moneda', 'Moneda'),
+            ('TipoCambio', u'Tipo de cambio'),
+            ('formaDePago', u'Forma de pago'),
+            ('condicionesDePago', u'Condiciones de pago'),
+            ('metodoDePago', u'Método de pago'),
+            ('NumCtaPago', u'Cuenta de pago'),
+        )
+        self._verify_margin(20)
+        self._set_donataria(pre)
+        self._verify_margin(20)
+        self._set_leyendas(pre)
+        self._verify_margin(20)
+        for f in fields:
+            if f[0] in self.xml.attrib:
+                self._write_otros(f[1], self.xml.attrib[f[0]])
+        self.ln(self.SPACE)
+        if self.timbre:
+            qr_data = '?re=%s&rr=%s&tt=%s&id=%s' % (
+                self.data['emisor_rfc'],
+                self.data['receptor_rfc'],
+                '%017.06f' % float(self.xml.attrib['total']),
+                self.timbre['UUID']
+            )
+            path = self._get_cbb(qr_data)
+            if os.path.exists(path):
+                self._verify_margin(self.elements['qr_cbb']['h'])
+                self.image(
+                    path,
+                    self.elements['qr_cbb']['x'],
+                    self.y,
+                    self.elements['qr_cbb']['w'],
+                    self.elements['qr_cbb']['h']
+                )
+                os.unlink(path)
+            sello_emisor = self.timbre['selloCFD']
+            sello_sat = self.timbre['selloSAT']
+            self.elements['sello_cfd_titulo']['y'] = self.y
+            self.elements['sello_cfd_titulo']['text'] += 'I'
+            self._write_text('sello_cfd_titulo')
+            self.elements['sello_cfd']['y'] = self.y + 4
+            self._write_text('sello_cfd', sello_emisor)
+            self.elements['sello_sat_titulo']['y'] = self.y + 1
+            self._write_text('sello_sat_titulo')
+            self.elements['sello_sat']['y'] = self.y + 4
+            self._write_text('sello_sat', sello_sat)
+            self.elements['fecha_titulo']['y'] = self.y + 1
+            self._write_text('fecha_titulo')
+            self.elements['fecha']['y'] = self.y
+            self._write_text('fecha', self.timbre['FechaTimbrado'])
+            self.elements['leyenda']['text'] += 'I'
+        else:
+            sello_emisor = self.xml.attrib['sello']
+            self.elements['sello_cfd_titulo']['x'] = 10
+            self.elements['sello_cfd_titulo']['y'] = self.y
+            self._write_text('sello_cfd_titulo')
+            self.elements['sello_cfd']['x'] = 10
+            self.elements['sello_cfd']['y'] = self.y + 4
+            self.elements['sello_cfd']['w'] = 195
+            self.elements['sello_cfd']['multiline'] = 0
+            self._write_text('sello_cfd', sello_emisor)
+            self.elements['cadena_titulo']['text'] = 'Cadena original del CFD'
+        self._verify_margin(10)
+        self.elements['cadena_titulo']['y'] = self.y + 5
+        self._write_text('cadena_titulo')
+        self.elements['cadena']['y'] = self.y + 4
+        self._write_text('cadena', self.cadena)
+        #~ self._verify_margin(10)
+        self.elements['leyenda']['y'] = self.y + 5
+        self._write_text('leyenda')
+        return
+
+    def _get_cbb(self, data):
+        scale = 10
+        f = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
+        path = f.name
+        code = pyqrcode.QRCode(data, mode='binary')
+        code.png(path, scale)
+        return path
+
+
+    def _set_totales(self, pre):
+        moneda = ('peso', '$', 'm.n.')
+        if 'Moneda' in self.xml.attrib:
+            if self.xml.attrib['Moneda'].lower() in self.monedas:
+                moneda = self.monedas[self.xml.attrib['Moneda'].lower()]
+            else:
+                moneda = (self.xml.attrib['Moneda'], '', '')
+        importe = '%s %s' % (
+            moneda[1],
+            self.currency.format(float(self.xml.attrib['subTotal']))
+        )
+        self._verify_margin(20)
+        self._write_importe('Subtotal', importe)
+
+        if 'descuento' in self.xml.attrib:
+            if 'motivoDescuento' in self.xml.attrib:
+                self.elements['motivo_descuento']['y'] = self.y
+                self.elements['motivo_titulo']['y'] = self.y
+                self._write_text('motivo_titulo')
+                self._write_text(
+                    'motivo_descuento', self.xml.attrib['motivoDescuento'])
+            importe = '%s %s' % (
+                moneda[1],
+                self.currency.format(float(self.xml.attrib['descuento']))
+            )
+            self._write_importe('Descuento', importe)
+
+        imp = self.xml.find('%sImpuestos' % pre)
+        if imp is not None:
+            nodo = imp.find('%sTraslados' % pre)
+            if nodo is not None:
+                for n in list(nodo):
+                    title = '%s %s %%' % (n.attrib['impuesto'], n.attrib['tasa'])
+                    importe = '%s %s' % (
+                        moneda[1],
+                        self.currency.format(float(n.attrib['importe']))
+                    )
+                    self._write_importe(title, importe)
+            nodo = imp.find('%sRetenciones' % pre)
+            if nodo is not None:
+                for n in list(nodo):
+                    title = u'Retención %s' % n.attrib['impuesto']
+                    importe = '%s %s' % (
+                        moneda[1],
+                        self.currency.format(float(n.attrib['importe']))
+                    )
+                    self._write_importe(title, importe)
+
+        com = self.xml.find('%sComplemento' % pre)
+        if com is not None:
+            otros = com.find('%sImpuestosLocales' % self.G.PREFIX['IMP_LOCAL'])
+            if otros is not None:
+                for otro in list(otros):
+                    if otro.tag == '%sRetencionesLocales' % self.G.PREFIX['IMP_LOCAL']:
+                        name = 'ImpLocRetenido'
+                        tasa = 'TasadeRetencion'
+                    else:
+                        name = 'ImpLocTrasladado'
+                        tasa = 'TasadeTraslado'
+                    title = u'%s %s %%' % (otro.attrib[name], otro.attrib[tasa])
+                    importe = '%s %s' % (
+                        moneda[1],
+                        self.currency.format(float(otro.attrib['Importe']))
+                    )
+                    self._write_importe(title, importe)
+
+        if 'totalImpuestosTrasladados' in imp.attrib:
+            importe = '%s %s' % (
+                moneda[1],
+                self.currency.format(float(imp.attrib['totalImpuestosTrasladados']))
+            )
+            self.elements['imp_tras_titulo']['y'] = self.y
+            self.elements['imp_trasladado']['y'] = self.y
+            self._write_text('imp_tras_titulo')
+            self._write_text('imp_trasladado', importe)
+        if 'totalImpuestosRetenidos' in imp.attrib:
+            importe = '%s %s' % (
+                moneda[1],
+                self.currency.format(float(imp.attrib['totalImpuestosRetenidos']))
+            )
+            self.elements['imp_rete_titulo']['y'] = self.y
+            self.elements['imp_retenido']['y'] = self.y
+            self._write_text('imp_rete_titulo')
+            self._write_text('imp_retenido', importe)
+
+        total = float(self.xml.attrib['total'])
+        importe = '%s %s' % (
+            moneda[1],
+            self.currency.format(total)
+        )
+        self._write_importe('Total', importe)
+        self.ln()
+        letras = '-(%s/100 %s)-' % (
+            NumerosLetras().to_letters(total, moneda[0]),
+            moneda[2]
+        )
+        self._verify_margin(20)
+        self.elements['en_letras']['y'] = self.y
+        self._write_text('en_letras', letras.upper())
+        self.ln(self.SPACE)
+        return
+
+    def _write_otros(self, title, value):
+        self.elements['otros_titulo']['text'] = title
+        self.elements['otros_titulo']['y'] = self.y
+        self.elements['otros']['y'] = self.y
+        self._write_text('otros_titulo')
+        self._write_text('otros', value)
+        self.y += 3
+        return
+
+    def _write_importe(self, title, importe):
+        self.elements['subtotal_titulo']['text'] = title
+        self.elements['subtotal_titulo']['y'] = self.y
+        self.elements['subtotal']['y'] = self.y
+        self._write_text('subtotal_titulo')
+        self._write_text('subtotal', importe)
+        self.y += 4.5
+        return
+
+    def _set_detalle(self, pre):
+        conceptos = self.xml.find('%sConceptos' % pre)
+        for c in list(conceptos):
+            clave = ''
+            if 'noIdentificacion' in c.attrib:
+                clave = c.attrib['noIdentificacion']
+            self._write_text('clave', clave)
+            unidad = 'No aplica'
+            if 'unidad' in c.attrib:
+                unidad = c.attrib['unidad']
+            self._write_text('unidad', unidad)
+            importe = self.currency.format(float(c.attrib['cantidad']))
+            self._write_text('cantidad', importe)
+            importe = self.currency.format(float(c.attrib['valorUnitario']))
+            if c.attrib['valorUnitario'].startswith('-'):
+                self.elements['pu']['foreground'] = self.COLOR_RED
+            else:
+                self.elements['pu']['foreground'] = 0
+            self._write_text('pu', importe)
+            importe = self.currency.format(float(c.attrib['importe']))
+            if c.attrib['importe'].startswith('-'):
+                self.elements['importe']['foreground'] = self.COLOR_RED
+            else:
+                self.elements['importe']['foreground'] = 0
+            self._write_text('importe', importe)
+            page = self.page_no()
+            descripcion = self._get_descripcion(c, pre)
+            self._write_text('descripcion', descripcion)
+            if self.page_no() > page:
+                new_y = self.y_detalle
+            else:
+                new_y = self.y
+            self.elements['clave']['y'] = new_y
+            self.elements['descripcion']['y'] = new_y
+            self.elements['unidad']['y'] = new_y
+            self.elements['cantidad']['y'] = new_y
+            self.elements['pu']['y'] = new_y
+            self.elements['importe']['y'] = new_y
+        self.line(10, self.y, 205, self.y)
+        self.ln()
+        return
+
+    def _get_descripcion(self, nodo, pre):
+        s = nodo.attrib['descripcion']
+        for n in list(nodo):
+            if n.tag == '%sInformacionAduanera' % pre:
+                s += u'\nAduana: %s\nFecha: %s    Número: %s' % (
+                    n.attrib['aduana'],
+                    n.attrib['fecha'],
+                    n.attrib['numero']
+                )
+            elif n.tag == '%sCuentaPredial' % pre:
+                s += u'\n\nCuenta Predial Número: %s' % n.attrib['numero']
+            elif n.tag == '%sParte' % pre:
+                serie = ''
+                if 'noIdentificacion' in n.attrib:
+                    serie = n.attrib['noIdentificacion']
+                s += u'\n\n    Cantidad: %s    Serie: %s\n    %s' % (
+                    n.attrib['cantidad'],
+                    serie,
+                    n.attrib['descripcion']
+                )
+                for n2 in list(n):
+                    if n2.tag == '%sInformacionAduanera' % pre:
+                        s += u'\n        Aduana: %s\n        Fecha: %s    Número: %s' % (
+                            n2.attrib['aduana'],
+                            n2.attrib['fecha'],
+                            n2.attrib['numero']
+                        )
+        info = nodo.find('%sComplementoConcepto' % pre)
+        if info is None:
+            return s
+        info = info.find('{}instEducativas'.format(self.G.PREFIX['IEDU']))
+        if info is not None:
+            s1 = ''
+            if 'nombreAlumno' in info.attrib:
+                s += '\n\nAlumno: %s' % info.attrib['nombreAlumno']
+            if 'CURP' in info.attrib:
+                s += '\nCURP: %s' % info.attrib['CURP']
+            if 'nivelEducativo' in info.attrib:
+                s1 = '\nAcuerdo de incorporación ante la SEP %s' % info.attrib['nivelEducativo']
+            if 'autRVOE' in info.attrib:
+                if s1:
+                    s1 = '%s %s' % (s1, info.attrib['autRVOE'])
+                else:
+                    s1 = '\nAcuerdo de incorporación ante la SEP No: %s' % info.attrib['autRVOE']
+                s += s1
+            if 'rfcPago' in info.attrib:
+                s += '\nRFC de pago: %s' % info.attrib['rfcPago']
+        return s
+
+    def _set_encabezados_detalle(self):
+        self._write_text('clave_titulo')
+        self._write_text('descripcion_titulo')
+        self._write_text('unidad_titulo')
+        self._write_text('cantidad_titulo')
+        self._write_text('pu_titulo')
+        self._write_text('importe_titulo')
+        self.ln()
+        return
+
+    def _set_comprobante(self, pre):
+        if 'LugarExpedicion' in self.xml.attrib:
+            lugar = '%s, ' % self.xml.attrib['LugarExpedicion']
+        else:
+            lugar = self.data['expedicion']
+        fecha = self.xml.attrib['fecha'].split('T')
+        date = datetime.strptime(fecha[0], '%Y-%m-%d')
+        lugar += date.strftime('%A, %d de %B del %Y')    # .decode('utf-8')
+        self._write_text('cfdi_fecha', lugar)
+        self._write_text('cfdi_hora', fecha[1])
+        self._write_text('cfdi_titulo1')
+        self._write_text('cfdi_titulo2', self.TITULO2[self.version])
+        self._write_text('cfdi_titulo3', self.TITULO3[self.version])
+        self._write_text('cfdi_titulo4')
+        self._write_text('cfdi_titulo5')
+        self._write_text('cfdi_titulo', self.TITULO1[self.version])
+        self._write_text('cfdi_regimen', self.data['regimen'])
+        self.timbre = self._get_timbre(self.G.PREFIX[self.version])
+        csdsat = ''
+        uuid = ''
+        if self.timbre:
+            csdsat = self.timbre['noCertificadoSAT']
+            uuid = self.timbre['UUID'].upper()
+        else:
+            if 'anoAprobacion' in self.xml.attrib:
+                csdsat = self.xml.attrib['anoAprobacion']
+            if 'noAprobacion' in self.xml.attrib:
+                uuid = self.xml.attrib['noAprobacion']
+        folio = ''
+        if 'serie' in self.xml.attrib:
+            folio += self.xml.attrib['serie']
+        if 'folio' in self.xml.attrib:
+            if folio:
+                folio += '-%s' % self.xml.attrib['folio']
+            else:
+                folio = self.xml.attrib['folio']
+        self._write_text('cfdi_csd', self.xml.attrib['noCertificado'])
+        self._write_text('cfdi_csdsat', csdsat)
+        self._write_text('cfdi_uuid', uuid)
+        self._write_text('cfdi_tipo', self.xml.attrib['tipoDeComprobante'].upper())
+        self._write_text('cfdi_folio', folio)
+        return
+
+    def _set_receptor(self, pre):
+        self._write_text('receptor_titulo')
+        receptor = self.xml.find('%sReceptor' % pre)
+        name_receptor = 'Sin nombre'
+        if 'nombre' in receptor.attrib:
+            name_receptor = receptor.attrib['nombre']
+        self._write_text('receptor_nombre', name_receptor)
+        self._write_text('receptor_rfc', receptor.attrib['rfc'])
+        self.data['receptor_rfc'] = receptor.attrib['rfc']
+        dir_fiscal = receptor.find('%sDomicilio' % pre)
+        domicilio1 = ''
+        if dir_fiscal is not None:
+            if 'calle' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['calle']
+            if 'noExterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noExterior']
+            if 'noInterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noInterior']
+            domicilio2 = ''
+            if 'colonia' in dir_fiscal.attrib:
+                if dir_fiscal.attrib['colonia'].strip().lower().startswith('col.'):
+                    domicilio2 += '%s, ' % dir_fiscal.attrib['colonia']
+                else:
+                    domicilio2 += 'Col. %s, ' % dir_fiscal.attrib['colonia']
+            if 'codigoPostal' in dir_fiscal.attrib:
+                domicilio2 += 'C.P. %s ' % dir_fiscal.attrib['codigoPostal']
+            domicilio3 =''
+            if 'municipio' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['municipio']
+            if 'estado' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['estado']
+            if 'pais' in dir_fiscal.attrib:
+                domicilio3 += '%s ' % dir_fiscal.attrib['pais']
+            domicilio4 = ''
+            if 'localidad' in dir_fiscal.attrib:
+                domicilio4 += 'Localidad: %s, ' % dir_fiscal.attrib['localidad']
+            if 'referencia' in dir_fiscal.attrib:
+                domicilio4 += 'Referencia: %s' % dir_fiscal.attrib['referencia']
+            self._write_text('receptor_direccion1', domicilio1)
+            self._write_text('receptor_direccion2', domicilio2)
+            self._write_text('receptor_direccion3', domicilio3)
+            self._write_text('receptor_direccion4', domicilio4)
+        return
+
+    def _set_emisor(self, pre):
+        emisor = self.xml.find('%sEmisor' % pre)
+        dir_fiscal = emisor.find('%sExpedidoEn' % pre)
+        lugar = ''
+        if dir_fiscal is not None:
+            self.elements['emisor_logo']['x'] = 10
+            self.elements['emisor_nombre']['x'] = 45
+            self.elements['emisor_rfc']['x'] = 45
+            self.elements['emisor_direccion1']['x'] = 45
+            self.elements['emisor_direccion2']['x'] = 45
+            self.elements['emisor_direccion3']['x'] = 45
+            self.elements['emisor_direccion4']['x'] = 45
+            self.elements['emisor_nombre']['w'] = 75
+            self.elements['emisor_rfc']['w'] = 75
+            self.elements['emisor_direccion1']['w'] = 75
+            self.elements['emisor_direccion2']['w'] = 75
+            self.elements['emisor_direccion3']['w'] = 75
+            self.elements['emisor_direccion4']['w'] = 75
+            domicilio1 = ''
+            if 'calle' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['calle']
+            if 'noExterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noExterior']
+            if 'noInterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noInterior']
+            domicilio2 = ''
+            if 'colonia' in dir_fiscal.attrib:
+                if dir_fiscal.attrib['colonia'].strip().lower().startswith('col.'):
+                    domicilio2 += '%s, ' % dir_fiscal.attrib['colonia']
+                else:
+                    domicilio2 += 'Col. %s, ' % dir_fiscal.attrib['colonia']
+            if 'codigoPostal' in dir_fiscal.attrib:
+                domicilio2 += 'C.P. %s ' % dir_fiscal.attrib['codigoPostal']
+            domicilio3 =''
+            if 'municipio' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['municipio']
+                lugar += '%s, ' % dir_fiscal.attrib['municipio']
+            if 'estado' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['estado']
+                lugar += '%s, ' % dir_fiscal.attrib['estado']
+            if 'pais' in dir_fiscal.attrib:
+                domicilio3 += '%s ' % dir_fiscal.attrib['pais']
+            domicilio4 = ''
+            if 'localidad' in dir_fiscal.attrib:
+                domicilio4 += '%s, ' % dir_fiscal.attrib['localidad']
+            if 'referencia' in dir_fiscal.attrib:
+                domicilio4 += '%s' % dir_fiscal.attrib['referencia']
+            self._write_text('expedido_titulo')
+            self._write_text('expedido_direccion1', domicilio1)
+            self._write_text('expedido_direccion2', domicilio2)
+            self._write_text('expedido_direccion3', domicilio3)
+            self._write_text('expedido_direccion4', domicilio4)
+
+        path_logo = 'logos/{}.png'.format(emisor.attrib['rfc'].lower())
+        self.data['emisor_rfc'] = emisor.attrib['rfc']
+        if os.path.exists(path_logo):
+            self.image(
+                path_logo,
+                self.elements['emisor_logo']['x'],
+                self.elements['emisor_logo']['y'],
+                self.elements['emisor_logo']['w'],
+                self.elements['emisor_logo']['h']
+            )
+        regimen = emisor.find('%sRegimenFiscal' % pre)
+        if regimen is None:
+            regimen = ''
+        else:
+            regimen = regimen.attrib['Regimen']
+        dir_fiscal = emisor.find('%sDomicilioFiscal' % pre)
+        lugar2 = ''
+        domicilio1 = ''
+        domicilio2 = ''
+        domicilio3 = ''
+        domicilio4 = ''
+        if not dir_fiscal is None:
+            if 'calle' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['calle']
+            if 'noExterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noExterior']
+            if 'noInterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noInterior']
+
+            if 'colonia' in dir_fiscal.attrib:
+                if dir_fiscal.attrib['colonia'].strip().lower().startswith('col.'):
+                    domicilio2 += '%s, ' % dir_fiscal.attrib['colonia']
+                else:
+                    domicilio2 += 'Col. %s, ' % dir_fiscal.attrib['colonia']
+            if 'codigoPostal' in dir_fiscal.attrib:
+                domicilio2 += 'C.P. %s ' % dir_fiscal.attrib['codigoPostal']
+
+            if 'municipio' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['municipio']
+                lugar2 += '%s, ' % dir_fiscal.attrib['municipio']
+            if 'estado' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['estado']
+                lugar2 += '%s, ' % dir_fiscal.attrib['estado']
+            if 'pais' in dir_fiscal.attrib:
+                domicilio3 += '%s ' % dir_fiscal.attrib['pais']
+
+            if 'localidad' in dir_fiscal.attrib:
+                domicilio4 += '%s, ' % dir_fiscal.attrib['localidad']
+            if 'referencia' in dir_fiscal.attrib:
+                domicilio4 += '%s' % dir_fiscal.attrib['referencia']
+        name_emisor = 'Sin nombre'
+        if 'nombre' in emisor.attrib:
+            name_emisor = emisor.attrib['nombre']
+        self._write_text('emisor_nombre', name_emisor)
+        self._write_text('emisor_rfc', emisor.attrib['rfc'])
+        self._write_text('emisor_direccion1', domicilio1)
+        self._write_text('emisor_direccion2', domicilio2)
+        self._write_text('emisor_direccion3', domicilio3)
+        self._write_text('emisor_direccion4', domicilio4)
+        if not lugar:
+            lugar = lugar2
+        self.data['expedicion'] = lugar
+        self.data['regimen'] = regimen
+        return
+
+    def _rgb(self, col):
+        return (col // 65536), (col // 256 % 256), (col % 256)
+
+    def _color(self, r, g, b):
+        return int('%02x%02x%02x' % (r, g, b), 16)
+
+    def _write_text(self, k, s=''):
+        if not k in self.elements: return
+        self.pos_size['x'] = self.elements[k]['x']
+        self.pos_size['y'] = self.elements[k]['y']
+        self.pos_size['w'] = self.elements[k]['w']
+        self.pos_size['h'] = self.elements[k]['h']
+        self.set_font(
+            self.elements[k]['font'],
+            self.elements[k]['style'],
+            self.elements[k]['size']
+        )
+        self.set_text_color(*self._rgb(self.elements[k]['foreground']))
+        self.set_fill_color(*self._rgb(self.elements[k]['background']))
+        self.set_xy(self.pos_size['x'], self.pos_size['y'])
+        if self.elements[k]['border'] == '0' or \
+            self.elements[k]['border'] == '1':
+            border = eval(self.elements[k]['border'])
+        else:
+            border = self.elements[k]['border']
+        if not s:
+            s = self.elements[k]['text']
+        if  self.elements[k]['multiline']:
+            self.multi_cell(
+                self.pos_size['w'],
+                self.pos_size['h'],
+                s,
+                border,
+                self.elements[k]['align'],
+                bool(self.elements[k]['background'])
+            )
+        else:
+            self._ajust_text(s, self.elements[k]['size'])
+            self.cell(
+                self.pos_size['w'],
+                self.pos_size['h'],
+                s,
+                border,
+                0,
+                self.elements[k]['align'],
+                bool(self.elements[k]['background'])
+            )
+        return
+
+    def _ajust_text(self, s, size):
+        if not isinstance(s, str):
+            s = str(s)
+        s = s.encode('ascii', 'replace')
+        while True:
+            if self.get_string_width(s) < (self.pos_size['w']-0.8):
+                break
+            else:
+                size -= 1
+                self.set_font_size(size)
+        return
+
+    def _get_timbre(self, pre):
+        com = self.xml.find('%sComplemento' % pre)
+        if com is None: return {}
+        timbre = com.find('%sTimbreFiscalDigital' % self.G.PREFIX['TIMBRE'])
+        if timbre is None:
+            return {}
+        else:
+            return timbre.attrib
+
+    def _get_cadena(self, path_xml, version):
+        #~ return self.G.CADENA.format(**self.timbre)
+        #~ from lxml import etree
+
+        #~ file_xslt = self.G.PATHS['XSLT_CADENA'].format(version)
+        #~ styledoc = etree.parse(file_xslt)
+        #~ transform = etree.XSLT(styledoc)
+        #~ parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        #~ doc = etree.fromstring(xml.encode('utf-8'), parser=parser)
+        #~ result = str(transform(doc))
+        return ''
+
+    def _parse_csv(self, emisor_rfc=''):
+        "Parse template format csv file and create elements dict"
+        keys = ('x', 'y', 'w', 'h', 'font', 'size', 'style', 'foreground',
+            'background', 'align', 'priority', 'multiline', 'border', 'text')
+        self.elements = {}
+        path_template = '{}/{}.csv'.format(
+            self.G.PATHS['TEMPLATE'],
+            emisor_rfc.lower()
+        )
+        if not os.path.exists(path_template):
+            path_template = '{}/default.csv'.format(self.G.PATHS['TEMPLATE'])
+        reader = csv.reader(open(path_template, 'r'), delimiter=',')
+        for row in reader:
+            new_list = []
+            for v in row[1:]:
+                if v == (''):
+                    new_list.append('')
+                elif v.startswith("'"):
+                    new_list.append(v[1:-1])
+                else:
+                    new_list.append(eval(v.strip()))
+            self.elements[row[0][1:-1]] = dict(zip(keys, new_list))
+
