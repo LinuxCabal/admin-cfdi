@@ -1976,7 +1976,7 @@ class CSVPDF(FPDF):
         decimales = self.DECIMALES
         if self.xml:
             self.version = self.xml.attrib['version']
-            self.cadena = self._get_cadena(path_xml, self.version)
+            #~ self.cadena = self._get_cadena(path_xml)
             self._parse_csv()
             decimales = len(self.xml.attrib['total'].split('.')[1])
         self.currency = '{0:,.%sf}' % decimales
@@ -2135,7 +2135,7 @@ class CSVPDF(FPDF):
         self.elements['cadena_titulo']['y'] = self.y + 5
         self._write_text('cadena_titulo')
         self.elements['cadena']['y'] = self.y + 4
-        self._write_text('cadena', self.cadena)
+        self._write_text('cadena', self._get_cadena())
         #~ self._verify_margin(10)
         self.elements['leyenda']['y'] = self.y + 5
         self._write_text('leyenda')
@@ -2148,7 +2148,6 @@ class CSVPDF(FPDF):
         code = pyqrcode.QRCode(data, mode='binary')
         code.png(path, scale)
         return path
-
 
     def _set_totales(self, pre):
         moneda = ('peso', '$', 'm.n.')
@@ -2646,11 +2645,11 @@ class CSVPDF(FPDF):
         else:
             return timbre.attrib
 
-    def _get_cadena(self, path_xml, version):
-        #~ return self.G.CADENA.format(**self.timbre)
+    def _get_cadena(self):
+        return self.G.CADENA.format(**self.timbre)
         #~ from lxml import etree
 
-        #~ file_xslt = self.G.PATHS['XSLT_CADENA'].format(version)
+        #~ file_xslt = self.G.PATHS['CADENA'].format(self.version)
         #~ styledoc = etree.parse(file_xslt)
         #~ transform = etree.XSLT(styledoc)
         #~ parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
