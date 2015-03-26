@@ -37,6 +37,7 @@ class Global(object):
         'XSLT_SELLO_SAT': os.path.join(CWD, 'bin', 'get_sello_sat.xslt'),
         'XSLT_CADENA': os.path.join(CWD, 'bin', 'cfdi_{}.xslt'),
         'XSLT_TIMBRE': os.path.join(CWD, 'bin', 'timbre_1.0.xslt'),
+        'TEMPLATE': os.path.join(CWD, 'template'),
     }
     EXT_XML = '.xml'
     EXT_ODS = '.ods'
@@ -147,6 +148,7 @@ class Global(object):
         'IMP_LOCAL': '{http://www.sat.gob.mx/implocal}',
         'IEDU': '{http://www.sat.gob.mx/iedu}',
         'DONATARIA': '{http://www.sat.gob.mx/donat}',
+        'LEYENDAS': '{http://www.sat.gob.mx/leyendasFiscales}',
     }
     page_init = 'https://cfdiau.sat.gob.mx/nidp/app/login?id=SATUPCFDiCon&' \
         'sid=0&option=credential&sid=0'
