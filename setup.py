@@ -5,7 +5,7 @@
 from setuptools import setup, find_packages
 
 setup(name='Admin-CFDI',
-      version='0.2.6',
+      version='0.2.7',
       description='Herramienta para administracion de CFDIs',
       license='GPL 3.0',
       author='Mauricio Baeza',
