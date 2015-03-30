@@ -1,7 +1,7 @@
 import argparse
 
-from pyutil import CSVPDF
-from pyutil import Util
+from admincfdi.pyutil import CSVPDF
+from admincfdi.pyutil import Util
 
 def process_command_line_arguments():
     parser = argparse.ArgumentParser(
