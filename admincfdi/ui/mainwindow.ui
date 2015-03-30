@@ -1569,9 +1569,9 @@
                       </object>
                     </child>
                     <child>
-                      <object class="tk.Radiobutton" id="radio_json">
+                      <object class="tk.Radiobutton" id="radio_csv">
                         <property name="font">{Sans} 10 {}</property>
-                        <property name="text" translatable="yes">JSON</property>
+                        <property name="text" translatable="yes">CSV</property>
                         <property name="value">2</property>
                         <property name="variable">int:template_type</property>
                         <bind add="True" handler="radio_template_type" sequence="&lt;ButtonRelease-1&gt;" />
@@ -1614,11 +1614,11 @@
                       </object>
                     </child>
                     <child>
-                      <object class="tk.Entry" id="text_template_json">
+                      <object class="tk.Entry" id="text_template_csv">
                         <property name="font">{Sans} 10 {}</property>
                         <property name="highlightcolor">#ff5500</property>
                         <property name="state">readonly</property>
-                        <property name="textvariable">string:template_json</property>
+                        <property name="textvariable">string:template_csv</property>
                         <property name="width">36</property>
                         <bind add="True" handler="_focus_in" sequence="&lt;FocusIn&gt;" />
                         <bind add="True" handler="_focus_out" sequence="&lt;FocusOut&gt;" />
@@ -1668,8 +1668,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="ttk.Button" id="button_select_template_json">
-                        <property name="command">button_select_template_json_click</property>
+                      <object class="ttk.Button" id="button_select_template_csv">
+                        <property name="command">button_select_template_csv_click</property>
                         <property name="image">csv.gif</property>
                         <property name="width">1</property>
                         <layout>
