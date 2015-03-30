@@ -13,7 +13,7 @@ setup(name='Admin-CFDI',
       url='https://facturalibre.net/servicios/',
       packages=find_packages(),
       install_requires=['pypng', 'fpdf', 'pygubu', 'selenium', 'pyqrcode', 'pysimplesoap'],
-      package_data = {'': ['img/*.png', 'img/*.gif', 'ui/*']},
+      package_data = {'': ['img/*.png', 'img/*.gif', 'ui/*', 'template/*']},
       scripts=['admin-cfdi','descarga-cfdi'])
 
 # vim: ts=4 et sw=4
