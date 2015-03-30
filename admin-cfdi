@@ -16,6 +16,7 @@ import pygubu
 from selenium import webdriver
 from admincfdi.pyutil import Util, Mail, LibO, CFDIPDF, DescargaSAT
 from admincfdi.values import Global
+from admincfdi.pyutil import LIBO
 
 
 class Application(pygubu.TkApplication):
@@ -122,6 +123,9 @@ class Application(pygubu.TkApplication):
         self._set('mail_port', 993)
         self._get_object('check_ssl').invoke()
         self._focus_set('text_rfc')
+
+        if not LIBO:
+            self._config('radio_ods', {'state': 'disabled'})
         return
 
     def _center_window(self, root):
