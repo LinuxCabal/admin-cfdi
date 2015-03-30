@@ -14,6 +14,6 @@ setup(name='Admin-CFDI',
       packages=find_packages(),
       install_requires=['pypng', 'fpdf', 'pygubu', 'selenium', 'pyqrcode', 'pysimplesoap'],
       package_data = {'': ['img/*.png', 'img/*.gif', 'ui/*', 'template/*']},
-      scripts=['admin-cfdi','descarga-cfdi'])
+      scripts=['admin-cfdi','descarga-cfdi', 'cfdi2pdf'])
 
 # vim: ts=4 et sw=4
