@@ -49,15 +49,18 @@ except ImportError:
 WIN = 'win32'
 MAC = 'darwin'
 LINUX = 'linux'
-
+LIBO = True
 
 if sys.platform == WIN:
     from win32com.client import Dispatch
 elif sys.platform == LINUX:
-    import uno
-    from com.sun.star.beans import PropertyValue
-    from com.sun.star.beans.PropertyState import DIRECT_VALUE
-    from com.sun.star.awt import Size
+    try:
+        import uno
+        from com.sun.star.beans import PropertyValue
+        from com.sun.star.beans.PropertyState import DIRECT_VALUE
+        from com.sun.star.awt import Size
+    except ImportError:
+        LIBO = False
 
 
 class SAT(object):

@@ -16,6 +16,7 @@ import pygubu
 from selenium import webdriver
 from admincfdi.pyutil import Util, Mail, LibO, CFDIPDF, DescargaSAT
 from admincfdi.values import Global
+from admincfdi.pyutil import LIBO
 
 
 class Application(pygubu.TkApplication):
@@ -122,6 +123,9 @@ class Application(pygubu.TkApplication):
         self._set('mail_port', 993)
         self._get_object('check_ssl').invoke()
         self._focus_set('text_rfc')
+
+        if not LIBO:
+            self._config('radio_ods', {'state': 'disabled'})
         return
 
     def _center_window(self, root):
@@ -258,10 +262,10 @@ class Application(pygubu.TkApplication):
         radio = 'radio_ods'
         button = 'button_select_template_ods'
         self._config(button, {'state': 'normal'})
-        self._config('button_select_template_json', {'state': 'normal'})
+        self._config('button_select_template_csv', {'state': 'normal'})
         if opt == 1:
-            radio = 'radio_json'
-            button = 'button_select_template_json'
+            radio = 'radio_csv'
+            button = 'button_select_template_csv'
         self._config(radio, {'bg': self.g.COLORS['DEFAULT']})
         self._config(button, {'state': 'disabled'})
         return
@@ -888,13 +892,13 @@ class Application(pygubu.TkApplication):
         file_name = self.util.get_file(self.parent, ext=self.g.EXT_ODS)
         if file_name:
             self._set('template_ods', file_name)
-            self._set('template_json')
+            self._set('template_csv')
         return
 
-    def button_select_template_json_click(self):
-        file_name = self.util.get_file(self.parent, ext=self.g.EXT_JSON)
+    def button_select_template_csv_click(self):
+        file_name = self.util.get_file(self.parent, ext=self.g.EXT_CSV)
         if file_name:
-            self._set('template_json', file_name)
+            self._set('template_csv', file_name)
             self._set('template_ods')
         return
 
@@ -911,7 +915,7 @@ class Application(pygubu.TkApplication):
             'pdf_source',
             'pdf_target',
             'template_ods',
-            'template_json'
+            'template_csv'
         )
         for v in var:
             self._set(v)
@@ -969,13 +973,13 @@ class Application(pygubu.TkApplication):
                 self.util.msgbox(msg)
                 return False, data
             template_ods = self.util.path_config(template_ods)
-        template_json = self._get('template_json')
-        if template_json:
-            if not self.util.validate_dir(template_json):
-                msg = 'No se encontró la plantilla JSON'
+        template_csv = self._get('template_csv')
+        if template_csv:
+            if not self.util.validate_dir(template_csv):
+                msg = 'No se encontró la plantilla CSV'
                 self.util.msgbox(msg)
                 return False, data
-            template_json = self.util.path_config(template_json)
+            template_csv = self.util.path_config(template_csv)
 
         template_type = self._get('template_type')
         if template_type == 1:
@@ -984,8 +988,8 @@ class Application(pygubu.TkApplication):
                 self.util.msgbox(msg)
                 return False, data
         elif template_type == 2:
-            if not template_json:
-                msg = 'Selecciona una plantilla JSON'
+            if not template_csv:
+                msg = 'Selecciona una plantilla CSV'
                 self.util.msgbox(msg)
                 return False, data
 
@@ -993,7 +997,7 @@ class Application(pygubu.TkApplication):
         data['pdf_source'] = self.util.path_config(pdf_source)
         data['pdf_target'] = self.util.path_config(pdf_target)
         data['template_ods'] = template_ods
-        data['template_json'] = template_json
+        data['template_csv'] = template_csv
         #~ data['pdf_print'] = self._get('pdf_print')
         return True, data
 
@@ -1006,7 +1010,7 @@ class Application(pygubu.TkApplication):
                 'pdf_source',
                 'pdf_target',
                 'template_ods',
-                'template_json',
+                'template_csv',
             )
             for v in var:
                 self._set(v, self.users_pdf[sel][v])
@@ -1065,8 +1069,8 @@ class Application(pygubu.TkApplication):
         source = data['pdf_source']
         target = data['pdf_target']
         template = data['template_ods']
-        if data['template_json']:
-            template = data['template_json']
+        if data['template_csv']:
+            template = data['template_csv']
         info = self.util.get_path_info(path)
         path_pdf = self.util.join(target, info[0][len(source)+1:])
         self.util.makedirs(path_pdf)
