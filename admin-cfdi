@@ -1085,7 +1085,7 @@ class Application(pygubu.TkApplication):
             pdf.make(libo.SM)
             return True
         except Exception as e:
-            print (e)
+            self.g.LOG.error("No se pudo generar el PDF para: " + path + str(e))
             return False
 
     def _validate_pdf(self):

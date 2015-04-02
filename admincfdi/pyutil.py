@@ -1412,8 +1412,9 @@ class CFDIPDF(object):
         n = c.find(self.tree['aduana'])
         if n is not None:
             data += '\nPedimento de Importación No. %s\n' % n.attrib['numero']
-            data += 'Aduana: %s, Fecha del pedimento: %s' % (
-                n.attrib['aduana'], n.attrib['fecha'])
+            if 'aduana' in n.attrib:
+                data += 'Aduana: %s' % (n.attrib['aduana'])
+            data += 'Fecha del pedimento: %s' % (n.attrib['fecha'])
         n = c.find(self.tree['predial'])
         if n is not None:
             data += '\n\nCuenta Predial Número: %s' % n.attrib['numero']

@@ -5,10 +5,10 @@ admin-cfdi
     Ver archivo contributors.txt
 
 :Fecha:
-    04/12/2014
+    01/04/2015
 
 :Ultima Versión:
-    0.2.6
+    0.2.7
 
 
 Descripción
