@@ -2,13 +2,13 @@ admin-cfdi
 ==========
 
 :Autores:
-    Maurico Baeza
+    Universo Libre A.C., Python Cabal
 
 :Fecha:
-    04/12/2014
+    01/04/2015
 
 :Versión:
-    0.2.2
+    0.2.7
 
 
 Descripción
