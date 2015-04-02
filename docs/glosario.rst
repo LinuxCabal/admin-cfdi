@@ -8,7 +8,7 @@ Glosario
         Un administrador de documentos CFDI
 
    CFDI
-        Certificado de Firma Digital Integrada
+        Comprobante Fiscal Digital por Internet
 
    SAT
         Servicio de Administración Tributaria

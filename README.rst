@@ -2,13 +2,13 @@ admin-cfdi
 ==========
 
 :Autores:
-    Maurico Baeza
+    Ver archivo contributors.txt
 
 :Fecha:
     04/12/2014
 
-:Versión:
-    0.2.2
+:Ultima Versión:
+    0.2.6
 
 
 Descripción
@@ -27,18 +27,17 @@ Pequeño sistema para administrar CFDIs; facturas electrónicas de México. Entr
 
 Requerimientos
 --------------
-* Python 3.4
+* Python 3.2+
 * Tk si usas Linux. Si usas Windows, ya lo integra Python.
 * Firefox para la automatización de la descarga del SAT.
 * Selenium para la automatización de la descarga del SAT.
 * PyGubu para la interfaz gráfica.
-* ReportLab si usas una plantilla JSON (por implementar, aunque podemos usar pyfpdf; mucho más sencilla).
 * LibreOffice si usas la plantilla ODS.
 * Extensiones win32 para Python si usas Windows.
 
 Instalación
 -----------
-Si tienes instalado correctamente Python 3.4, puedes instalar con Pip.
+Si tienes instalado correctamente Python 3.2+, puedes instalar con Pip.
 
 GNU & LInux
 ###########
