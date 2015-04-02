@@ -4,8 +4,8 @@
 """Admin CFDI"""
 
 
-__author__ = "Mauricio Baeza"
-__author_email__ = "correopublico@mauriciobaeza.org"
-__copyright__ = "Copyright (C) 2014 Mauricio Baeza"
+__author__ = "PythonCabal"
+__author_email__ = "correo@mauriciobaeza.net"
+__copyright__ = "Copyright (C) 2015 Universo Libre"
 __license__ = "GPL 3.0"
-__version__ = "0.2.2"
+__version__ = "0.2.7"
