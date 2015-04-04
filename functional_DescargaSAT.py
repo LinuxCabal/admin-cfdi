@@ -12,7 +12,7 @@ class DescargaSAT(unittest.TestCase):
     def test_uuid(self):
         import os
         import tempfile
-        from pyutil import DescargaSAT
+        from admincfdi.pyutil import DescargaSAT
 
         def no_op(*args):
             pass
@@ -34,7 +34,7 @@ class DescargaSAT(unittest.TestCase):
     def test_rfc(self):
         import os
         import tempfile
-        from pyutil import DescargaSAT
+        from admincfdi.pyutil import DescargaSAT
 
         def no_op(*args):
             pass
@@ -58,7 +58,7 @@ class DescargaSAT(unittest.TestCase):
     def test_año_mes_día(self):
         import os
         import tempfile
-        from pyutil import DescargaSAT
+        from admincfdi.pyutil import DescargaSAT
 
         def no_op(*args):
             pass
@@ -80,7 +80,7 @@ class DescargaSAT(unittest.TestCase):
     def test_mes_completo(self):
         import os
         import tempfile
-        from pyutil import DescargaSAT
+        from admincfdi.pyutil import DescargaSAT
 
         def no_op(*args):
             pass
