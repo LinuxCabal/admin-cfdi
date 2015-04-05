@@ -1744,16 +1744,8 @@ class DescargaSAT(object):
             page_query = self.g.SAT['page_emisor']
         profile = self.get_firefox_profile(carpeta_destino)
         try:
-            browser = webdriver.Firefox(profile)
-            self.status('Conectando...')
-            browser.get(self.g.SAT['page_init'])
-            txt = browser.find_element_by_name(self.g.SAT['user'])
-            txt.send_keys(rfc)
-            txt = browser.find_element_by_name(self.g.SAT['password'])
-            txt.send_keys(ciec)
-            txt.submit()
-            self.util.sleep(3)
-            self.status('Conectado...')
+            self.connect(profile, rfc=rfc, ciec=ciec)
+            browser = self.browser
             browser.get(page_query)
             self.util.sleep(3)
             self.status('Buscando...')
