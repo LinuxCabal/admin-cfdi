@@ -1672,6 +1672,48 @@ class DescargaSAT(object):
         self.status = status_callback
         self.progress = download_callback
 
+    def get_firefox_profile(self, carpeta_destino):
+        'Devuelve un perfil para Firefox'
+
+        # To prevent download dialog
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference(
+            'browser.download.folderList', 2)
+        profile.set_preference(
+            'browser.download.manager.showWhenStarting', False)
+        profile.set_preference(
+            'browser.helperApps.alwaysAsk.force', False)
+        profile.set_preference(
+            'browser.helperApps.neverAsk.saveToDisk',
+            'text/xml, application/octet-stream, application/xml')
+        profile.set_preference(
+            'browser.download.dir', carpeta_destino)
+        # mrE - desactivar telemetry
+        profile.set_preference(
+            'toolkit.telemetry.prompted', 2)
+        profile.set_preference(
+            'toolkit.telemetry.rejected', True)
+        profile.set_preference(
+            'toolkit.telemetry.enabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.service.enabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.uploadEnabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.service.firstRun', False)
+        profile.set_preference(
+            'datareporting.healthreport.logging.consoleEnabled', False)
+        profile.set_preference(
+            'datareporting.policy.dataSubmissionEnabled', False)
+        profile.set_preference(
+            'datareporting.policy.dataSubmissionPolicyResponseType', 'accepted-info-bar-dismissed')
+        #profile.set_preference(
+        #    'datareporting.policy.dataSubmissionPolicyAccepted'; False) # este me marca error, why?
+        #oculta la gran flecha animada al descargar
+        profile.set_preference(
+            'browser.download.animateNotifications', False)
+        return profile
+
     def _download_sat(self, facturas_emitidas=False,
                  type_search=0,
                  rfc='', ciec='', carpeta_destino='',
