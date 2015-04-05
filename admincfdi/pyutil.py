@@ -1745,6 +1745,146 @@ class DescargaSAT(object):
             self.status('Desconectado...')
             self.browser = None
 
+    def search(self, facturas_emitidas=False,
+                 type_search=0,
+                 rfc='', ciec='',
+                 uuid='', rfc_emisor='',
+                 año=None, mes=None, día=None,
+                 mes_completo_por_día=False):
+        'Busca y regresa los resultados'
+
+        if self.browser:
+            browser = self.browser
+
+            page_query = self.g.SAT['page_receptor']
+            if facturas_emitidas == 1:
+                page_query = self.g.SAT['page_emisor']
+
+            browser.get(page_query)
+            self.util.sleep(3)
+            self.status('Buscando...')
+            if type_search == 1:
+                txt = browser.find_element_by_id(self.g.SAT['uuid'])
+                txt.click()
+                txt.send_keys(uuid)
+            else:
+                # Descargar por fecha
+                opt = browser.find_element_by_id(self.g.SAT['date'])
+                opt.click()
+                self.util.sleep()
+                if rfc_emisor:
+                    if type_search == 1:
+                        txt = browser.find_element_by_id(self.g.SAT['receptor'])
+                    else:
+                        txt = browser.find_element_by_id(self.g.SAT['emisor'])
+                    txt.send_keys(rfc_emisor)
+                # Emitidas
+                if facturas_emitidas == 1:
+                    year = int(año)
+                    month = int(mes)
+                    dates = self.util.get_dates(year, month)
+                    txt = browser.find_element_by_id(self.g.SAT['date_from'])
+                    arg = "document.getElementsByName('{}')[0]." \
+                        "removeAttribute('disabled');".format(
+                        self.g.SAT['date_from_name'])
+                    browser.execute_script(arg)
+                    txt.send_keys(dates[0])
+                    txt = browser.find_element_by_id(self.g.SAT['date_to'])
+                    arg = "document.getElementsByName('{}')[0]." \
+                        "removeAttribute('disabled');".format(
+                        self.g.SAT['date_to_name'])
+                    browser.execute_script(arg)
+                    txt.send_keys(dates[1])
+                # Recibidas
+                else:
+                    #~ combos = browser.find_elements_by_class_name(
+                        #~ self.g.SAT['combos'])
+                    #~ combos[0].click()
+                    combo = browser.find_element_by_id(self.g.SAT['year'])
+                    combo = browser.find_element_by_id(
+                        'sbToggle_{}'.format(combo.get_attribute('sb')))
+                    combo.click()
+                    self.util.sleep(2)
+                    link = browser.find_element_by_link_text(año)
+                    link.click()
+                    self.util.sleep(2)
+                    combo = browser.find_element_by_id(self.g.SAT['month'])
+                    combo = browser.find_element_by_id(
+                        'sbToggle_{}'.format(combo.get_attribute('sb')))
+                    combo.click()
+                    self.util.sleep(2)
+                    link = browser.find_element_by_link_text(mes)
+                    link.click()
+                    self.util.sleep(2)
+                    if día != '00':
+                        combo = browser.find_element_by_id(self.g.SAT['day'])
+                        sb = combo.get_attribute('sb')
+                        combo = browser.find_element_by_id(
+                            'sbToggle_{}'.format(sb))
+                        combo.click()
+                        self.util.sleep()
+                        if mes == día:
+                            links = browser.find_elements_by_link_text(día)
+                            for l in links:
+                                p = l.find_element_by_xpath(
+                                    '..').find_element_by_xpath('..')
+                                sb2 = p.get_attribute('id')
+                                if sb in sb2:
+                                    link = l
+                                    break
+                        else:
+                            link = browser.find_element_by_link_text(día)
+                        link.click()
+                        self.util.sleep()
+
+            browser.find_element_by_id(self.g.SAT['submit']).click()
+            sec = 3
+            if facturas_emitidas != 1 and día == '00':
+                sec = 15
+            self.util.sleep(sec)
+            # Bug del SAT
+            if facturas_emitidas != 1 and día != '00':
+                combo = browser.find_element_by_id(self.g.SAT['day'])
+                sb = combo.get_attribute('sb')
+                combo = browser.find_element_by_id(
+                    'sbToggle_{}'.format(sb))
+                combo.click()
+                self.util.sleep(2)
+                if mes == día:
+                    links = browser.find_elements_by_link_text(día)
+                    for l in links:
+                        p = l.find_element_by_xpath(
+                            '..').find_element_by_xpath('..')
+                        sb2 = p.get_attribute('id')
+                        if sb in sb2:
+                            link = l
+                            break
+                else:
+                    link = browser.find_element_by_link_text(día)
+                link.click()
+                self.util.sleep(2)
+                browser.find_element_by_id(self.g.SAT['submit']).click()
+                self.util.sleep(sec)
+            elif facturas_emitidas == 2 and mes_completo_por_día:
+                return self._download_sat_month(año, mes, browser)
+
+            try:
+                found = True
+                content = browser.find_elements_by_class_name(
+                    self.g.SAT['subtitle'])
+                for c in content:
+                    if self.g.SAT['found'] in c.get_attribute('innerHTML') \
+                        and c.is_displayed():
+                        found = False
+                        break
+            except Exception as e:
+                print (str(e))
+
+            if found:
+                docs = browser.find_elements_by_name(self.g.SAT['download'])
+                return docs
+        return []
+
     def _download_sat(self, facturas_emitidas=False,
                  type_search=0,
                  rfc='', ciec='', carpeta_destino='',

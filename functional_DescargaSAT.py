@@ -24,6 +24,27 @@ class DescargaSAT(unittest.TestCase):
         descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
         descarga.disconnect()
 
+    def test_search_uuid(self):
+        import os
+        import tempfile
+        from admincfdi.pyutil import DescargaSAT
+
+        def no_op(*args):
+            pass
+
+        seccion = self.config['uuid']
+        uuid = seccion['uuid']
+        expected = int(seccion['expected'])
+        descarga = DescargaSAT(status_callback=no_op,
+                                download_callback=no_op)
+        profile = descarga.get_firefox_profile('destino')
+        descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+        result = descarga.search(uuid=uuid,
+            type_search=1,
+            día='00')
+        descarga.disconnect()
+        self.assertEqual(expected, len(result))
+
     def test_uuid(self):
         import os
         import tempfile
