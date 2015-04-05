@@ -88,7 +88,8 @@ def main():
         pwd = getpass.getpass('CIEC: ')
     else:
         rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
-    descarga = DescargaSAT(facturas_emitidas= args.facturas_emitidas,
+    descarga = DescargaSAT()
+    descarga._download_sat(facturas_emitidas= args.facturas_emitidas,
             type_search=1 * (args.uuid != ''),
             rfc=rfc,
             ciec=pwd,

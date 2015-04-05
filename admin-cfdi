@@ -381,9 +381,9 @@ class Application(pygubu.TkApplication):
         ok, data = self._validate_download_sat()
         if not ok:
             return
-        DescargaSAT(status_callback=self.msg_user,
-                    download_callback=self.progress,
-                    **data)
+        descarga = DescargaSAT(status_callback=self.msg_user,
+                               download_callback=self.progress)
+        descarga._download_sat(**data)
         return
 
     def _validate_download_sat(self):
