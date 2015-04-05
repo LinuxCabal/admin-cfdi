@@ -1898,16 +1898,7 @@ class DescargaSAT(object):
         except Exception as e:
             print (e)
         finally:
-            try:
-                self.status('Desconectando...')
-                link = browser.find_element_by_partial_link_text('Cerrar Sesi')
-                link.click()
-            except:
-                pass
-            finally:
-                browser.close()
-        self.status('Desconectado...')
-        return
+            self.disconnect()
 
     def _download_sat_month(self, año, mes, browser):
         '''Descarga CFDIs del SAT a una carpeta local
