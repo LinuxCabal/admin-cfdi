@@ -1671,6 +1671,7 @@ class DescargaSAT(object):
         self.util = Util()
         self.status = status_callback
         self.progress = download_callback
+        self.browser = None
 
     def get_firefox_profile(self, carpeta_destino):
         'Devuelve un perfil para Firefox'
@@ -1713,6 +1714,21 @@ class DescargaSAT(object):
         profile.set_preference(
             'browser.download.animateNotifications', False)
         return profile
+
+    def connect(self, profile, rfc='', ciec=''):
+        'Lanza navegador y hace login en el portal del SAT'
+
+        browser = webdriver.Firefox(profile)
+        self.browser = browser
+        self.status('Conectando...')
+        browser.get(self.g.SAT['page_init'])
+        txt = browser.find_element_by_name(self.g.SAT['user'])
+        txt.send_keys(rfc)
+        txt = browser.find_element_by_name(self.g.SAT['password'])
+        txt.send_keys(ciec)
+        txt.submit()
+        time.sleep(3)
+        self.status('Conectado...')
 
     def _download_sat(self, facturas_emitidas=False,
                  type_search=0,

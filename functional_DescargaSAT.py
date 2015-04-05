@@ -11,6 +11,18 @@ class DescargaSAT(unittest.TestCase):
 
         self.rfc, self.ciec = open('credenciales.conf').readline()[:-1].split()
 
+    def test_connect(self):
+        from admincfdi.pyutil import DescargaSAT
+        from selenium import webdriver
+
+        profile = webdriver.FirefoxProfile()
+
+        def no_op(*args):
+            pass
+
+        descarga = DescargaSAT(status_callback=no_op)
+        descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+
     def test_uuid(self):
         import os
         import tempfile
