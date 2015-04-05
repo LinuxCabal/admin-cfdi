@@ -1730,6 +1730,21 @@ class DescargaSAT(object):
         time.sleep(3)
         self.status('Conectado...')
 
+    def disconnect(self):
+        'Cierra la sesión y el navegador'
+
+        if self.browser:
+            try:
+                self.status('Desconectando...')
+                link = self.browser.find_element_by_partial_link_text('Cerrar Sesi')
+                link.click()
+            except:
+                pass
+            finally:
+                self.browser.close()
+            self.status('Desconectado...')
+            self.browser = None
+
     def _download_sat(self, facturas_emitidas=False,
                  type_search=0,
                  rfc='', ciec='', carpeta_destino='',

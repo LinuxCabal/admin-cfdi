@@ -42,6 +42,24 @@ class DescargaSAT(unittest.TestCase):
         profile = descarga.connect(profile, rfc='x', ciec='y')
         self.assertEqual(2, self.status.call_count)
 
+    def test_disconnect_not_connected(self):
+        from admincfdi.pyutil import DescargaSAT
+        from selenium import webdriver
+
+        descarga = DescargaSAT(status_callback=self.status)
+        descarga.disconnect()
+        self.assertEqual(0, self.status.call_count)
+
+    def test_disconnect(self):
+        from unittest.mock import Mock
+        from admincfdi.pyutil import DescargaSAT
+        from selenium import webdriver
+
+        descarga = DescargaSAT(status_callback=self.status)
+        descarga.browser = Mock()
+        descarga.disconnect()
+        self.assertEqual(2, self.status.call_count)
+
 
 if __name__ == '__main__':
     unittest.main()
