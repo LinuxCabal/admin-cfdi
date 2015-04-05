@@ -24,12 +24,13 @@ class DescargaSAT(unittest.TestCase):
         expected = int(seccion['expected'])
         with tempfile.TemporaryDirectory() as tempdir:
             destino = os.path.join(tempdir, 'cfdi-descarga')
-            descarga = DescargaSAT(uuid=uuid,
+            descarga = DescargaSAT(status_callback=no_op,
+                                   download_callback=no_op)
+            descarga._download_sat(uuid=uuid,
                 type_search=1,
                 día='00',
                 rfc=self.rfc, ciec=self.ciec,
-                carpeta_destino=destino,
-                status_callback=no_op, download_callback=no_op)
+                carpeta_destino=destino)
             self.assertEqual(expected, len(os.listdir(destino)))
 
     def test_rfc(self):
@@ -48,11 +49,12 @@ class DescargaSAT(unittest.TestCase):
         expected = int(seccion['expected'])
         with tempfile.TemporaryDirectory() as tempdir:
             destino = os.path.join(tempdir, 'cfdi-descarga')
-            descarga = DescargaSAT(año=año, mes=mes, día=día,
+            descarga = DescargaSAT(status_callback=no_op,
+                                   download_callback=no_op)
+            descarga._download_sat(año=año, mes=mes, día=día,
                 rfc_emisor=rfc_emisor,
                 rfc=self.rfc, ciec=self.ciec,
-                carpeta_destino=destino,
-                status_callback=no_op, download_callback=no_op)
+                carpeta_destino=destino)
             self.assertEqual(expected, len(os.listdir(destino)))
 
     def test_año_mes_día(self):
@@ -70,10 +72,11 @@ class DescargaSAT(unittest.TestCase):
         expected = int(seccion['expected'])
         with tempfile.TemporaryDirectory() as tempdir:
             destino = os.path.join(tempdir, 'cfdi-descarga')
-            descarga = DescargaSAT(año=año, mes=mes, día=día,
+            descarga = DescargaSAT(status_callback=no_op,
+                                   download_callback=no_op)
+            descarga._download_sat(año=año, mes=mes, día=día,
                 rfc=self.rfc, ciec=self.ciec,
-                carpeta_destino=destino,
-                status_callback=no_op, download_callback=no_op)
+                carpeta_destino=destino)
             self.assertEqual(expected, len(os.listdir(destino)))
 
     def test_mes_completo(self):
@@ -90,11 +93,12 @@ class DescargaSAT(unittest.TestCase):
         expected = int(seccion['expected'])
         with tempfile.TemporaryDirectory() as tempdir:
             destino = os.path.join(tempdir, 'cfdi-descarga')
-            descarga = DescargaSAT(año=año, mes=mes, día='00',
+            descarga = DescargaSAT(status_callback=no_op,
+                                   download_callback=no_op)
+            descarga._download_sat(año=año, mes=mes, día='00',
                 mes_completo_por_día=True,
                 rfc=self.rfc, ciec=self.ciec,
-                carpeta_destino=destino,
-                status_callback=no_op, download_callback=no_op)
+                carpeta_destino=destino)
             self.assertEqual(expected, len(os.listdir(destino)))
 
 

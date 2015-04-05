@@ -1665,31 +1665,19 @@ class CFDIPDF(object):
 
 class DescargaSAT(object):
 
-    def __init__(self, facturas_emitidas=False,
-                 type_search=0,
-                 rfc='', ciec='', carpeta_destino='',
-                 uuid='', rfc_emisor='',
-                 año=None, mes=None, día=None,
-                 mes_completo_por_día=False,
-                 status_callback=print,
+    def __init__(self, status_callback=print,
                  download_callback=print):
         self.g = Global()
         self.util = Util()
         self.status = status_callback
         self.progress = download_callback
-        self._download_sat(facturas_emitidas,
-            type_search,
-            rfc, ciec, carpeta_destino,
-            uuid, rfc_emisor,
-            año, mes, día,
-            mes_completo_por_día)
 
-    def _download_sat(self, facturas_emitidas,
-            type_search,
-            rfc, ciec, carpeta_destino,
-            uuid, rfc_emisor,
-            año, mes, día,
-            mes_completo_por_día):
+    def _download_sat(self, facturas_emitidas=False,
+                 type_search=0,
+                 rfc='', ciec='', carpeta_destino='',
+                 uuid='', rfc_emisor='',
+                 año=None, mes=None, día=None,
+                 mes_completo_por_día=False):
         'Descarga CFDIs del SAT a una carpeta local'
 
         self.status('Abriendo Firefox...')
