@@ -1718,6 +1718,7 @@ class DescargaSAT(object):
     def connect(self, profile, rfc='', ciec=''):
         'Lanza navegador y hace login en el portal del SAT'
 
+        self.status('Abriendo Firefox...')
         browser = webdriver.Firefox(profile)
         self.browser = browser
         self.status('Conectando...')
@@ -1883,6 +1884,8 @@ class DescargaSAT(object):
             if found:
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
                 return docs
+            else:
+                self.status('Sin facturas...')
         return []
 
     def download(self, docs):
