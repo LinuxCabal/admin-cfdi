@@ -89,17 +89,22 @@ def main():
     else:
         rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
     descarga = DescargaSAT()
-    descarga._download_sat(facturas_emitidas= args.facturas_emitidas,
-            type_search=1 * (args.uuid != ''),
-            rfc=rfc,
-            ciec=pwd,
-            carpeta_destino=args.carpeta_destino,
-            uuid=args.uuid,
-            rfc_emisor=args.rfc_emisor,
-            año=args.año,
-            mes=args.mes,
-            día=args.día,
-            mes_completo_por_día=args.mes_completo_por_día)
+    profile = descarga.get_firefox_profile(args.carpeta_destino)
+    try:
+        descarga.connect(profile, rfc=rfc, ciec=pwd)
+        docs = descarga.search(facturas_emitidas= args.facturas_emitidas,
+                type_search=1 * (args.uuid != ''),
+                uuid=args.uuid,
+                rfc_emisor=args.rfc_emisor,
+                año=args.año,
+                mes=args.mes,
+                día=args.día,
+                mes_completo_por_día=args.mes_completo_por_día)
+        descarga.download(docs)
+    except Exception as e:
+        print (e)
+    finally:
+        descarga.disconnect()
 
 
 if __name__ == '__main__':

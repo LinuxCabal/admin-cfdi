@@ -383,7 +383,22 @@ class Application(pygubu.TkApplication):
             return
         descarga = DescargaSAT(status_callback=self.msg_user,
                                download_callback=self.progress)
-        descarga._download_sat(**data)
+        profile = descarga.get_firefox_profile(data['carpeta_destino'])
+        try:
+            descarga.connect(profile, rfc=data['rfc'], ciec=data['ciec'])
+            docs = descarga.search(facturas_emitidas=data['facturas_emitidas'],
+                    type_search=1 * (data['uuid'] != ''),
+                    uuid=data['uuid'],
+                    rfc_emisor=data['rfc_emisor'],
+                    año=data['año'],
+                    mes=data['mes'],
+                    día=data['día'],
+                    mes_completo_por_día=data['mes_completo_por_día'])
+            descarga.download(docs)
+        except Exception as e:
+            print (e)
+        finally:
+            descarga.disconnect()
         return
 
     def _validate_download_sat(self):
