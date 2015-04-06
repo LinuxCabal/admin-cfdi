@@ -178,6 +178,17 @@ class DescargaSAT(unittest.TestCase):
         results = descarga.search(día='01', mes='02')
         self.assertEqual(0, len(results))
 
+    def test_download(self):
+        from unittest.mock import MagicMock
+        from admincfdi.pyutil import DescargaSAT
+        from selenium import webdriver
+
+        profile = webdriver.FirefoxProfile()
+        descarga = DescargaSAT(status_callback=self.status)
+        descarga.browser = MagicMock()
+        docs = [MagicMock()]
+        descarga.download(docs)
+
 
 if __name__ == '__main__':
     unittest.main()

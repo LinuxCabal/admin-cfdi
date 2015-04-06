@@ -1885,6 +1885,21 @@ class DescargaSAT(object):
                 return docs
         return []
 
+    def download(self, docs):
+        'Descarga los resultados'
+
+        if self.browser:
+            t = len(docs)
+            for i, v in enumerate(docs):
+                msg = 'Factura {} de {}'.format(i+1, t)
+                self.progress(i + 1, t)
+                self.status(msg)
+                download = self.g.SAT['page_cfdi'].format(
+                    v.get_attribute('onclick').split("'")[1])
+                self.browser.get(download)
+            self.progress(0, t)
+            self.util.sleep()
+
     def _download_sat(self, facturas_emitidas=False,
                  type_search=0,
                  rfc='', ciec='', carpeta_destino='',

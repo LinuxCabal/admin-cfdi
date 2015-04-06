@@ -56,15 +56,17 @@ class DescargaSAT(unittest.TestCase):
         seccion = self.config['uuid']
         uuid = seccion['uuid']
         expected = int(seccion['expected'])
+        descarga = DescargaSAT(status_callback=no_op,
+                               download_callback=no_op)
         with tempfile.TemporaryDirectory() as tempdir:
             destino = os.path.join(tempdir, 'cfdi-descarga')
-            descarga = DescargaSAT(status_callback=no_op,
-                                   download_callback=no_op)
-            descarga._download_sat(uuid=uuid,
+            profile = descarga.get_firefox_profile(destino)
+            descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+            docs = descarga.search(uuid=uuid,
                 type_search=1,
-                día='00',
-                rfc=self.rfc, ciec=self.ciec,
-                carpeta_destino=destino)
+                día='00')
+            descarga.download(docs)
+            descarga.disconnect()
             self.assertEqual(expected, len(os.listdir(destino)))
 
     def test_rfc(self):
