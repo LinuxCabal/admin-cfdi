@@ -17,6 +17,7 @@ class DescargaSAT(unittest.TestCase):
         time.sleep = Mock()
 
         self.status = Mock()
+        self.transfer = Mock()
 
         pyutil.print = Mock()
 
@@ -43,7 +44,7 @@ class DescargaSAT(unittest.TestCase):
         profile = webdriver.FirefoxProfile()
         descarga = DescargaSAT(status_callback=self.status)
         profile = descarga.connect(profile, rfc='x', ciec='y')
-        self.assertEqual(2, self.status.call_count)
+        self.assertEqual(3, self.status.call_count)
 
     def test_disconnect_not_connected(self):
         from admincfdi.pyutil import DescargaSAT
@@ -184,7 +185,8 @@ class DescargaSAT(unittest.TestCase):
         from selenium import webdriver
 
         profile = webdriver.FirefoxProfile()
-        descarga = DescargaSAT(status_callback=self.status)
+        descarga = DescargaSAT(status_callback=self.status,
+            download_callback=self.transfer)
         descarga.browser = MagicMock()
         docs = [MagicMock()]
         descarga.download(docs)
