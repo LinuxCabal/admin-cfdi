@@ -88,19 +88,23 @@ def main():
         pwd = getpass.getpass('CIEC: ')
     else:
         rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
-    data = {'type_invoice': args.facturas_emitidas,
-            'type_search': 1 * (args.uuid != ''),
-            'user_sat': {'target_sat': args.carpeta_destino,
-                            'user_sat': rfc,
-                            'password': pwd},
-            'search_uuid': args.uuid,
-            'search_rfc': args.rfc_emisor,
-            'search_year': args.año,
-            'search_month': args.mes,
-            'search_day': args.día,
-            'sat_month': args.mes_completo_por_día
-            }
-    descarga = DescargaSAT(data)
+    descarga = DescargaSAT()
+    profile = descarga.get_firefox_profile(args.carpeta_destino)
+    try:
+        descarga.connect(profile, rfc=rfc, ciec=pwd)
+        docs = descarga.search(facturas_emitidas= args.facturas_emitidas,
+                type_search=1 * (args.uuid != ''),
+                uuid=args.uuid,
+                rfc_emisor=args.rfc_emisor,
+                año=args.año,
+                mes=args.mes,
+                día=args.día,
+                mes_completo_por_día=args.mes_completo_por_día)
+        descarga.download(docs)
+    except Exception as e:
+        print (e)
+    finally:
+        descarga.disconnect()
 
 
 if __name__ == '__main__':

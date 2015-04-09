@@ -1665,21 +1665,17 @@ class CFDIPDF(object):
 
 class DescargaSAT(object):
 
-    def __init__(self, data, status_callback=print,
-            download_callback=print):
+    def __init__(self, status_callback=print,
+                 download_callback=print):
         self.g = Global()
         self.util = Util()
         self.status = status_callback
         self.progress = download_callback
-        self._download_sat(data)
+        self.browser = None
 
-    def _download_sat(self, data):
-        'Descarga CFDIs del SAT a una carpeta local'
+    def get_firefox_profile(self, carpeta_destino):
+        'Devuelve un perfil para Firefox'
 
-        self.status('Abriendo Firefox...')
-        page_query = self.g.SAT['page_receptor']
-        if data['type_invoice'] == 1:
-            page_query = self.g.SAT['page_emisor']
         # To prevent download dialog
         profile = webdriver.FirefoxProfile()
         profile.set_preference(
@@ -1692,7 +1688,7 @@ class DescargaSAT(object):
             'browser.helperApps.neverAsk.saveToDisk',
             'text/xml, application/octet-stream, application/xml')
         profile.set_preference(
-            'browser.download.dir', data['user_sat']['target_sat'])
+            'browser.download.dir', carpeta_destino)
         # mrE - desactivar telemetry
         profile.set_preference(
             'toolkit.telemetry.prompted', 2)
@@ -1717,39 +1713,76 @@ class DescargaSAT(object):
         #oculta la gran flecha animada al descargar
         profile.set_preference(
             'browser.download.animateNotifications', False)
-        try:
-            browser = webdriver.Firefox(profile)
-            self.status('Conectando...')
-            browser.get(self.g.SAT['page_init'])
-            txt = browser.find_element_by_name(self.g.SAT['user'])
-            txt.send_keys(data['user_sat']['user_sat'])
-            txt = browser.find_element_by_name(self.g.SAT['password'])
-            txt.send_keys(data['user_sat']['password'])
-            txt.submit()
-            self.util.sleep(3)
-            self.status('Conectado...')
+        return profile
+
+    def connect(self, profile, rfc='', ciec=''):
+        'Lanza navegador y hace login en el portal del SAT'
+
+        self.status('Abriendo Firefox...')
+        browser = webdriver.Firefox(profile)
+        self.browser = browser
+        self.status('Conectando...')
+        browser.get(self.g.SAT['page_init'])
+        txt = browser.find_element_by_name(self.g.SAT['user'])
+        txt.send_keys(rfc)
+        txt = browser.find_element_by_name(self.g.SAT['password'])
+        txt.send_keys(ciec)
+        txt.submit()
+        time.sleep(3)
+        self.status('Conectado...')
+
+    def disconnect(self):
+        'Cierra la sesión y el navegador'
+
+        if self.browser:
+            try:
+                self.status('Desconectando...')
+                link = self.browser.find_element_by_partial_link_text('Cerrar Sesi')
+                link.click()
+            except:
+                pass
+            finally:
+                self.browser.close()
+            self.status('Desconectado...')
+            self.browser = None
+
+    def search(self, facturas_emitidas=False,
+                 type_search=0,
+                 rfc='', ciec='',
+                 uuid='', rfc_emisor='',
+                 año=None, mes=None, día=None,
+                 mes_completo_por_día=False):
+        'Busca y regresa los resultados'
+
+        if self.browser:
+            browser = self.browser
+
+            page_query = self.g.SAT['page_receptor']
+            if facturas_emitidas == 1:
+                page_query = self.g.SAT['page_emisor']
+
             browser.get(page_query)
             self.util.sleep(3)
             self.status('Buscando...')
-            if data['type_search'] == 1:
+            if type_search == 1:
                 txt = browser.find_element_by_id(self.g.SAT['uuid'])
                 txt.click()
-                txt.send_keys(data['search_uuid'])
+                txt.send_keys(uuid)
             else:
                 # Descargar por fecha
                 opt = browser.find_element_by_id(self.g.SAT['date'])
                 opt.click()
                 self.util.sleep()
-                if data['search_rfc']:
-                    if data['type_search'] == 1:
+                if rfc_emisor:
+                    if type_search == 1:
                         txt = browser.find_element_by_id(self.g.SAT['receptor'])
                     else:
                         txt = browser.find_element_by_id(self.g.SAT['emisor'])
-                    txt.send_keys(data['search_rfc'])
+                    txt.send_keys(rfc_emisor)
                 # Emitidas
-                if data['type_invoice'] == 1:
-                    year = int(data['search_year'])
-                    month = int(data['search_month'])
+                if facturas_emitidas == 1:
+                    year = int(año)
+                    month = int(mes)
                     dates = self.util.get_dates(year, month)
                     txt = browser.find_element_by_id(self.g.SAT['date_from'])
                     arg = "document.getElementsByName('{}')[0]." \
@@ -1773,8 +1806,7 @@ class DescargaSAT(object):
                         'sbToggle_{}'.format(combo.get_attribute('sb')))
                     combo.click()
                     self.util.sleep(2)
-                    link = browser.find_element_by_link_text(
-                        data['search_year'])
+                    link = browser.find_element_by_link_text(año)
                     link.click()
                     self.util.sleep(2)
                     combo = browser.find_element_by_id(self.g.SAT['month'])
@@ -1782,20 +1814,18 @@ class DescargaSAT(object):
                         'sbToggle_{}'.format(combo.get_attribute('sb')))
                     combo.click()
                     self.util.sleep(2)
-                    link = browser.find_element_by_link_text(
-                        data['search_month'])
+                    link = browser.find_element_by_link_text(mes)
                     link.click()
                     self.util.sleep(2)
-                    if data['search_day'] != '00':
+                    if día != '00':
                         combo = browser.find_element_by_id(self.g.SAT['day'])
                         sb = combo.get_attribute('sb')
                         combo = browser.find_element_by_id(
                             'sbToggle_{}'.format(sb))
                         combo.click()
                         self.util.sleep()
-                        if data['search_month'] == data['search_day']:
-                            links = browser.find_elements_by_link_text(
-                                data['search_day'])
+                        if mes == día:
+                            links = browser.find_elements_by_link_text(día)
                             for l in links:
                                 p = l.find_element_by_xpath(
                                     '..').find_element_by_xpath('..')
@@ -1804,27 +1834,25 @@ class DescargaSAT(object):
                                     link = l
                                     break
                         else:
-                            link = browser.find_element_by_link_text(
-                                data['search_day'])
+                            link = browser.find_element_by_link_text(día)
                         link.click()
                         self.util.sleep()
 
             browser.find_element_by_id(self.g.SAT['submit']).click()
             sec = 3
-            if data['type_invoice'] != 1 and data['search_day'] == '00':
+            if facturas_emitidas != 1 and día == '00':
                 sec = 15
             self.util.sleep(sec)
             # Bug del SAT
-            if data['type_invoice'] != 1 and data['search_day'] != '00':
+            if facturas_emitidas != 1 and día != '00':
                 combo = browser.find_element_by_id(self.g.SAT['day'])
                 sb = combo.get_attribute('sb')
                 combo = browser.find_element_by_id(
                     'sbToggle_{}'.format(sb))
                 combo.click()
                 self.util.sleep(2)
-                if data['search_month'] == data['search_day']:
-                    links = browser.find_elements_by_link_text(
-                        data['search_day'])
+                if mes == día:
+                    links = browser.find_elements_by_link_text(día)
                     for l in links:
                         p = l.find_element_by_xpath(
                             '..').find_element_by_xpath('..')
@@ -1833,14 +1861,13 @@ class DescargaSAT(object):
                             link = l
                             break
                 else:
-                    link = browser.find_element_by_link_text(
-                        data['search_day'])
+                    link = browser.find_element_by_link_text(día)
                 link.click()
                 self.util.sleep(2)
                 browser.find_element_by_id(self.g.SAT['submit']).click()
                 self.util.sleep(sec)
-            elif data['type_invoice'] == 2 and data['sat_month']:
-                return self._download_sat_month(data, browser)
+            elif facturas_emitidas == 2 and mes_completo_por_día:
+                return self._download_sat_month(año, mes, browser)
 
             try:
                 found = True
@@ -1856,39 +1883,33 @@ class DescargaSAT(object):
 
             if found:
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
-                t = len(docs)
-                for i, v in enumerate(docs):
-                    msg = 'Factura {} de {}'.format(i+1, t)
-                    self.progress(i + 1, t)
-                    self.status(msg)
-                    download = self.g.SAT['page_cfdi'].format(
-                        v.get_attribute('onclick').split("'")[1])
-                    browser.get(download)
-                self.progress(0, t)
-                self.util.sleep()
+                return docs
             else:
                 self.status('Sin facturas...')
-        except Exception as e:
-            print (e)
-        finally:
-            try:
-                self.status('Desconectando...')
-                link = browser.find_element_by_partial_link_text('Cerrar Sesi')
-                link.click()
-            except:
-                pass
-            finally:
-                browser.close()
-        self.status('Desconectado...')
-        return
+        return []
 
-    def _download_sat_month(self, data, browser):
+    def download(self, docs):
+        'Descarga los resultados'
+
+        if self.browser:
+            t = len(docs)
+            for i, v in enumerate(docs):
+                msg = 'Factura {} de {}'.format(i+1, t)
+                self.progress(i + 1, t)
+                self.status(msg)
+                download = self.g.SAT['page_cfdi'].format(
+                    v.get_attribute('onclick').split("'")[1])
+                self.browser.get(download)
+            self.progress(0, t)
+            self.util.sleep()
+
+    def _download_sat_month(self, año, mes, browser):
         '''Descarga CFDIs del SAT a una carpeta local
 
         Todos los CFDIs del mes selecionado'''
 
-        year = int(data['search_year'])
-        month = int(data['search_month'])
+        year = int(año)
+        month = int(mes)
         days_month = self.util.get_days(year, month) + 1
         days = ['%02d' % x for x in range(1, days_month)]
         for d in days:
@@ -1897,7 +1918,7 @@ class DescargaSAT(object):
             combo = browser.find_element_by_id('sbToggle_{}'.format(sb))
             combo.click()
             self.util.sleep(2)
-            if data['search_month'] == d:
+            if mes == d:
                 links = browser.find_elements_by_link_text(d)
                 for l in links:
                     p = l.find_element_by_xpath(
