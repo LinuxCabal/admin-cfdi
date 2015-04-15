@@ -34,7 +34,7 @@ import tkinter as tk
 from tkinter.filedialog import askdirectory
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
-from pysimplesoap.client import SoapClient, SoapFault
+from requests import Request, Session
 from selenium import webdriver
 from fpdf import FPDF
 from admincfdi.values import Global
@@ -65,24 +65,44 @@ elif sys.platform == LINUX:
 
 class SAT(object):
     _webservice = 'https://consultaqr.facturaelectronica.sat.gob.mx/' \
-        'consultacfdiservice.svc?wsdl'
+        'consultacfdiservice.svc'
+    _soap = """<?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope
+        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <soap:Header/>
+        <soap:Body>
+        <Consulta xmlns="http://tempuri.org/">
+            <expresionImpresa>
+                ?re={emisor_rfc}&amp;rr={receptor_rfc}&amp;tt={total}&amp;id={uuid}
+            </expresionImpresa>
+        </Consulta>
+        </soap:Body>
+    </soap:Envelope>"""
 
-    def __init__(self):
+    def __init__(self, log):
+        self.log = log
         self.error = ''
         self.msg = ''
 
     def get_estatus(self, data):
+        data = self._soap.format(**data).encode('utf-8')
+        headers = {
+            'SOAPAction': '"http://tempuri.org/IConsultaCFDIService/Consulta"',
+            'Content-length': len(data),
+            'Content-type': 'text/xml; charset="UTF-8"'
+        }
+        s = Session()
+        req = Request('POST', self._webservice, data=data, headers=headers)
+        prepped = req.prepare()
         try:
-            args = '?re={emisor_rfc}&rr={receptor_rfc}&tt={total}&id={uuid}'
-            client = SoapClient(wsdl = self._webservice)
-            fac = args.format(**data)
-            res = client.Consulta(fac)
-            if 'ConsultaResult' in res:
-                self.msg = res['ConsultaResult']['Estado']
-                return True
-            return False
-        except SoapFault as sf:
-            self.error = sf.faultstring
+            response = s.send(prepped, timeout=5)
+            tree = ET.fromstring(response.text)
+            self.msg = tree[0][0][0][1].text
+            return True
+        except Exception as e:
+            self.log.error(str(e))
             return False
 
 
@@ -680,7 +700,7 @@ class Util(object):
                 'total': data['total'],
                 'uuid': data['UUID']
             }
-            sat = SAT()
+            sat = SAT(g.LOG)
             if sat.get_estatus(data_sat):
                 info.append(sat.msg)
             else:
