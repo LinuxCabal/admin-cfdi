@@ -106,3 +106,104 @@ de la interfase gráfica, en esta secuencia::
     Factura 12 de 12
     Desconectando...
     Desconectado...
+
+API
+===
+El módulo :mod:`admincfdi.pyutil` provee varias clases, las cuales
+pueden ser usadas por las aplicaciones.  En las siguientes
+secciones se explican y dan ejemplos de uso cada una de estas clases.
+
+
+SAT
+---
+
+ValidCFDI
+---------
+
+Util
+----
+
+Mail
+----
+
+LibO
+----
+
+NumerosLetras
+-------------
+
+CFDIPDF
+-------
+
+DescargaSAT
+-----------
+Lleva a cabo al descarga de CFDIs del sitio del SAT.  Para descargar
+un conjunto de CFDIs con ciertos criterios de búsqueda, se
+utilizan los siguientes pasos:
+
+#. Instanciar :class:`~admincfdi.pyutil.DescargaSAT`::
+
+    descarga = DescargaSAT()
+
+#. Crear un perfil de Firefox::
+
+    profile = descarga.get_firefox_profile(carpeta_destino)
+
+#. Conectar al sitio del SAT, lanzando Firefox::
+
+    descarga.connect(profile, rfc=rfc, ciec=pwd)
+
+#. Realizar una búsqueda, guardando la lista de resultados
+   obtenida::
+
+        docs = descarga.search(facturas_emitidas=facturas_emitidas,
+                type_search=1 * (uuid != ''),
+                uuid=uuid,
+                rfc_emisor=rfc_emisor,
+                año=año,
+                mes=mes,
+                día=día,
+                mes_completo_por_día=mes_completo_por_día)
+
+#. Descargar los CFDIs::
+
+        descarga.download(docs)
+
+#. Desconectar la sesión del sitio del SAT y terminar
+   Firefox::
+
+        descarga.disconnect()
+
+Los pasos 4. de búsqueda y 5. de descarga pueden repetirse, si
+se desean descargar dos o más conjuntos de CFDIs con diferentes
+criterios de búsqueda, manteniendo la sesión original abierta.
+
+Como ejemplo, a continuación se muestra el uso de los
+pasos en las aplicaciones ``admin-cfdi`` y ``descarga-cfdi``
+que son parte del proyecto::
+
+    descarga = DescargaSAT()
+    profile = descarga.get_firefox_profile(args.carpeta_destino)
+    try:
+        descarga.connect(profile, rfc=rfc, ciec=pwd)
+        docs = descarga.search(facturas_emitidas= args.facturas_emitidas,
+                type_search=1 * (args.uuid != ''),
+                uuid=args.uuid,
+                rfc_emisor=args.rfc_emisor,
+                año=args.año,
+                mes=args.mes,
+                día=args.día,
+                mes_completo_por_día=args.mes_completo_por_día)
+        descarga.download(docs)
+    except Exception as e:
+        print (e)
+    finally:
+        descarga.disconnect()
+
+Las cláusulas ``try/except/finally`` son para manejar alguna
+excepción que ocurra en cualquiera de los pasos, y garantizar
+que en cualquier caso se hace la desconexión de la sesión
+y se termina Firefox.
+
+CSVPDF
+------

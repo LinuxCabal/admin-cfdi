@@ -13,7 +13,7 @@ admincfdi
 pyutil
 ------
 
-.. automodule:: pyutil
+.. automodule:: admincfdi.pyutil
    :members:
    :undoc-members:
    :private-members:
@@ -21,7 +21,7 @@ pyutil
 values
 ------
 
-.. automodule:: values
+.. automodule:: admincfdi.values
    :members:
    :undoc-members:
    :private-members:
