@@ -1816,6 +1816,23 @@ class DescargaSAT(object):
                         self.g.SAT['date_to_name'])
                     browser.execute_script(arg)
                     txt.send_keys(dates[1])
+
+                    # Hay que seleccionar también la hora, minuto y segundo
+                    self.util.sleep(3)
+                    combos = (
+                        (self.g.SAT['second'], '59'),
+                        (self.g.SAT['minute'], '59'),
+                        (self.g.SAT['hour'], '23'),
+                    )
+                    for control, value in combos:
+                        combo = browser.find_element_by_id(control)
+                        combo = browser.find_element_by_id(
+                            self.g.SAT['combos'].format(combo.get_attribute('sb')))
+                        combo.click()
+                        self.util.sleep(2)
+                        link = browser.find_element_by_link_text(value)
+                        link.click()
+                        self.util.sleep(2)
                 # Recibidas
                 else:
                     #~ combos = browser.find_elements_by_class_name(
