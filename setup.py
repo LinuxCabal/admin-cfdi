@@ -12,7 +12,7 @@ setup(name='Admin-CFDI',
       author_email='correopublico@mauriciobaeza.org',
       url='https://facturalibre.net/servicios/',
       packages=find_packages(),
-      install_requires=['pypng', 'fpdf', 'pygubu', 'selenium', 'pyqrcode', 'pysimplesoap'],
+      install_requires=['pypng', 'fpdf', 'pygubu', 'selenium', 'pyqrcode', 'requests'],
       package_data = {'': ['img/*.png', 'img/*.gif', 'ui/*', 'template/*']},
       scripts=['admin-cfdi','descarga-cfdi', 'cfdi2pdf'])
 
