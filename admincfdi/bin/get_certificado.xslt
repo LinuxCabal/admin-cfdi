@@ -51,6 +51,10 @@
                     <xsl:if test="string-length(@certificado)>1729">
                         <xsl:value-of select="$newline"/>
                         <xsl:value-of select="substring(@certificado, 1729, 64)"/>
+                        <xsl:if test="string-length(@certificado)>1793">
+                            <xsl:value-of select="$newline"/>
+                            <xsl:value-of select="substring(@certificado, 1793, 64)"/>
+                        </xsl:if>
                     </xsl:if>
                 </xsl:if>
             </xsl:if>

@@ -4,7 +4,7 @@
 <xsl:output method = "text" />
 
 <xsl:template match="cfdi:Comprobante">
-      <xsl:value-of select="@sello"/>
+    <xsl:value-of select="translate(@sello, ' ', '')"/>
 </xsl:template>
 
 </xsl:stylesheet>
