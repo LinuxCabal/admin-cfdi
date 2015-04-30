@@ -36,6 +36,9 @@ from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from requests import Request, Session
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from fpdf import FPDF
 from admincfdi.values import Global
 
