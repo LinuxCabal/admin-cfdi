@@ -64,7 +64,7 @@ class Global(object):
     PESO = ('mxn', 'mxp', 'm.n.', 'p', 'mn', 'pmx', 'mex')
     DOLAR = ('dólar', 'dólares', 'dolar', 'dolares', 'usd')
     ICON = os.path.join(PATHS['img'], 'favicon.png')
-    YEAR_INIT = 2011
+    YEAR_INIT = 2014
     FIELDS_REPORT = '{UUID}|{serie}|{folio}|{emisor_rfc}|{emisor_nombre}|' \
         '{receptor_rfc}|{receptor_nombre}|{fecha}|{FechaTimbrado}|' \
         '{tipoDeComprobante}|{Moneda}|{TipoCambio}|{subTotal}|' \
