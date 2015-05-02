@@ -1754,7 +1754,12 @@ class DescargaSAT(object):
         txt = browser.find_element_by_name(self.g.SAT['password'])
         txt.send_keys(ciec)
         txt.submit()
-        time.sleep(3)
+        wait = WebDriverWait(browser, 10)
+        wait.until(EC.title_contains('NetIQ Access'))
+        iframe = browser.find_element(By.ID, 'content')
+        browser.switch_to.frame(iframe)
+        wait.until(EC.text_to_be_present_in_element(
+            (By.CLASS_NAME, 'messagetext'), 'session has been authenticated'))
         self.status('Conectado...')
 
     def disconnect(self):
@@ -1790,7 +1795,8 @@ class DescargaSAT(object):
                 page_query = self.g.SAT['page_emisor']
 
             browser.get(page_query)
-            self.util.sleep(3)
+            wait = WebDriverWait(browser, 10)
+            wait.until(EC.title_contains('Buscar CFDI'))
             self.status('Buscando...')
             if uuid:
                 txt = browser.find_element_by_id(self.g.SAT['uuid'])
@@ -1800,12 +1806,13 @@ class DescargaSAT(object):
                 # Descargar por fecha
                 opt = browser.find_element_by_id(self.g.SAT['date'])
                 opt.click()
-                self.util.sleep(3)
+                if facturas_emitidas:
+                    txt = wait.until(EC.element_to_be_clickable(
+                                        (By.ID, self.g.SAT['receptor'])))
+                else:
+                    txt = wait.until(EC.element_to_be_clickable(
+                                        (By.ID, self.g.SAT['emisor'])))
                 if rfc_emisor:
-                    if uuid:
-                        txt = browser.find_element_by_id(self.g.SAT['receptor'])
-                    else:
-                        txt = browser.find_element_by_id(self.g.SAT['emisor'])
                     txt.send_keys(rfc_emisor)
                 # Emitidas
                 if facturas_emitidas:
