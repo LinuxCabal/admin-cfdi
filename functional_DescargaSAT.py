@@ -159,7 +159,7 @@ class DescargaSAT(unittest.TestCase):
             profile = descarga.get_firefox_profile(destino)
             descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
             docs = descarga.search(año=año, mes=mes, día='00',
-                facturas_emitidas=1)
+                facturas_emitidas=True)
             descarga.disconnect()
             self.assertEqual(expected, len(docs))
 

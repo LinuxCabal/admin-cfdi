@@ -47,8 +47,8 @@ def process_command_line_arguments():
     help = 'Descargar facturas emitidas. ' \
            'Por omisión se descargan facturas recibidas'
     parser.add_argument('--facturas-emitidas',
-                        action='store_const', const=1,
-                        help=help, default=2)
+                        action='store_const', const=True,
+                        help=help, default=False)
 
     help = 'UUID. Por omisión no se usa en la búsqueda. ' \
            'Esta opción tiene precedencia sobre las demás ' \

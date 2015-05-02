@@ -1785,7 +1785,7 @@ class DescargaSAT(object):
             browser = self.browser
 
             page_query = self.g.SAT['page_receptor']
-            if facturas_emitidas == 1:
+            if facturas_emitidas:
                 page_query = self.g.SAT['page_emisor']
 
             browser.get(page_query)
@@ -1807,7 +1807,7 @@ class DescargaSAT(object):
                         txt = browser.find_element_by_id(self.g.SAT['emisor'])
                     txt.send_keys(rfc_emisor)
                 # Emitidas
-                if facturas_emitidas == 1:
+                if facturas_emitidas:
                     year = int(año)
                     month = int(mes)
                     day = int(día)
@@ -1893,7 +1893,7 @@ class DescargaSAT(object):
             #~ El mismo tiempo tanto para emitidas como recibidas
             self.util.sleep(sec)
             # Bug del SAT
-            if facturas_emitidas != 1 and día != '00':
+            if not facturas_emitidas and día != '00':
                 combo = browser.find_element_by_id(self.g.SAT['day'])
                 sb = combo.get_attribute('sb')
                 combo = browser.find_element_by_id(
@@ -1915,7 +1915,7 @@ class DescargaSAT(object):
                 self.util.sleep(2)
                 browser.find_element_by_id(self.g.SAT['submit']).click()
                 self.util.sleep(sec)
-            elif facturas_emitidas == 2 and mes_completo_por_día:
+            elif not facturas_emitidas and mes_completo_por_día:
                 return self._download_sat_month(año, mes, browser)
 
             try:
