@@ -40,7 +40,6 @@ class DescargaSAT(unittest.TestCase):
         profile = descarga.get_firefox_profile('destino')
         descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
         result = descarga.search(uuid=uuid,
-            type_search=1,
             día='00')
         descarga.disconnect()
         self.assertEqual(expected, len(result))
@@ -62,9 +61,7 @@ class DescargaSAT(unittest.TestCase):
             destino = os.path.join(tempdir, 'cfdi-descarga')
             profile = descarga.get_firefox_profile(destino)
             descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
-            docs = descarga.search(uuid=uuid,
-                type_search=1,
-                día='00')
+            docs = descarga.search(uuid=uuid, día='00')
             descarga.download(docs)
             descarga.disconnect()
             self.assertEqual(expected, len(os.listdir(destino)))

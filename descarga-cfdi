@@ -93,7 +93,6 @@ def main():
     try:
         descarga.connect(profile, rfc=rfc, ciec=pwd)
         docs = descarga.search(facturas_emitidas= args.facturas_emitidas,
-                type_search=1 * (args.uuid != ''),
                 uuid=args.uuid,
                 rfc_emisor=args.rfc_emisor,
                 año=args.año,

@@ -1771,7 +1771,6 @@ class DescargaSAT(object):
 
     def search(self,
         facturas_emitidas=False,
-        type_search=0,
         rfc='',
         ciec='',
         uuid='',
@@ -1792,7 +1791,7 @@ class DescargaSAT(object):
             browser.get(page_query)
             self.util.sleep(3)
             self.status('Buscando...')
-            if type_search == 1:
+            if uuid:
                 txt = browser.find_element_by_id(self.g.SAT['uuid'])
                 txt.click()
                 txt.send_keys(uuid)
@@ -1802,7 +1801,7 @@ class DescargaSAT(object):
                 opt.click()
                 self.util.sleep(3)
                 if rfc_emisor:
-                    if type_search == 1:
+                    if uuid:
                         txt = browser.find_element_by_id(self.g.SAT['receptor'])
                     else:
                         txt = browser.find_element_by_id(self.g.SAT['emisor'])

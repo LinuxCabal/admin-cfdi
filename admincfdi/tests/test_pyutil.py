@@ -81,8 +81,7 @@ class DescargaSAT(unittest.TestCase):
         profile = webdriver.FirefoxProfile()
         descarga = DescargaSAT(status_callback=self.status)
         descarga.browser = MagicMock()
-        results = descarga.search(type_search=1, uuid='uuid',
-                                  día='00')
+        results = descarga.search(uuid='uuid', día='00')
         self.assertEqual(0, len(results))
 
     def test_search_facturas_emitidas(self):

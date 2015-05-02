@@ -388,7 +388,6 @@ class Application(pygubu.TkApplication):
             descarga.connect(profile, rfc=data['rfc'], ciec=data['ciec'])
             docs = descarga.search(
                 facturas_emitidas=data['facturas_emitidas'],
-                type_search=1 * (data['uuid'] != ''),
                 uuid=data['uuid'],
                 rfc_emisor=data['rfc_emisor'],
                 año=data['año'],
@@ -432,9 +431,6 @@ class Application(pygubu.TkApplication):
         - type_invoice: La selección hecha en
           *Tipo de consulta*: 2 facturas recibidas,
           1 facturas emitidas
-        - type_search: La selección hecha en *Tipo
-          de búsqueda*: 0 por fecha,
-          1 por folio fiscal (UUID)
         - search_uuid: el valor llenado para *UUID*,
           es cadena vacía por omisión
         - search_rfc: el valor llenado en *RFC Emisor*,
@@ -489,7 +485,6 @@ class Application(pygubu.TkApplication):
         user = self.users_sat[current_user]
         data = {
             'facturas_emitidas': self._get('type_invoice'),
-            'type_search': opt,
             'rfc': user['user_sat'],
             'ciec': user['password'],
             'carpeta_destino': user['target_sat'],

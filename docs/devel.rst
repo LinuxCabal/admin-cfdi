@@ -157,7 +157,6 @@ utilizan los siguientes pasos:
    obtenida::
 
         docs = descarga.search(facturas_emitidas=facturas_emitidas,
-                type_search=1 * (uuid != ''),
                 uuid=uuid,
                 rfc_emisor=rfc_emisor,
                 año=año,
@@ -187,7 +186,6 @@ que son parte del proyecto::
     try:
         descarga.connect(profile, rfc=rfc, ciec=pwd)
         docs = descarga.search(facturas_emitidas= args.facturas_emitidas,
-                type_search=1 * (args.uuid != ''),
                 uuid=args.uuid,
                 rfc_emisor=args.rfc_emisor,
                 año=args.año,
