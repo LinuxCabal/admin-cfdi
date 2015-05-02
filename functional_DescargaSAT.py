@@ -143,6 +143,29 @@ class DescargaSAT(unittest.TestCase):
             descarga.disconnect()
             self.assertEqual(expected, len(os.listdir(destino)))
 
+    def test_emitidas(self):
+        import os
+        import tempfile
+        from admincfdi.pyutil import DescargaSAT
+
+        def no_op(*args):
+            pass
+
+        seccion = self.config['emitidas']
+        año = seccion['año']
+        mes = seccion['mes']
+        expected = int(seccion['expected'])
+        descarga = DescargaSAT(status_callback=no_op,
+                               download_callback=no_op)
+        with tempfile.TemporaryDirectory() as tempdir:
+            destino = os.path.join(tempdir, 'cfdi-descarga')
+            profile = descarga.get_firefox_profile(destino)
+            descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+            docs = descarga.search(año=año, mes=mes, día='00',
+                facturas_emitidas=1)
+            descarga.disconnect()
+            self.assertEqual(expected, len(docs))
+
 
 if __name__ == '__main__':
 	unittest.main()
