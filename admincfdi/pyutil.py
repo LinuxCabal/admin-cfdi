@@ -1771,8 +1771,6 @@ class DescargaSAT(object):
 
     def search(self,
         facturas_emitidas=False,
-        rfc='',
-        ciec='',
         uuid='',
         rfc_emisor='',
         año=None,
