@@ -1935,6 +1935,8 @@ class DescargaSAT(object):
             results_table = wait.until(EC.presence_of_element_located(
                 (By.ID, 'ctl00_MainContent_PnlResultados')))
             if results_table.is_displayed():
+                wait.until(EC.element_to_be_clickable(
+                    (By.NAME, self.g.SAT['download'])))
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
                 return docs
             else:
