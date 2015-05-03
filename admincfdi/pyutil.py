@@ -1859,20 +1859,22 @@ class DescargaSAT(object):
                     #~ combos = browser.find_elements_by_class_name(
                         #~ self.g.SAT['combos'])
                     #~ combos[0].click()
-                    combo = browser.find_element_by_id(self.g.SAT['year'])
+                    combo = wait.until(EC.presence_of_element_located(
+                                        (By.ID, self.g.SAT['year'])))
+                    sb = combo.get_attribute('sb')
                     combo = browser.find_element_by_id(
-                        'sbToggle_{}'.format(combo.get_attribute('sb')))
+                        'sbToggle_{}'.format(sb))
                     combo.click()
-                    self.util.sleep(2)
-                    link = browser.find_element_by_link_text(año)
+                    link = wait.until(EC.element_to_be_clickable(
+                                        (By.LINK_TEXT, año)))
                     link.click()
-                    self.util.sleep(2)
-                    combo = browser.find_element_by_id(self.g.SAT['month'])
+                    combo = wait.until(EC.presence_of_element_located(
+                                        (By.ID, self.g.SAT['month'])))
                     combo = browser.find_element_by_id(
                         'sbToggle_{}'.format(combo.get_attribute('sb')))
                     combo.click()
-                    self.util.sleep(2)
-                    link = browser.find_element_by_link_text(mes)
+                    link = wait.until(EC.element_to_be_clickable(
+                                        (By.LINK_TEXT, mes)))
                     link.click()
                     self.util.sleep(2)
                     if día != '00':
@@ -1897,9 +1899,8 @@ class DescargaSAT(object):
                         self.util.sleep()
 
             browser.find_element_by_id(self.g.SAT['submit']).click()
-            sec = 15
-            #~ El mismo tiempo tanto para emitidas como recibidas
-            self.util.sleep(sec)
+            wait.until(EC.presence_of_element_located(
+                        (By.ID, 'ctl00_MainContent_UpnlResultados')))
             # Bug del SAT
             if not facturas_emitidas and día != '00':
                 combo = browser.find_element_by_id(self.g.SAT['day'])
@@ -1908,6 +1909,8 @@ class DescargaSAT(object):
                     'sbToggle_{}'.format(sb))
                 combo.click()
                 self.util.sleep(2)
+                link = wait.until(EC.element_to_be_clickable(
+                                    (By.LINK_TEXT, día)))
                 if mes == día:
                     links = browser.find_elements_by_link_text(día)
                     for l in links:
