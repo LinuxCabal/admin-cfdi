@@ -1924,25 +1924,17 @@ class DescargaSAT(object):
                 else:
                     link = browser.find_element_by_link_text(día)
                 link.click()
-                self.util.sleep(2)
+                link = wait.until(EC.element_to_be_clickable(
+                                    (By.LINK_TEXT, día)))
                 browser.find_element_by_id(self.g.SAT['submit']).click()
-                self.util.sleep(sec)
+                wait.until(EC.presence_of_element_located(
+                            (By.ID, 'ctl00_MainContent_UpnlResultados')))
             elif not facturas_emitidas and mes_completo_por_día:
                 return self._download_sat_month(año, mes, browser)
 
-            try:
-                found = True
-                content = browser.find_elements_by_class_name(
-                    self.g.SAT['subtitle'])
-                for c in content:
-                    if self.g.SAT['found'] in c.get_attribute('innerHTML') \
-                        and c.is_displayed():
-                        found = False
-                        break
-            except Exception as e:
-                print (str(e))
-
-            if found:
+            results_table = wait.until(EC.presence_of_element_located(
+                (By.ID, 'ctl00_MainContent_PnlResultados')))
+            if results_table.is_displayed():
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
                 return docs
             else:
