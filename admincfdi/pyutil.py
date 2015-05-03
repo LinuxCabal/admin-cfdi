@@ -1878,8 +1878,8 @@ class DescargaSAT(object):
                     link.click()
                     self.util.sleep(2)
                     if día != '00':
-                        combo = browser.find_element_by_id(self.g.SAT['day'])
-                        sb = combo.get_attribute('sb')
+                        combo_day = browser.find_element_by_id(self.g.SAT['day'])
+                        sb = combo_day.get_attribute('sb')
                         combo = browser.find_element_by_id(
                             'sbToggle_{}'.format(sb))
                         combo.click()
@@ -1903,6 +1903,7 @@ class DescargaSAT(object):
                         (By.ID, 'ctl00_MainContent_UpnlResultados')))
             # Bug del SAT
             if not facturas_emitidas and día != '00':
+                wait.until(EC.staleness_of(combo_day))
                 combo = browser.find_element_by_id(self.g.SAT['day'])
                 sb = combo.get_attribute('sb')
                 combo = browser.find_element_by_id(
