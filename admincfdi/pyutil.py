@@ -451,10 +451,13 @@ class Util(object):
     def now(self):
         return datetime.now()
 
-    def get_dates(self, year, month):
-        days = calendar.monthrange(year, month)[1]
-        d1 = '01/{:02d}/{}'.format(month, year)
-        d2 = '{}/{:02d}/{}'.format(days, month, year)
+    def get_dates(self, year, month, day=0):
+        if day:
+            d1 = d2 = '{:02d}/{:02d}/{}'.format(day, month, year)
+        else:
+            days = calendar.monthrange(year, month)[1]
+            d1 = '01/{:02d}/{}'.format(month, year)
+            d2 = '{}/{:02d}/{}'.format(days, month, year)
         return d1, d2
 
     def get_days(self, year, month):
@@ -1766,12 +1769,17 @@ class DescargaSAT(object):
             self.status('Desconectado...')
             self.browser = None
 
-    def search(self, facturas_emitidas=False,
-                 type_search=0,
-                 rfc='', ciec='',
-                 uuid='', rfc_emisor='',
-                 año=None, mes=None, día=None,
-                 mes_completo_por_día=False):
+    def search(self,
+        facturas_emitidas=False,
+        type_search=0,
+        rfc='',
+        ciec='',
+        uuid='',
+        rfc_emisor='',
+        año=None,
+        mes=None,
+        día=None,
+        mes_completo_por_día=False):
         'Busca y regresa los resultados'
 
         if self.browser:
@@ -1792,7 +1800,7 @@ class DescargaSAT(object):
                 # Descargar por fecha
                 opt = browser.find_element_by_id(self.g.SAT['date'])
                 opt.click()
-                self.util.sleep()
+                self.util.sleep(3)
                 if rfc_emisor:
                     if type_search == 1:
                         txt = browser.find_element_by_id(self.g.SAT['receptor'])
@@ -1803,7 +1811,11 @@ class DescargaSAT(object):
                 if facturas_emitidas == 1:
                     year = int(año)
                     month = int(mes)
-                    dates = self.util.get_dates(year, month)
+                    day = int(día)
+                    if not mes_completo_por_día and day:
+                        dates = self.util.get_dates(year, month, day)
+                    else:
+                        dates = self.util.get_dates(year, month)
                     txt = browser.find_element_by_id(self.g.SAT['date_from'])
                     arg = "document.getElementsByName('{}')[0]." \
                         "removeAttribute('disabled');".format(
@@ -1833,6 +1845,8 @@ class DescargaSAT(object):
                         link = browser.find_element_by_link_text(value)
                         link.click()
                         self.util.sleep(2)
+                    if mes_completo_por_día:
+                        return self._download_sat_month_emitidas(dates[1], day)
                 # Recibidas
                 else:
                     #~ combos = browser.find_elements_by_class_name(
@@ -1876,9 +1890,8 @@ class DescargaSAT(object):
                         self.util.sleep()
 
             browser.find_element_by_id(self.g.SAT['submit']).click()
-            sec = 3
-            if facturas_emitidas != 1 and día == '00':
-                sec = 15
+            sec = 15
+            #~ El mismo tiempo tanto para emitidas como recibidas
             self.util.sleep(sec)
             # Bug del SAT
             if facturas_emitidas != 1 and día != '00':
@@ -1927,7 +1940,9 @@ class DescargaSAT(object):
 
     def download(self, docs):
         'Descarga los resultados'
-
+        if docs is None:
+            self.status('No se encontraron documentos')
+            return
         if self.browser:
             t = len(docs)
             for i, v in enumerate(docs):
@@ -1939,11 +1954,12 @@ class DescargaSAT(object):
                 self.browser.get(download)
             self.progress(0, t)
             self.util.sleep()
+        return
 
     def _download_sat_month(self, año, mes, browser):
         '''Descarga CFDIs del SAT a una carpeta local
 
-        Todos los CFDIs del mes selecionado'''
+        Todos los CFDIs recibidos del mes selecionado'''
 
         year = int(año)
         month = int(mes)
@@ -1983,6 +1999,41 @@ class DescargaSAT(object):
                     self.util.sleep()
                 self.progress(0, t)
                 self.util.sleep()
+        return
+
+    def _download_sat_month_emitidas(self, date_end, day_init):
+        '''Descarga CFDIs del SAT a una carpeta local
+
+        Todos los CFDIs emitidos del mes selecionado
+        La interfaz en el SAT para facturas emitidas es diferente que para las
+        recibidas, es necesario buscar otros controles.
+        '''
+        if day_init > 0:
+            day_init -= 1
+        last_day = int(date_end.split('/')[0])
+        for day in range(day_init, last_day):
+            current = '{:02d}'.format(day + 1) + date_end[2:]
+            print ("Día: ", current)
+            arg = "document.getElementsByName('{}')[0].removeAttribute(" \
+                "'disabled');".format(self.g.SAT['date_from_name'])
+            self.browser.execute_script(arg)
+            arg = "document.getElementsByName('{}')[0].removeAttribute(" \
+                "'disabled');".format(self.g.SAT['date_to_name'])
+            self.browser.execute_script(arg)
+            date_from = self.browser.find_element_by_id(self.g.SAT['date_from'])
+            date_to = self.browser.find_element_by_id(self.g.SAT['date_to'])
+            date_from.clear()
+            date_to.clear()
+            date_from.send_keys(current)
+            date_to.send_keys(current)
+            self.browser.find_element_by_id(self.g.SAT['submit']).click()
+            self.util.sleep(5)
+            docs = self.browser.find_elements_by_name(self.g.SAT['download'])
+            if docs:
+                print ("\tDocumentos: ", len(docs))
+            else:
+                print ("\tDocumentos: 0")
+            self.download(docs)
         return
 
 

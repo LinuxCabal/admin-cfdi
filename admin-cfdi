@@ -381,22 +381,23 @@ class Application(pygubu.TkApplication):
         ok, data = self._validate_download_sat()
         if not ok:
             return
-        descarga = DescargaSAT(status_callback=self.msg_user,
-                               download_callback=self.progress)
+        descarga = DescargaSAT(
+            status_callback=self.msg_user, download_callback=self.progress)
         profile = descarga.get_firefox_profile(data['carpeta_destino'])
         try:
             descarga.connect(profile, rfc=data['rfc'], ciec=data['ciec'])
-            docs = descarga.search(facturas_emitidas=data['facturas_emitidas'],
-                    type_search=1 * (data['uuid'] != ''),
-                    uuid=data['uuid'],
-                    rfc_emisor=data['rfc_emisor'],
-                    año=data['año'],
-                    mes=data['mes'],
-                    día=data['día'],
-                    mes_completo_por_día=data['mes_completo_por_día'])
+            docs = descarga.search(
+                facturas_emitidas=data['facturas_emitidas'],
+                type_search=1 * (data['uuid'] != ''),
+                uuid=data['uuid'],
+                rfc_emisor=data['rfc_emisor'],
+                año=data['año'],
+                mes=data['mes'],
+                día=data['día'],
+                mes_completo_por_día=data['mes_completo_por_día'])
             descarga.download(docs)
         except Exception as e:
-            print (e)
+            self.g.LOG.error("Descarga SAT: \n" + str(e))
         finally:
             descarga.disconnect()
         return
@@ -484,10 +485,7 @@ class Application(pygubu.TkApplication):
                     self.util.msgbox(msg)
                     return False, data
         sat_month = self._get('sat_month')
-        if sat_month:
-            search_day = '00'
-        else:
-            search_day = self._get('search_day')
+        search_day = self._get('search_day')
         user = self.users_sat[current_user]
         data = {
             'facturas_emitidas': self._get('type_invoice'),
