@@ -1775,7 +1775,7 @@ class DescargaSAT(object):
         rfc_emisor='',
         año=None,
         mes=None,
-        día=None,
+        día='00',
         mes_completo_por_día=False):
         'Busca y regresa los resultados'
 
