@@ -1919,8 +1919,9 @@ class DescargaSAT(object):
                         self.util.sleep()
 
             browser.find_element_by_id(self.g.SAT['submit']).click()
-            wait.until(EC.presence_of_element_located(
-                        (By.ID, 'ctl00_MainContent_UpnlResultados')))
+            wait.until(visibility_of_either(
+                (By.ID, "ctl00_MainContent_PnlResultados"),
+                (By.ID, 'ctl00_MainContent_PnlNoResultados')))
             # Bug del SAT
             if not facturas_emitidas and día != '00':
                 wait.until(EC.staleness_of(combo_day))
@@ -1947,14 +1948,16 @@ class DescargaSAT(object):
                 link = wait.until(EC.element_to_be_clickable(
                                     (By.LINK_TEXT, día)))
                 browser.find_element_by_id(self.g.SAT['submit']).click()
-                wait.until(EC.presence_of_element_located(
-                            (By.ID, 'ctl00_MainContent_UpnlResultados')))
+                wait.until(visibility_of_either(
+                    (By.ID, "ctl00_MainContent_PnlResultados"),
+                    (By.ID, 'ctl00_MainContent_PnlNoResultados')))
             elif not facturas_emitidas and mes_completo_por_día:
                 return self._download_sat_month(año, mes, browser)
 
-            results_table = wait.until(EC.presence_of_element_located(
-                (By.ID, 'ctl00_MainContent_PnlResultados')))
-            if results_table.is_displayed():
+            results = wait.until(visibility_of_either(
+                (By.ID, "ctl00_MainContent_PnlResultados"),
+                (By.ID, 'ctl00_MainContent_PnlNoResultados')))
+            if 'PnlResultados' in results.get_attribute('id'):
                 wait.until(EC.element_to_be_clickable(
                     (By.NAME, self.g.SAT['download'])))
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
