@@ -13,6 +13,9 @@ class DescargaSAT(unittest.TestCase):
         pyutil.webdriver = Mock()
         pyutil.webdriver.FirefoxProfile = webdriver.FirefoxProfile
 
+        self.WebDriverWait = pyutil.WebDriverWait
+        pyutil.WebDriverWait = Mock()
+
         self.sleep = time.sleep
         time.sleep = Mock()
 
@@ -26,6 +29,7 @@ class DescargaSAT(unittest.TestCase):
         from admincfdi import pyutil
 
         pyutil.webdriver = self.webdriver
+        pyutil.WebDriverWait = self.WebDriverWait
         time.sleep = self.sleep
         del pyutil.print
 

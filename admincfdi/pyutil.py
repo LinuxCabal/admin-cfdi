@@ -36,6 +36,9 @@ from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from requests import Request, Session
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from fpdf import FPDF
 from admincfdi.values import Global
 
@@ -1685,6 +1688,26 @@ class CFDIPDF(object):
         return date.strftime('{}, %d de {} de %Y'.format(
             d[date.weekday()], m[date.month]))
 
+class visibility_of_either(object):
+    """ An expectation for checking that one of two elements,
+    located by locator 1 and locator2, is visible.
+    Visibility means that the element is not only
+    displayed but also has a height and width that is
+    greater than 0.
+    returns the WebElement that is visible.
+    """
+    def __init__(self, locator1, locator2):
+        self.locator1 = locator1
+        self.locator2 = locator2
+
+    def __call__(self, driver):
+        element1 = driver.find_element(*self.locator1)
+        element2 = driver.find_element(*self.locator2)
+        return _element_if_visible(element1) or \
+               _element_if_visible(element2)
+
+def _element_if_visible(element):
+    return element if element.is_displayed() else False
 
 class DescargaSAT(object):
 
@@ -1751,7 +1774,12 @@ class DescargaSAT(object):
         txt = browser.find_element_by_name(self.g.SAT['password'])
         txt.send_keys(ciec)
         txt.submit()
-        time.sleep(3)
+        wait = WebDriverWait(browser, 10)
+        wait.until(EC.title_contains('NetIQ Access'))
+        iframe = browser.find_element(By.ID, 'content')
+        browser.switch_to.frame(iframe)
+        wait.until(EC.text_to_be_present_in_element(
+            (By.CLASS_NAME, 'messagetext'), 'session has been authenticated'))
         self.status('Conectado...')
 
     def disconnect(self):
@@ -1787,7 +1815,8 @@ class DescargaSAT(object):
                 page_query = self.g.SAT['page_emisor']
 
             browser.get(page_query)
-            self.util.sleep(3)
+            wait = WebDriverWait(browser, 10)
+            wait.until(EC.title_contains('Buscar CFDI'))
             self.status('Buscando...')
             if uuid:
                 txt = browser.find_element_by_id(self.g.SAT['uuid'])
@@ -1797,12 +1826,13 @@ class DescargaSAT(object):
                 # Descargar por fecha
                 opt = browser.find_element_by_id(self.g.SAT['date'])
                 opt.click()
-                self.util.sleep(3)
+                if facturas_emitidas:
+                    txt = wait.until(EC.element_to_be_clickable(
+                                        (By.ID, self.g.SAT['receptor'])))
+                else:
+                    txt = wait.until(EC.element_to_be_clickable(
+                                        (By.ID, self.g.SAT['emisor'])))
                 if rfc_emisor:
-                    if uuid:
-                        txt = browser.find_element_by_id(self.g.SAT['receptor'])
-                    else:
-                        txt = browser.find_element_by_id(self.g.SAT['emisor'])
                     txt.send_keys(rfc_emisor)
                 # Emitidas
                 if facturas_emitidas:
@@ -1849,25 +1879,27 @@ class DescargaSAT(object):
                     #~ combos = browser.find_elements_by_class_name(
                         #~ self.g.SAT['combos'])
                     #~ combos[0].click()
-                    combo = browser.find_element_by_id(self.g.SAT['year'])
+                    combo = wait.until(EC.presence_of_element_located(
+                                        (By.ID, self.g.SAT['year'])))
+                    sb = combo.get_attribute('sb')
                     combo = browser.find_element_by_id(
-                        'sbToggle_{}'.format(combo.get_attribute('sb')))
+                        'sbToggle_{}'.format(sb))
                     combo.click()
-                    self.util.sleep(2)
-                    link = browser.find_element_by_link_text(año)
+                    link = wait.until(EC.element_to_be_clickable(
+                                        (By.LINK_TEXT, año)))
                     link.click()
-                    self.util.sleep(2)
-                    combo = browser.find_element_by_id(self.g.SAT['month'])
+                    combo = wait.until(EC.presence_of_element_located(
+                                        (By.ID, self.g.SAT['month'])))
                     combo = browser.find_element_by_id(
                         'sbToggle_{}'.format(combo.get_attribute('sb')))
                     combo.click()
-                    self.util.sleep(2)
-                    link = browser.find_element_by_link_text(mes)
+                    link = wait.until(EC.element_to_be_clickable(
+                                        (By.LINK_TEXT, mes)))
                     link.click()
                     self.util.sleep(2)
                     if día != '00':
-                        combo = browser.find_element_by_id(self.g.SAT['day'])
-                        sb = combo.get_attribute('sb')
+                        combo_day = browser.find_element_by_id(self.g.SAT['day'])
+                        sb = combo_day.get_attribute('sb')
                         combo = browser.find_element_by_id(
                             'sbToggle_{}'.format(sb))
                         combo.click()
@@ -1886,18 +1918,24 @@ class DescargaSAT(object):
                         link.click()
                         self.util.sleep()
 
+            results_table = browser.find_element_by_id(
+                self.g.SAT['resultados'])
             browser.find_element_by_id(self.g.SAT['submit']).click()
-            sec = 15
-            #~ El mismo tiempo tanto para emitidas como recibidas
-            self.util.sleep(sec)
+            wait.until(EC.staleness_of(results_table))
+            wait.until(visibility_of_either(
+                (By.ID, self.g.SAT['resultados']),
+                (By.ID, self.g.SAT['noresultados'])))
             # Bug del SAT
             if not facturas_emitidas and día != '00':
+                wait.until(EC.staleness_of(combo_day))
                 combo = browser.find_element_by_id(self.g.SAT['day'])
                 sb = combo.get_attribute('sb')
                 combo = browser.find_element_by_id(
                     'sbToggle_{}'.format(sb))
                 combo.click()
                 self.util.sleep(2)
+                link = wait.until(EC.element_to_be_clickable(
+                                    (By.LINK_TEXT, día)))
                 if mes == día:
                     links = browser.find_elements_by_link_text(día)
                     for l in links:
@@ -1910,25 +1948,24 @@ class DescargaSAT(object):
                 else:
                     link = browser.find_element_by_link_text(día)
                 link.click()
-                self.util.sleep(2)
+                link = wait.until(EC.element_to_be_clickable(
+                                    (By.LINK_TEXT, día)))
+                results_table = browser.find_element_by_id(
+                    self.g.SAT['resultados'])
                 browser.find_element_by_id(self.g.SAT['submit']).click()
-                self.util.sleep(sec)
+                wait.until(EC.staleness_of(results_table))
+                wait.until(visibility_of_either(
+                    (By.ID, self.g.SAT['resultados']),
+                    (By.ID, self.g.SAT['noresultados'])))
             elif not facturas_emitidas and mes_completo_por_día:
                 return self._download_sat_month(año, mes, browser)
 
-            try:
-                found = True
-                content = browser.find_elements_by_class_name(
-                    self.g.SAT['subtitle'])
-                for c in content:
-                    if self.g.SAT['found'] in c.get_attribute('innerHTML') \
-                        and c.is_displayed():
-                        found = False
-                        break
-            except Exception as e:
-                print (str(e))
-
-            if found:
+            results = wait.until(visibility_of_either(
+                (By.ID, self.g.SAT['resultados']),
+                (By.ID, self.g.SAT['noresultados'])))
+            if results.get_attribute('id') == self.g.SAT['resultados']:
+                wait.until(EC.element_to_be_clickable(
+                    (By.NAME, self.g.SAT['download'])))
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
                 return docs
             else:
