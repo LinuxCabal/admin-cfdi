@@ -1963,7 +1963,7 @@ class DescargaSAT(object):
             results = wait.until(visibility_of_either(
                 (By.ID, "ctl00_MainContent_PnlResultados"),
                 (By.ID, 'ctl00_MainContent_PnlNoResultados')))
-            if 'PnlResultados' in results.get_attribute('id'):
+            if results.get_attribute('id') == 'ctl00_MainContent_PnlResultados':
                 wait.until(EC.element_to_be_clickable(
                     (By.NAME, self.g.SAT['download'])))
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
