@@ -81,8 +81,7 @@ class DescargaSAT(unittest.TestCase):
         profile = webdriver.FirefoxProfile()
         descarga = DescargaSAT(status_callback=self.status)
         descarga.browser = MagicMock()
-        results = descarga.search(type_search=1, uuid='uuid',
-                                  día='00')
+        results = descarga.search(uuid='uuid', día='00')
         self.assertEqual(0, len(results))
 
     def test_search_facturas_emitidas(self):
@@ -93,7 +92,7 @@ class DescargaSAT(unittest.TestCase):
         profile = webdriver.FirefoxProfile()
         descarga = DescargaSAT(status_callback=self.status)
         descarga.browser = MagicMock()
-        results = descarga.search(facturas_emitidas=1,
+        results = descarga.search(facturas_emitidas=True,
                     año=1, mes=1)
         self.assertEqual(0, len(results))
 
@@ -164,7 +163,7 @@ class DescargaSAT(unittest.TestCase):
         descarga = DescargaSAT(status_callback=self.status)
         descarga.browser = MagicMock()
         descarga._download_sat_month = Mock(return_value=[])
-        results = descarga.search(facturas_emitidas=2, día='00',
+        results = descarga.search(día='00',
                                   mes_completo_por_día=True)
         self.assertEqual(0, len(results))
 
