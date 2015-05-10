@@ -1688,6 +1688,26 @@ class CFDIPDF(object):
         return date.strftime('{}, %d de {} de %Y'.format(
             d[date.weekday()], m[date.month]))
 
+class visibility_of_either(object):
+    """ An expectation for checking that one of two elements,
+    located by locator 1 and locator2, is visible.
+    Visibility means that the element is not only
+    displayed but also has a height and width that is
+    greater than 0.
+    returns the WebElement that is visible.
+    """
+    def __init__(self, locator1, locator2):
+        self.locator1 = locator1
+        self.locator2 = locator2
+
+    def __call__(self, driver):
+        element1 = driver.find_element(*self.locator1)
+        element2 = driver.find_element(*self.locator2)
+        return _element_if_visible(element1) or \
+               _element_if_visible(element2)
+
+def _element_if_visible(element):
+    return element if element.is_displayed() else False
 
 class DescargaSAT(object):
 
