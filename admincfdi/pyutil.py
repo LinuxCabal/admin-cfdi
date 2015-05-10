@@ -1918,7 +1918,10 @@ class DescargaSAT(object):
                         link.click()
                         self.util.sleep()
 
+            results_table = browser.find_element_by_id(
+                'ctl00_MainContent_PnlResultados')
             browser.find_element_by_id(self.g.SAT['submit']).click()
+            wait.until(EC.staleness_of(results_table))
             wait.until(visibility_of_either(
                 (By.ID, "ctl00_MainContent_PnlResultados"),
                 (By.ID, 'ctl00_MainContent_PnlNoResultados')))
@@ -1947,7 +1950,10 @@ class DescargaSAT(object):
                 link.click()
                 link = wait.until(EC.element_to_be_clickable(
                                     (By.LINK_TEXT, día)))
+                results_table = browser.find_element_by_id(
+                    'ctl00_MainContent_PnlResultados')
                 browser.find_element_by_id(self.g.SAT['submit']).click()
+                wait.until(EC.staleness_of(results_table))
                 wait.until(visibility_of_either(
                     (By.ID, "ctl00_MainContent_PnlResultados"),
                     (By.ID, 'ctl00_MainContent_PnlNoResultados')))
