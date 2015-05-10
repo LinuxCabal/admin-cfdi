@@ -182,6 +182,8 @@ class Global(object):
         'page_cfdi': page_cfdi,
         'page_receptor': page_cfdi.format('ConsultaReceptor.aspx'),
         'page_emisor': page_cfdi.format('ConsultaEmisor.aspx'),
+        'resultados': 'ctl00_MainContent_PnlResultados',
+        'noresultados': 'ctl00_MainContent_PnlNoResultados',
     }
     frm_1 = '%(asctime)s - %(levelname)s - %(lineno)s - %(message)s'
     CONF_LOG = {

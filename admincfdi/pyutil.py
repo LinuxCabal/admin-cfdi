@@ -1919,12 +1919,12 @@ class DescargaSAT(object):
                         self.util.sleep()
 
             results_table = browser.find_element_by_id(
-                'ctl00_MainContent_PnlResultados')
+                self.g.SAT['resultados'])
             browser.find_element_by_id(self.g.SAT['submit']).click()
             wait.until(EC.staleness_of(results_table))
             wait.until(visibility_of_either(
-                (By.ID, "ctl00_MainContent_PnlResultados"),
-                (By.ID, 'ctl00_MainContent_PnlNoResultados')))
+                (By.ID, self.g.SAT['resultados']),
+                (By.ID, self.g.SAT['noresultados'])))
             # Bug del SAT
             if not facturas_emitidas and día != '00':
                 wait.until(EC.staleness_of(combo_day))
@@ -1951,19 +1951,19 @@ class DescargaSAT(object):
                 link = wait.until(EC.element_to_be_clickable(
                                     (By.LINK_TEXT, día)))
                 results_table = browser.find_element_by_id(
-                    'ctl00_MainContent_PnlResultados')
+                    self.g.SAT['resultados'])
                 browser.find_element_by_id(self.g.SAT['submit']).click()
                 wait.until(EC.staleness_of(results_table))
                 wait.until(visibility_of_either(
-                    (By.ID, "ctl00_MainContent_PnlResultados"),
-                    (By.ID, 'ctl00_MainContent_PnlNoResultados')))
+                    (By.ID, self.g.SAT['resultados']),
+                    (By.ID, self.g.SAT['noresultados'])))
             elif not facturas_emitidas and mes_completo_por_día:
                 return self._download_sat_month(año, mes, browser)
 
             results = wait.until(visibility_of_either(
-                (By.ID, "ctl00_MainContent_PnlResultados"),
-                (By.ID, 'ctl00_MainContent_PnlNoResultados')))
-            if results.get_attribute('id') == 'ctl00_MainContent_PnlResultados':
+                (By.ID, self.g.SAT['resultados']),
+                (By.ID, self.g.SAT['noresultados'])))
+            if results.get_attribute('id') == self.g.SAT['resultados']:
                 wait.until(EC.element_to_be_clickable(
                     (By.NAME, self.g.SAT['download'])))
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
