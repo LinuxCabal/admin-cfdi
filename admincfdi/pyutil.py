@@ -1876,47 +1876,18 @@ class DescargaSAT(object):
                         return self._download_sat_month_emitidas(dates[1], day)
                 # Recibidas
                 else:
-                    #~ combos = browser.find_elements_by_class_name(
-                        #~ self.g.SAT['combos'])
-                    #~ combos[0].click()
-                    combo = wait.until(EC.presence_of_element_located(
-                                        (By.ID, self.g.SAT['year'])))
-                    sb = combo.get_attribute('sb')
-                    combo = browser.find_element_by_id(
-                        'sbToggle_{}'.format(sb))
-                    combo.click()
-                    link = wait.until(EC.element_to_be_clickable(
-                                        (By.LINK_TEXT, año)))
-                    link.click()
-                    combo = wait.until(EC.presence_of_element_located(
-                                        (By.ID, self.g.SAT['month'])))
-                    combo = browser.find_element_by_id(
-                        'sbToggle_{}'.format(combo.get_attribute('sb')))
-                    combo.click()
-                    link = wait.until(EC.element_to_be_clickable(
-                                        (By.LINK_TEXT, mes)))
-                    link.click()
-                    self.util.sleep(2)
-                    if día != '00':
-                        combo_day = browser.find_element_by_id(self.g.SAT['day'])
-                        sb = combo_day.get_attribute('sb')
-                        combo = browser.find_element_by_id(
-                            'sbToggle_{}'.format(sb))
-                        combo.click()
-                        self.util.sleep()
-                        if mes == día:
-                            links = browser.find_elements_by_link_text(día)
-                            for l in links:
-                                p = l.find_element_by_xpath(
-                                    '..').find_element_by_xpath('..')
-                                sb2 = p.get_attribute('id')
-                                if sb in sb2:
-                                    link = l
-                                    break
-                        else:
-                            link = browser.find_element_by_link_text(día)
-                        link.click()
-                        self.util.sleep()
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                        self.g.SAT['year'], año)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                        self.g.SAT['month'], mes)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                        self.g.SAT['day'], día)
+                    browser.execute_script(arg)
 
             results_table = browser.find_element_by_id(
                 self.g.SAT['resultados'])
@@ -1925,39 +1896,7 @@ class DescargaSAT(object):
             wait.until(visibility_of_either(
                 (By.ID, self.g.SAT['resultados']),
                 (By.ID, self.g.SAT['noresultados'])))
-            # Bug del SAT
-            if not facturas_emitidas and día != '00':
-                wait.until(EC.staleness_of(combo_day))
-                combo = browser.find_element_by_id(self.g.SAT['day'])
-                sb = combo.get_attribute('sb')
-                combo = browser.find_element_by_id(
-                    'sbToggle_{}'.format(sb))
-                combo.click()
-                self.util.sleep(2)
-                link = wait.until(EC.element_to_be_clickable(
-                                    (By.LINK_TEXT, día)))
-                if mes == día:
-                    links = browser.find_elements_by_link_text(día)
-                    for l in links:
-                        p = l.find_element_by_xpath(
-                            '..').find_element_by_xpath('..')
-                        sb2 = p.get_attribute('id')
-                        if sb in sb2:
-                            link = l
-                            break
-                else:
-                    link = browser.find_element_by_link_text(día)
-                link.click()
-                link = wait.until(EC.element_to_be_clickable(
-                                    (By.LINK_TEXT, día)))
-                results_table = browser.find_element_by_id(
-                    self.g.SAT['resultados'])
-                browser.find_element_by_id(self.g.SAT['submit']).click()
-                wait.until(EC.staleness_of(results_table))
-                wait.until(visibility_of_either(
-                    (By.ID, self.g.SAT['resultados']),
-                    (By.ID, self.g.SAT['noresultados'])))
-            elif not facturas_emitidas and mes_completo_por_día:
+            if not facturas_emitidas and mes_completo_por_día:
                 return self._download_sat_month(año, mes, browser)
 
             results = wait.until(visibility_of_either(
