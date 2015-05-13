@@ -544,9 +544,7 @@ class Util(object):
         if not 'serie' in data:
             data['serie'] = ''
         data['fecha'] = data['fecha'].partition('T')[0]
-        if 'folio' in data:
-            data['folio'] = int(data['folio'])
-        else:
+        if not 'folio' in data:
             data['folio'] = 0
         node = xml.find('{}Emisor'.format(pre))
         data['emisor_rfc'] = node.attrib['rfc']
