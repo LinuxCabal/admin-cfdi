@@ -47,30 +47,29 @@ estos dos métodos:
 
 El proceso de descarga consiste en estos pasos:
 
-#. Lanzar el navegador
+#. Conectar a la aplicación de CFDIs del SAT
 
-#. Entrar a la página de búsquedas de CFDIs
-
+     - Lanzar el navegador
      - Navegar a la página de login de CFDIs
-
      - Llenar el usuario y la contraseña (RFC y CIEC)
-
      - Enviar los datos al servidor
+     - Esperar la respuesta
+
+#. Realizar una búsqueda
 
      - Navegar a la página de búsqueda de facturas emitidas,
        o a la de facturas recibidas
-
-#. Solicitar la búsqueda
-
      - Seleccionar el tipo de búsqueda
      - Llenar los datos de la búsqueda
      - Enviar los datos al servidor
-
-#. Descargar cada renglón de los resultados
-
+     - Esperar los resultados
      - Encontrar los elementos con atributo ``name``
        igual a *download*, corresponden al ícono
        de descarga a la izquierda en cada renglón.
+     - Regresar una lista de los valores
+
+
+#. Descargar cada renglón de los resultados
 
      - Iterar en cada elemento de esta lista:
 
@@ -79,12 +78,14 @@ El proceso de descarga consiste en estos pasos:
            del elemento
          - Hacer la solicitud GET a esta URL
 
-#. Cerrar la sesión
-#. Cerrar el navegador
+#. Desconectar
+     - Cerrar la sesión
+     - Cerrar el navegador. Este paso se realiza
+       a pesar de que ocurra una falla en el paso
+       anterior.
 
-En caso de alguna falla en los primeros cuatro pasos,
-se intenta el 5, y por último y en todos los casos
-se realiza el paso 6.
+En caso de alguna falla en los primeros tres pasos,
+la aplicación debe realizar el paso 4.
 
 El avance del proceso se indica al usuario mediante
 textos cortos que se muestran en una línea de estado
