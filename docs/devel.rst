@@ -22,8 +22,8 @@ El paquete `admincfdi` incluye los siguientes módulos:
   es un diccionario que es usado
   en la descarga de CFDIs.
 
-Descarga de facturas del SAT
-============================
+admin-cfdi
+==========
 
 La descarga de los archivos XML del sitio web del SAT se
 maneja en la primera pestaña de la interfase gráfica.
@@ -37,13 +37,16 @@ datos y/o seleccionar opciones en estos tres apartados:
 
 El proceso de la descarga se inicia mediante el botón
 ``Descargar``, el cual está ligado al método
-:func:`admincfdi.Application.button_download_sat_click`
+:func:`admin-cfdi.Application.button_download_sat_click`
 de la aplicación, que ejecuta
 estos dos métodos:
 
-- :func:`admincfdi.Application._validate_download_sat`
+- :func:`admin-cfdi.Application._validate_download_sat`
 
-- :func:`admincfdi.Application._download_sat`
+- :func:`admin-cfdi.Application._download_sat`
+
+Descarga de facturas del SAT
+============================
 
 El proceso de descarga consiste en estos pasos:
 
