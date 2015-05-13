@@ -45,6 +45,32 @@ estos dos métodos:
 
 - :func:`admin-cfdi.Application._download_sat`
 
+descarga-cfdi
+=============
+
+El avance del proceso se indica al usuario mediante
+textos cortos que se muestran en una línea de estado
+de la interfase gráfica, en esta secuencia::
+
+    Abriendo Firefox...
+    Conectando...
+    Conectado...
+    Buscando...
+    Factura 1 de 12
+    Factura 2 de 12
+    Factura 3 de 12
+    Factura 4 de 12
+    Factura 5 de 12
+    Factura 6 de 12
+    Factura 7 de 12
+    Factura 8 de 12
+    Factura 9 de 12
+    Factura 10 de 12
+    Factura 11 de 12
+    Factura 12 de 12
+    Desconectando...
+    Desconectado...
+
 Descarga de facturas del SAT
 ============================
 
@@ -92,28 +118,6 @@ del SAT consiste en estos pasos:
 En caso de alguna falla en los primeros tres pasos,
 la aplicación debe realizar el paso 4.
 
-El avance del proceso se indica al usuario mediante
-textos cortos que se muestran en una línea de estado
-de la interfase gráfica, en esta secuencia::
-
-    Abriendo Firefox...
-    Conectando...
-    Conectado...
-    Buscando...
-    Factura 1 de 12
-    Factura 2 de 12
-    Factura 3 de 12
-    Factura 4 de 12
-    Factura 5 de 12
-    Factura 6 de 12
-    Factura 7 de 12
-    Factura 8 de 12
-    Factura 9 de 12
-    Factura 10 de 12
-    Factura 11 de 12
-    Factura 12 de 12
-    Desconectando...
-    Desconectado...
 
 API
 ===
