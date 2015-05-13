@@ -12,15 +12,15 @@ Estructura
 
 El paquete `admincfdi` incluye los siguientes módulos:
 
-- values.py Tiene la clase Global que centraliza
+- `pyutil` Tiene varias clases que implementan
+  las funcionalidades usadas por las aplicaciones.
+
+- `values` Tiene la clase Global que centraliza
   valores que se usan en los otros módulos.  Por
   ejemplo, las URLs y valores id de la página web
   de CFDIs del SAT están en el atributo SAT,
   es un diccionario que es usado
   en la descarga de CFDIs.
-
-- pyutil.py Tiene varias clases que implementan
-  utilerías usadas por las aplicaciones.
 
 Descarga de facturas del SAT
 ============================
