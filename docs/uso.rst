@@ -2,6 +2,17 @@
 Uso
 ===
 
+Aplicaciones
+------------
+Admincfdi incluye las siguientes aplicaciones:
+
+- `admin-cfdi`
+
+- `descarga-cfdi`
+
+- `cfdi2pdf`
+
+
 
 Pruebas funcionales de descarga del SAT
 ---------------------------------------

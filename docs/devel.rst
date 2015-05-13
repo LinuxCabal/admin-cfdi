@@ -1,14 +1,16 @@
 ==========
 Desarrollo
 ==========
+Este capítulo contiene información útil para quienes desean
+desarrollar aplicaciones que trabajen con CFDIs, para lo
+cual pueden usar una o más de las clases disponibles dentro
+del paquete `admincfdi`.
+
 
 Estructura
 ==========
 
-La aplicación consta de los siguientes archivos:
-
-- admincfdi.py Implementa la interfase gráfica y
-  es la aplicación principal.
+El paquete `admincfdi` incluye los siguientes módulos:
 
 - values.py Tiene la clase Global que centraliza
   valores que se usan en los otros módulos.  Por
@@ -18,7 +20,7 @@ La aplicación consta de los siguientes archivos:
   en la descarga de CFDIs.
 
 - pyutil.py Tiene varias clases que implementan
-  utilerías usadas por los otros módulos.
+  utilerías usadas por las aplicaciones.
 
 Descarga de facturas del SAT
 ============================
