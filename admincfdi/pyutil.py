@@ -1824,6 +1824,7 @@ class DescargaSAT(object):
                 # Descargar por fecha
                 opt = browser.find_element_by_id(self.g.SAT['date'])
                 opt.click()
+                wait.until(EC.staleness_of(opt))
                 if facturas_emitidas:
                     txt = wait.until(EC.element_to_be_clickable(
                                         (By.ID, self.g.SAT['receptor'])))
