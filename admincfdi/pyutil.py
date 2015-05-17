@@ -1813,7 +1813,7 @@ class DescargaSAT(object):
                 page_query = self.g.SAT['page_emisor']
 
             browser.get(page_query)
-            wait = WebDriverWait(browser, 10)
+            wait = WebDriverWait(browser, 15)
             wait.until(EC.title_contains('Buscar CFDI'))
             self.status('Buscando...')
             if uuid:
