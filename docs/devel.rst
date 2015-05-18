@@ -54,19 +54,66 @@ Los detalles de cada paso:
      - Llenar el usuario y la contraseña (RFC y CIEC)
      - Enviar los datos al servidor
      - Esperar la respuesta
+     - El título de la página cambia a ``NetIQ Access Manager``
+     - Hay un elemento iframe con id 'content', el cual contiene:
+        - En caso de éxito, el elemento con clase 'messagetext'
+          con el texto 'session has been authenticated' .
+        - En caso de falla, un pop up con el elemento con id 'xacerror'
+          que contiene el texto ``Login failed``
 
 #. Buscar
 
      - Navegar a la página de búsqueda de facturas emitidas,
        o a la de facturas recibidas
-     - Seleccionar el tipo de búsqueda
+     - Esperar a que el título cambie a 'Buscar CFDI'
      - Llenar los datos de la búsqueda
+        - Si la búsqueda es por UUID, llenar el UUID en
+          el input con id ``ctl00_MainContent_TxtUUID``.
+        - Si la búsqueda es por fecha:
+            - Hacer clic en el botón de radio a la izquierda
+              de Fecha de Emisión con id
+              ``ctl00_MainContent_RdoFechas``.
+            - Esperar a que el input a la derecha de RFC Emisor
+              con id ``ctl00_MainContent_TxtRfcReceptor``
+              esté habilitado y se pueda hacer clic en él.
+            - Si se buscan facturas emitidas:
+                - Habilitar los dos inputs con name
+                  ``ctl00$MainContent$CldFechaInicial2$Calendario_text`` y
+                  ``ctl00$MainContent$CldFechaFinal2$Calendario_text``
+                  para fecha inicial y
+                  fecha final de emisión
+                - Llenar esos dos inputs con id
+                  ``ctl00_MainContent_CldFechaInicial2_Calendario_text`` y
+                  ``ctl00_MainContent_CldFechaFinal2_Calendario_text``
+                  con formato ``dd/mm/aaaa``
+                - Asignar a los selects no visibles de hora, minuto y
+                  segundo con ids
+                  ``ctl00_MainContent_CldFechaFinal2_DdlHora``
+                  ``ctl00_MainContent_CldFechaFinal2_DdlMinuto``
+                  ``ctl00_MainContent_CldFechaFinal2_DdlSegundo``
+                  final las cadenas 23, 59 y 59
+            - Se se buscan facturas recibidas:
+                - Asignar a los selects no visibles de año, mes y
+                  día con ids
+                  ``DdlAnio``
+                  ``ctl00_MainContent_CldFecha_DdlMes``
+                  ``ctl00_MainContent_CldFecha_DdlDia``
+                  los valores de los parámetros
      - Enviar los datos al servidor
-     - Esperar los resultados
-     - Encontrar los elementos con atributo ``name``
-       igual a *download*, corresponden al ícono
-       de descarga a la izquierda en cada renglón.
-     - Regresar una lista de los valores
+     - Esperar a que no sea visible el elemento div de los
+       resultados, o el botón mismo de enviar
+     - Esperar a que uno de los dos div con id
+       ``ctl00_MainContent_PnlResultados`` o id
+       ``ctl00_MainContent_PnlNoResultados`` esté
+       visible.
+     - Si el div con id ``ctl00_MainContent_PnlResultados``
+       es visible:
+
+        - Esperar que un elemento con name ``BtnDescarga``
+          se le pueda hacer clic
+        - Encontrar la lista todos los elementos con name
+          ``BtnDescarga``.  Son los íconos
+          de descarga a la izquierda en cada renglón.
 
 
 #. Descargar
