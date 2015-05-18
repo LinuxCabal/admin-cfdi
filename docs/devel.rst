@@ -41,6 +41,13 @@ El proceso de descarga mediante la aplicación de CFDIs
 del SAT consiste en estos pasos:
 
 #. Conectar
+#. Buscar
+#. Descargar
+#. Desconectar
+
+Los detalles de cada paso:
+
+#. Conectar
 
      - Lanzar el navegador
      - Navegar a la página de login de CFDIs
@@ -48,7 +55,7 @@ del SAT consiste en estos pasos:
      - Enviar los datos al servidor
      - Esperar la respuesta
 
-#. Realizar una búsqueda
+#. Buscar
 
      - Navegar a la página de búsqueda de facturas emitidas,
        o a la de facturas recibidas
@@ -62,7 +69,7 @@ del SAT consiste en estos pasos:
      - Regresar una lista de los valores
 
 
-#. Descargar CFDIs
+#. Descargar
 
      - Iterar en cada elemento de la lista
        de resultados:
