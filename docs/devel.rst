@@ -115,6 +115,16 @@ Los detalles de cada paso:
           ``BtnDescarga``.  Son los íconos
           de descarga a la izquierda en cada renglón.
 
+     - La lista de resultados está paginada en 500 elementos.
+       Si los
+       resultados son más de 500, una opción es dividir
+       la búsqueda en dos o más búsquedas
+       en las que se agregan criterios: La búsqueda de un
+       mes se puede dividir en búsquedas por día; la
+       búsqueda de un día puede dividirse en búsquedas en
+       un rango de horas en ese día.
+
+
 
 #. Descargar
 
