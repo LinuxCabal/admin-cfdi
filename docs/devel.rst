@@ -54,18 +54,18 @@ Los detalles de cada paso:
      - Llenar el usuario y la contraseña (RFC y CIEC)
      - Enviar los datos al servidor
      - Esperar la respuesta
-     - El título de la página cambia a ``NetIQ Access Manager``
-     - Hay un elemento iframe con id 'content', el cual contiene:
-        - En caso de éxito, el elemento con clase 'messagetext'
-          con el texto 'session has been authenticated' .
-        - En caso de falla, un pop up con el elemento con id 'xacerror'
-          que contiene el texto ``Login failed``
+     - El título de la página cambia a *NetIQ Access Manager*
+     - Hay un elemento iframe con id ``content``, el cual contiene:
+        - En caso de éxito, el elemento con clase ``messagetext``
+          con el texto *session has been authenticated*.
+        - En caso de falla, un pop up con el elemento con id ``xacerror``
+          que contiene el texto *Login failed*
 
 #. Buscar
 
      - Navegar a la página de búsqueda de facturas emitidas,
        o a la de facturas recibidas
-     - Esperar a que el título cambie a 'Buscar CFDI'
+     - Esperar a que el título cambie a *Buscar CFDI*
      - Llenar los datos de la búsqueda
         - Si la búsqueda es por UUID, llenar el UUID en
           el input con id ``ctl00_MainContent_TxtUUID``.
@@ -77,28 +77,28 @@ Los detalles de cada paso:
               con id ``ctl00_MainContent_TxtRfcReceptor``
               esté habilitado y se pueda hacer clic en él.
             - Si se buscan facturas emitidas:
-                - Habilitar los dos inputs con name
-                  ``ctl00$MainContent$CldFechaInicial2$Calendario_text`` y
-                  ``ctl00$MainContent$CldFechaFinal2$Calendario_text``
-                  para fecha inicial y
-                  fecha final de emisión
-                - Llenar esos dos inputs con id
-                  ``ctl00_MainContent_CldFechaInicial2_Calendario_text`` y
-                  ``ctl00_MainContent_CldFechaFinal2_Calendario_text``
-                  con formato ``dd/mm/aaaa``
-                - Asignar a los selects no visibles de hora, minuto y
-                  segundo con ids
-                  ``ctl00_MainContent_CldFechaFinal2_DdlHora``
-                  ``ctl00_MainContent_CldFechaFinal2_DdlMinuto``
-                  ``ctl00_MainContent_CldFechaFinal2_DdlSegundo``
-                  final las cadenas 23, 59 y 59
+                - Habilitar los inputs con id
+
+                    - ``ctl00_MainContent_CldFechaInicial2_Calendario_text``
+                    - ``ctl00_MainContent_CldFechaFinal2_Calendario_text``
+
+                  y asignar valor de fecha inicial y fecha final de emisión
+                  usando formato ``dd/mm/aaaa``
+                - Asignar a los selects no visibles de tiempo final con ids
+
+                    - ``ctl00_MainContent_CldFechaFinal2_DdlHora``
+                    - ``ctl00_MainContent_CldFechaFinal2_DdlMinuto``
+                    - ``ctl00_MainContent_CldFechaFinal2_DdlSegundo``
+
+                  las cadenas 23, 59 y 59
             - Se se buscan facturas recibidas:
-                - Asignar a los selects no visibles de año, mes y
-                  día con ids
-                  ``DdlAnio``
-                  ``ctl00_MainContent_CldFecha_DdlMes``
-                  ``ctl00_MainContent_CldFecha_DdlDia``
-                  los valores de los parámetros
+                - Asignar a los selects no visibles con ids
+
+                    - ``DdlAnio``
+                    - ``ctl00_MainContent_CldFecha_DdlMes``
+                    - ``ctl00_MainContent_CldFecha_DdlDia``
+
+                  los valores de los parámetros año, mes y día
      - Enviar los datos al servidor
      - Esperar a que no sea visible el elemento div de los
        resultados, o el botón mismo de enviar
