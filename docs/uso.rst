@@ -2,6 +2,59 @@
 Uso
 ===
 
+Aplicaciones
+------------
+Admincfdi incluye las siguientes aplicaciones:
+
+- `admin-cfdi`
+
+- `descarga-cfdi`
+
+- `cfdi2pdf`
+
+
+admin-cfdi
+==========
+
+La descarga de los archivos XML del sitio web del SAT se
+maneja en la primera pestaña de la interfase gráfica.
+
+Primeramente el usuario debe llenar
+datos y/o seleccionar opciones en estos tres apartados:
+
+- Datos de acceso
+- Tipo de consulta
+- Opciones de búsqueda
+
+El proceso de la descarga se inicia mediante el botón
+``Descargar``.
+
+descarga-cfdi
+=============
+
+El avance del proceso se indica al usuario mediante
+textos cortos que se muestran en una línea de estado
+de la interfase gráfica, en esta secuencia::
+
+    Abriendo Firefox...
+    Conectando...
+    Conectado...
+    Buscando...
+    Factura 1 de 12
+    Factura 2 de 12
+    Factura 3 de 12
+    Factura 4 de 12
+    Factura 5 de 12
+    Factura 6 de 12
+    Factura 7 de 12
+    Factura 8 de 12
+    Factura 9 de 12
+    Factura 10 de 12
+    Factura 11 de 12
+    Factura 12 de 12
+    Desconectando...
+    Desconectado...
+
 
 Pruebas funcionales de descarga del SAT
 ---------------------------------------
