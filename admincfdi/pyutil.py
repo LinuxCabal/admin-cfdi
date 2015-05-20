@@ -1813,7 +1813,7 @@ class DescargaSAT(object):
                 page_query = self.g.SAT['page_emisor']
 
             browser.get(page_query)
-            wait = WebDriverWait(browser, 10)
+            wait = WebDriverWait(browser, 15)
             wait.until(EC.title_contains('Buscar CFDI'))
             self.status('Buscando...')
             if uuid:
@@ -1824,6 +1824,7 @@ class DescargaSAT(object):
                 # Descargar por fecha
                 opt = browser.find_element_by_id(self.g.SAT['date'])
                 opt.click()
+                wait.until(EC.staleness_of(opt))
                 if facturas_emitidas:
                     txt = wait.until(EC.element_to_be_clickable(
                                         (By.ID, self.g.SAT['receptor'])))
@@ -1855,21 +1856,18 @@ class DescargaSAT(object):
                     txt.send_keys(dates[1])
 
                     # Hay que seleccionar también la hora, minuto y segundo
-                    self.util.sleep(3)
-                    combos = (
-                        (self.g.SAT['second'], '59'),
-                        (self.g.SAT['minute'], '59'),
-                        (self.g.SAT['hour'], '23'),
-                    )
-                    for control, value in combos:
-                        combo = browser.find_element_by_id(control)
-                        combo = browser.find_element_by_id(
-                            self.g.SAT['combos'].format(combo.get_attribute('sb')))
-                        combo.click()
-                        self.util.sleep(2)
-                        link = browser.find_element_by_link_text(value)
-                        link.click()
-                        self.util.sleep(2)
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                        self.g.SAT['hour'], '23')
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                        self.g.SAT['minute'], '59')
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                        self.g.SAT['second'], '59')
+                    browser.execute_script(arg)
                     if mes_completo_por_día:
                         return self._download_sat_month_emitidas(dates[1], day)
                 # Recibidas
