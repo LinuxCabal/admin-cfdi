@@ -12,6 +12,8 @@ Admincfdi incluye las siguientes aplicaciones:
 
 - `cfdi2pdf`
 
+`admin-cfdi` es una aplicación gráfica, `descarga-cfdi`
+y `cfdi2pdf` son aplicaciones de línea de comando.
 
 admin-cfdi
 ==========
