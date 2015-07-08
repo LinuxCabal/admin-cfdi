@@ -99,7 +99,9 @@ Los detalles de cada paso:
                     - ``ctl00_MainContent_CldFecha_DdlDia``
 
                   los valores de los parámetros año, mes y día
-     - Enviar los datos al servidor
+     - Enviar la forma de búsqueda al servidor mediante método POST, los
+       datos que se envían se muestran más bajo.
+
      - Esperar a que no sea visible el elemento div de los
        resultados, o el botón mismo de enviar
      - Esperar a que uno de los dos div con id
@@ -144,6 +146,67 @@ Los detalles de cada paso:
 
 En caso de alguna falla en los primeros tres pasos,
 la aplicación debe realizar el paso 4.
+
+Los datos que se envían por la forma de búsqueda de facturas recibidas:
+
+        -  ctl00$ScriptManager1=ctl00$MainContent$UpnlBusqueda|ctl00$MainContent$BtnBusqueda
+        -  __CSRFTOKEN=%2FwEFJGNjZmIzNzZmLTE4OWUtNDQwNS1iNmZiLWU2NWE4MDQ0Y2EwZA%3D%3D
+        -  ctl00$MainContent$TxtUUID=
+        -  ctl00$MainContent$FiltroCentral=RdoFechas
+        -  ctl00$MainContent$CldFecha$DdlAnio=2014
+        -  ctl00$MainContent$CldFecha$DdlMes=1
+        -  ctl00$MainContent$CldFecha$DdlDia=0
+        -  ctl00$MainContent$CldFecha$DdlHora=0
+        -  ctl00$MainContent$CldFecha$DdlMinuto=0
+        -  ctl00$MainContent$CldFecha$DdlSegundo=0
+        -  ctl00$MainContent$CldFecha$DdlHoraFin=23
+        -  ctl00$MainContent$CldFecha$DdlMinutoFin=59
+        -  ctl00$MainContent$CldFecha$DdlSegundoFin=59
+        -  ctl00$MainContent$TxtRfcReceptor=
+        -  ctl00$MainContent$DdlEstadoComprobante=-1
+        -  ctl00$MainContent$hfInicialBool=false
+        -  ctl00$MainContent$ddlComplementos=-1
+        -  __EVENTTARGET=
+        -  __EVENTARGUMENT=
+        -  __LASTFOCUS=
+        -  __VIEWSTATE=<datos codificados>
+        -  __VIEWSTATEGENERATOR=FE9DB3F4
+        -  __VIEWSTATEENCRYPTED=
+        -  __ASYNCPOST=true
+        -  ctl00$MainContent$BtnBusqueda=Buscar CFDI
+
+Los datos que se envían por la forma de búsqueda de facturas emitidas:
+
+        -  ctl00$ScriptManager1=ctl00$MainContent$UpnlBusqueda|ctl00$MainContent$BtnBusqueda
+        -  __CSRFTOKEN=%2FwEFJGNjZmIzNzZmLTE4OWUtNDQwNS1iNmZiLWU2NWE4MDQ0Y2EwZA%3D%3D
+        -  ctl00$MainContent$TxtUUID=
+        -  ctl00$MainContent$FiltroCentral=RdoFechas
+        -  ctl00$MainContent$hfInicial=2015
+        -  ctl00$MainContent$hfInicialBool=false
+        -  ctl00$MainContent$CldFechaInicial2$Calendario_text=18/05/2015
+        -  ctl00$MainContent$CldFechaInicial2$DdlHora=0
+        -  ctl00$MainContent$CldFechaInicial2$DdlMinuto=0
+        -  ctl00$MainContent$CldFechaInicial2$DdlSegundo=0
+        -  ctl00$MainContent$hfFinal=2015
+        -  ctl00$MainContent$CldFechaFinal2$Calendario_text=19/05/2015
+        -  ctl00$MainContent$CldFechaFinal2$DdlHora=23
+        -  ctl00$MainContent$CldFechaFinal2$DdlMinuto=59
+        -  ctl00$MainContent$CldFechaFinal2$DdlSegundo=59
+        -  ctl00$MainContent$TxtRfcReceptor=
+        -  ctl00$MainContent$DdlEstadoComprobante=-1
+        -  ctl00$MainContent$ddlComplementos=-1
+        -  ctl00$MainContent$hfDatos=
+        -  ctl00$MainContent$hfFlag=
+        -  ctl00$MainContent$hfAux=
+        -  __EVENTTARGET=
+        -  __EVENTARGUMENT=
+        -  __LASTFOCUS=
+        -  __VIEWSTATE=<datos codificados>
+        -  __VIEWSTATEGENERATOR=3D1378D8
+        -  __VIEWSTATEENCRYPTED=
+        -  __ASYNCPOST=true
+        -  ctl00$MainContent$BtnBusqueda=Buscar CFDI
+
 
 
 API
