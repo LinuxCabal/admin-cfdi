@@ -55,7 +55,10 @@ LINUX = 'linux'
 LIBO = True
 
 if sys.platform == WIN:
-    from win32com.client import Dispatch
+    try:
+        from win32com.client import Dispatch
+    except ImportError:
+        LIBO = False
 elif sys.platform == LINUX:
     try:
         import uno
@@ -337,6 +340,9 @@ class Util(object):
 
     def __init__(self):
         self.OS = sys.platform
+
+    def call(self, *arg):
+        return subprocess.call(*arg)
 
     def get_folder(self, parent):
         return askdirectory(parent=parent)
@@ -1707,6 +1713,7 @@ class visibility_of_either(object):
 def _element_if_visible(element):
     return element if element.is_displayed() else False
 
+
 class DescargaSAT(object):
 
     def __init__(self, status_callback=print,
@@ -2033,7 +2040,7 @@ class CSVPDF(FPDF):
     LIMIT_MARGIN = 260
     DECIMALES = 2
 
-    def __init__(self, path_xml, status_callback=print):
+    def __init__(self, path_xml, path_template='', status_callback=print):
         super().__init__(format='Letter')
         self.status = status_callback
         try:
@@ -2061,7 +2068,7 @@ class CSVPDF(FPDF):
         if self.xml:
             self.version = self.xml.attrib['version']
             #~ self.cadena = self._get_cadena(path_xml)
-            self._parse_csv()
+            self._parse_csv(path_template)
             decimales = len(self.xml.attrib['total'].split('.')[1])
         self.currency = '{0:,.%sf}' % decimales
         self.monedas = {
@@ -2731,25 +2738,19 @@ class CSVPDF(FPDF):
 
     def _get_cadena(self):
         return self.G.CADENA.format(**self.timbre)
-        #~ from lxml import etree
 
-        #~ file_xslt = self.G.PATHS['CADENA'].format(self.version)
-        #~ styledoc = etree.parse(file_xslt)
-        #~ transform = etree.XSLT(styledoc)
-        #~ parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-        #~ doc = etree.fromstring(xml.encode('utf-8'), parser=parser)
-        #~ result = str(transform(doc))
-        return ''
-
-    def _parse_csv(self, emisor_rfc=''):
+    def _parse_csv(self, template='', emisor_rfc=''):
         "Parse template format csv file and create elements dict"
         keys = ('x', 'y', 'w', 'h', 'font', 'size', 'style', 'foreground',
             'background', 'align', 'priority', 'multiline', 'border', 'text')
         self.elements = {}
-        path_template = '{}/{}.csv'.format(
-            self.G.PATHS['TEMPLATE'],
-            emisor_rfc.lower()
-        )
+        if template:
+            path_template = template
+        else:
+            path_template = '{}/{}.csv'.format(
+                self.G.PATHS['TEMPLATE'],
+                emisor_rfc.lower()
+            )
         if not os.path.exists(path_template):
             path_template = '{}/default.csv'.format(self.G.PATHS['TEMPLATE'])
         reader = csv.reader(open(path_template, 'r'), delimiter=',')
@@ -2763,4 +2764,5 @@ class CSVPDF(FPDF):
                 else:
                     new_list.append(eval(v.strip()))
             self.elements[row[0][1:-1]] = dict(zip(keys, new_list))
+        return
 

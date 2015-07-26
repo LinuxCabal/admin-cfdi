@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import sys
 
 from admincfdi.pyutil import CSVPDF
 from admincfdi.pyutil import Util
@@ -14,6 +15,12 @@ def process_command_line_arguments():
     help = 'Directorio origen.'
     parser.add_argument('-o', '--directorio-origen', help=help, default='')
 
+    help = 'Directorio destino.'
+    parser.add_argument('-d', '--directorio-destino', help=help, default='')
+
+    help = 'Plantilla CSV.'
+    parser.add_argument('-p', '--plantilla', help=help, default='')
+
     args = parser.parse_args()
     return args
 
@@ -24,16 +31,23 @@ def main():
     util = Util()
 
     if args.archivo_xml and util.exists(args.archivo_xml):
-        path_pdf = util.replace_extension(args.archivo_xml, ext_pdf)
-        pdf = CSVPDF(args.archivo_xml)
+        if args.directorio_destino:
+            info = util.get_path_info(args.archivo_xml)
+            path_pdf = util.join(args.directorio_destino, info[0][len(args.directorio_origen)+1:])
+            util.makedirs(path_pdf)
+            path_pdf = util.join(path_pdf, info[2] + ext_pdf)
+        else:
+            path_pdf = util.replace_extension(args.archivo_xml, ext_pdf)
+        pdf = CSVPDF(args.archivo_xml, args.plantilla)
         if pdf.xml:
             pdf.make_pdf()
             pdf.output(path_pdf, 'F')
+        sys.exit(0)
     if args.directorio_origen:
         files = util.get_files(args.directorio_origen)
         for f in files:
             path_pdf = util.replace_extension(f, ext_pdf)
-            pdf = CSVPDF(f)
+            pdf = CSVPDF(f, args.plantilla)
             if pdf.xml:
                 pdf.make_pdf()
                 pdf.output(path_pdf, 'F')

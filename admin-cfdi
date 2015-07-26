@@ -126,6 +126,7 @@ class Application(pygubu.TkApplication):
 
         if not LIBO:
             self._config('radio_ods', {'state': 'disabled'})
+        self.pb = self._get_object('progressbar')
         return
 
     def _center_window(self, root):
@@ -898,7 +899,7 @@ class Application(pygubu.TkApplication):
     def button_select_folder_target_pdf_click(self):
         folder = self.util.get_folder(self.parent)
         if folder:
-            self._set('target_pdf', folder)
+            self._set('pdf_target', folder)
         return
 
     def button_select_template_ods_click(self):
@@ -1043,36 +1044,56 @@ class Application(pygubu.TkApplication):
         if not ok:
             return
 
+        if data['pdf_user']['template_csv']:
+            self._csv_to_pdf(data)
+            return
+
+        #~ libo = LibO()
+        #~ if libo.SM is None:
+            #~ del libo
+            #~ msg = 'No fue posible iniciar LibreOffice, asegurate de que ' \
+                #~ 'este correctamente instalado e intentalo de nuevo'
+            #~ self.util.msgbox(msg)
+            #~ return False, data
+
         files = data['files']
-        del data['files']
         total = len(files)
-
-        libo = LibO()
-        if libo.SM is None:
-            del libo
-            msg = 'No fue posible iniciar LibreOffice, asegurate de que ' \
-                'este correctamente instalado e intentalo de nuevo'
-            self.util.msgbox(msg)
-            return False, data
-
-        pb = self._get_object('progressbar')
-        pb['maximum'] = total
-        pb.start()
+        #~ self.pb = self._get_object('progressbar')
+        self.pb['maximum'] = total
+        self.pb.start()
         j = 0
         for i, f in enumerate(files):
-            pb['value'] = i + 1
+            self.pb['value'] = i + 1
             msg = 'Archivo {} de {}'.format(i + 1, total)
             self._set('msg_user', msg)
             self.parent.update_idletasks()
             if self._make_pdf(f, libo, data['pdf_user']):
                 j += 1
         del libo
-        pb['value'] = 0
-        pb.stop()
+        self.pb['value'] = 0
+        self.pb.stop()
         msg = 'Archivos XML encontrados: {}\n'
         msg += 'Archivos PDF generados: {}'
         msg = msg.format(total, j)
         self.util.msgbox(msg)
+        return
+
+    def _csv_to_pdf(self, data):
+        files = data['files']
+        user = data['pdf_user']
+        total = len(files)
+        self.pb['maximum'] = total
+        self.pb.start()
+        for i, f in enumerate(files):
+            args = (self.g.SCRIPTS['CFDI2PDF'], '-a', f, '-o',
+                user['pdf_source'], '-d', user['pdf_target'], '-p', user['template_csv'])
+            self.util.call(args)
+            self.pb['value'] = i + 1
+            msg = 'Archivo {} de {}'.format(i + 1, total)
+            self._set('msg_user', msg)
+            self.parent.update_idletasks()
+        self.pb['value'] = 0
+        self.pb.stop()
         return
 
     def _make_pdf(self, path, libo, data):
@@ -1102,36 +1123,46 @@ class Application(pygubu.TkApplication):
             return False
 
     def _validate_pdf(self):
+        data = {}
         pdf_user = self._get('current_user_pdf')
         if not pdf_user:
             msg = 'Selecciona un usuario primero'
             self.util.msgbox(msg)
             return False, {}
 
-        data = self.users_pdf[pdf_user]
-        if not self.util.validate_dir(data['pdf_source'], 'r'):
+        pdf_user = self.users_pdf[pdf_user]
+        if not self.util.validate_dir(pdf_user['pdf_source'], 'r'):
             msg = 'No tienes derechos de lectura en el directorio origen'
             self.util.msgbox(msg)
             return False, {}
 
-        files = self.util.get_files(data['pdf_source'])
+        files = self.util.get_files(pdf_user['pdf_source'])
         if not files:
             msg = 'No se encontraron archivos XML en el directorio origen'
             self.util.msgbox(msg)
             return False, {}
 
-        if not self.util.validate_dir(data['pdf_target'], 'w'):
+        if not self.util.validate_dir(pdf_user['pdf_target'], 'w'):
             msg = 'No tienes derechos de escritura en el directorio destino'
             self.util.msgbox(msg)
             return False, {}
 
-        template_ods = data['template_ods']
-        if data['template_ods']:
-            if not self.util.exists(data['template_ods']):
+        data['pdf_user'] = pdf_user
+        data['files'] = files
+        data['libo'] = None
+        if pdf_user['template_csv']:
+            msg = 'Se van a generar {} PDFs\n\n¿Estas seguro de continuar?'
+            if not self.util.question(msg.format(len(files))):
+                return False, {}
+            return True, data
+
+        #~ template_ods = pdf_user['template_ods']
+        if pdf_user['template_ods']:
+            if not self.util.exists(pdf_user['template_ods']):
                 msg = 'No se encontró una plantilla en la ruta establecida'
                 self.util.msgbox(msg)
                 return False, {}
-            ext = self.util.get_path_info(data['template_ods'], 3)
+            ext = self.util.get_path_info(pdf_user['template_ods'], 3)
             if ext != self.g.EXT_ODS:
                 msg = 'La plantilla no es un archivo ODS de Calc'
                 self.util.msgbox(msg)
@@ -1142,25 +1173,20 @@ class Application(pygubu.TkApplication):
                 msg = 'No fue posible iniciar LibreOffice, asegurate de que ' \
                     'este correctamente instalado e intentalo de nuevo'
                 self.util.msgbox(msg)
-                return False, data
-            doc = libo.doc_open(data['template_ods'])
-            if doc is None:
-                del libo
-                msg = 'No fue posible abrir la plantilla, asegurate de que ' \
-                    'la ruta sea correcta'
-                self.util.msgbox(msg)
-                return False, data
-            doc.dispose()
-            del libo
-        else:   # ToDO CSV
-            return False, {}
-
+                return False, {}
+            #~ doc = libo.doc_open(data['template_ods'])
+            #~ if doc is None:
+                #~ del libo
+                #~ msg = 'No fue posible abrir la plantilla, asegurate de que ' \
+                    #~ 'la ruta sea correcta'
+                #~ self.util.msgbox(msg)
+                #~ return False, data
+            #~ doc.dispose()
+            #~ del libo
         msg = 'Se van a generar {} PDFs\n\n¿Estas seguro de continuar?'
         if not self.util.question(msg.format(len(files))):
             return False, {}
-
-        data['pdf_user'] = data
-        data['files'] = files
+        data['libo'] = libo
         return True, data
 
     def button_select_folder_report_source_click(self):
