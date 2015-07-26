@@ -1048,17 +1048,12 @@ class Application(pygubu.TkApplication):
             self._csv_to_pdf(data)
             return
 
-        #~ libo = LibO()
-        #~ if libo.SM is None:
-            #~ del libo
-            #~ msg = 'No fue posible iniciar LibreOffice, asegurate de que ' \
-                #~ 'este correctamente instalado e intentalo de nuevo'
-            #~ self.util.msgbox(msg)
-            #~ return False, data
+        self._ods_to_pdf(data)
+        return
 
+    def _ods_to_pdf(self, data):
         files = data['files']
         total = len(files)
-        #~ self.pb = self._get_object('progressbar')
         self.pb['maximum'] = total
         self.pb.start()
         j = 0
@@ -1067,9 +1062,9 @@ class Application(pygubu.TkApplication):
             msg = 'Archivo {} de {}'.format(i + 1, total)
             self._set('msg_user', msg)
             self.parent.update_idletasks()
-            if self._make_pdf(f, libo, data['pdf_user']):
+            if self._make_pdf(f, data['libo'], data['pdf_user']):
                 j += 1
-        del libo
+        del data['libo']
         self.pb['value'] = 0
         self.pb.stop()
         msg = 'Archivos XML encontrados: {}\n'
@@ -1174,15 +1169,7 @@ class Application(pygubu.TkApplication):
                     'este correctamente instalado e intentalo de nuevo'
                 self.util.msgbox(msg)
                 return False, {}
-            #~ doc = libo.doc_open(data['template_ods'])
-            #~ if doc is None:
-                #~ del libo
-                #~ msg = 'No fue posible abrir la plantilla, asegurate de que ' \
-                    #~ 'la ruta sea correcta'
-                #~ self.util.msgbox(msg)
-                #~ return False, data
-            #~ doc.dispose()
-            #~ del libo
+
         msg = 'Se van a generar {} PDFs\n\n¿Estas seguro de continuar?'
         if not self.util.question(msg.format(len(files))):
             return False, {}
