@@ -1,0 +1,6 @@
+pypng
+fpdf
+pygubu
+selenium
+pyqrcode
+requests

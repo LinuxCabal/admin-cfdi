@@ -38,6 +38,10 @@ class Global(object):
         'XSLT_CADENA': os.path.join(CWD, 'bin', 'cfdi_{}.xslt'),
         'XSLT_TIMBRE': os.path.join(CWD, 'bin', 'timbre_1.0.xslt'),
         'TEMPLATE': os.path.join(CWD, 'template'),
+        'USER': os.path.expanduser('~')
+    }
+    SCRIPTS = {
+        'CFDI2PDF': os.path.abspath(os.path.join(CWD, '..', 'cfdi2pdf')),
     }
     EXT_XML = '.xml'
     EXT_ODS = '.ods'
@@ -54,7 +58,7 @@ class Global(object):
     FILES = {
         'main': os.path.join(PATHS['ui'], 'mainwindow.ui'),
         'config': os.path.join(PATHS['ui'], 'config.ini'),
-        'log': os.path.join(CWD, 'admincfdi.log'),
+        'log': os.path.join(PATHS['USER'], 'admincfdi.log'),
     }
     FILE_NAME = '{serie}{folio:06d}_{fecha}_{receptor_rfc}'
     CADENA = '||{version}|{UUID}|{FechaTimbrado}|{selloCFD}|{noCertificadoSAT}||'
