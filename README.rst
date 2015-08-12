@@ -8,7 +8,7 @@ admin-cfdi
     01/04/2015
 
 :Ultima Versión:
-    0.2.7
+    0.3.0
 
 
 Descripción
@@ -44,8 +44,8 @@ GNU & LInux
 
 ::
 
-    sudo pip install selenium pygubu
-    python admincfdi.py
+    sudo install setup.py
+    ./admin-cfdi
 
 ArchLinux
 _________
