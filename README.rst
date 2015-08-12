@@ -44,27 +44,18 @@ GNU & LInux
 
 ::
 
-    sudo install setup.py
-    ./admin-cfdi
+    sudo python setup.py install
+    admin-cfdi
 
-ArchLinux
-_________
-
-
-::
-
-    sudo pip install selenium pygubu
-    python admincfdi.py
 
 Linux Mint
 __________
 
-
 ::
 
     sudo apt-get install python3-pip python3-tk
-    sudo pip3 install selenium pygubu
-    python3 admincfdi.py
+    sudo python setup.py install
+    admin-cfdi
 
 
 Windows
@@ -74,7 +65,7 @@ Si usas Windows, asegúrate de abrir el script con el ejecutable pythonw.exe loc
 
 ::
 
-    pip install selenium pygubu
+    python setup.py install
 
 
 Ligas
