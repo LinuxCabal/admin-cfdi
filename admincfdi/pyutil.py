@@ -2065,11 +2065,14 @@ class CSVPDF(FPDF):
         self.data = {}
         self.elements = {}
         decimales = self.DECIMALES
+        self.COLOR_RED = self._color(255, 0, 0)
         if self.xml:
             self.version = self.xml.attrib['version']
             #~ self.cadena = self._get_cadena(path_xml)
             self._parse_csv(path_template)
             decimales = len(self.xml.attrib['total'].split('.')[1])
+            if decimales == 1:
+                decimales = self.DECIMALES
         self.currency = '{0:,.%sf}' % decimales
         self.monedas = {
             'peso': ('peso', '$', 'm.n.'),
