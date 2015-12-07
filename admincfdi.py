@@ -439,6 +439,7 @@ class Application(pygubu.TkApplication):
         profile.set_preference(
             'browser.download.animateNotifications', False)
         try:
+            pb = self._get_object('progressbar')
             browser = webdriver.Firefox(profile)
             self._set('msg_user', 'Conectando...', True)
             browser.get(self.g.SAT['page_init'])
@@ -541,7 +542,6 @@ class Application(pygubu.TkApplication):
             if found:
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
                 t = len(docs)
-                pb = self._get_object('progressbar')
                 pb['maximum'] = t
                 pb.start()
                 for i, v in enumerate(docs):
