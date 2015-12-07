@@ -17,6 +17,7 @@ from selenium import webdriver
 from pyutil import Util
 from pyutil import Mail
 from pyutil import LibO
+from pyutil import APP_LIBO
 from pyutil import CFDIPDF
 from values import Global
 
@@ -137,6 +138,11 @@ class Application(pygubu.TkApplication):
         self.util.combo_values(combo, minutes, 59)
         combo = self._get_object('combo_end_second')
         self.util.combo_values(combo, minutes, 59)
+
+        if not APP_LIBO:
+            self._config('radio_ods', {'state': 'disabled'})
+        self._config('radio_json', {'state': 'disabled'})
+        self._config('button_select_template_json', {'state': 'disabled'})
 
         self._set('mail_port', 993)
         self._get_object('check_ssl').invoke()
