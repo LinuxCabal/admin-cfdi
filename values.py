@@ -177,7 +177,14 @@ class Global(object):
         'page_cfdi': page_cfdi,
         'page_receptor': page_cfdi.format('ConsultaReceptor.aspx'),
         'page_emisor': page_cfdi.format('ConsultaEmisor.aspx'),
+        'start_hour': 'ctl00_MainContent_CldFecha_DdlHora',
+        'start_minute': 'ctl00_MainContent_CldFecha_DdlMinuto',
+        'start_second': 'ctl00_MainContent_CldFecha_DdlSegundo',
+        'end_hour': 'ctl00_MainContent_CldFecha_DdlHoraFin',
+        'end_minute': 'ctl00_MainContent_CldFecha_DdlMinutoFin',
+        'end_second': 'ctl00_MainContent_CldFecha_DdlSegundoFin',
     }
+
     frm_1 = '%(asctime)s - %(levelname)s - %(lineno)s - %(message)s'
     CONF_LOG = {
         'version': 1,
