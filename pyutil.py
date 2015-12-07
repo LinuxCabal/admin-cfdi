@@ -45,10 +45,13 @@ except ImportError:
 WIN = 'win32'
 MAC = 'darwin'
 LINUX = 'linux'
-
+APP_LIBO = True
 
 if sys.platform == WIN:
-    from win32com.client import Dispatch
+    try:
+        from win32com.client import Dispatch
+    except ImportError as e:
+        APP_LIBO = False
 elif sys.platform == LINUX:
     import uno
     from com.sun.star.beans import PropertyValue

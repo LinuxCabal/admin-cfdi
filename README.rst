@@ -5,10 +5,10 @@ admin-cfdi
     Universo Libre A.C., Python Cabal
 
 :Fecha:
-    01/04/2015
+    07/12/2015
 
 :Versión:
-    0.2.7
+    0.2.8
 
 
 Descripción
@@ -32,7 +32,6 @@ Requerimientos
 * Firefox para la automatización de la descarga del SAT.
 * Selenium para la automatización de la descarga del SAT.
 * PyGubu para la interfaz gráfica.
-* ReportLab si usas una plantilla JSON (por implementar, aunque podemos usar pyfpdf; mucho más sencilla).
 * LibreOffice si usas la plantilla ODS.
 * Extensiones win32 para Python si usas Windows.
 
@@ -51,7 +50,6 @@ GNU & LInux
 ArchLinux
 _________
 
-
 ::
 
     sudo pip install selenium pygubu
@@ -59,7 +57,6 @@ _________
 
 Linux Mint
 __________
-
 
 ::
 
