@@ -17,6 +17,7 @@ from selenium import webdriver
 from pyutil import Util
 from pyutil import Mail
 from pyutil import LibO
+from pyutil import APP_LIBO
 from pyutil import CFDIPDF
 from values import Global
 
@@ -122,6 +123,27 @@ class Application(pygubu.TkApplication):
         days_month = self.util.get_days(now.year, now.month) + 1
         days = ['%02d' % x for x in range(0, days_month)]
         self.util.combo_values(combo, days, 0)
+
+        hours = ['%02d' % x for x in range(24)]
+        combo = self._get_object('combo_start_hour')
+        self.util.combo_values(combo, hours, 0)
+        combo = self._get_object('combo_end_hour')
+        self.util.combo_values(combo, hours, 23)
+        minutes = ['%02d' % x for x in range(60)]
+        combo = self._get_object('combo_start_minute')
+        self.util.combo_values(combo, minutes, 0)
+        combo = self._get_object('combo_start_second')
+        self.util.combo_values(combo, minutes, 0)
+        combo = self._get_object('combo_end_minute')
+        self.util.combo_values(combo, minutes, 59)
+        combo = self._get_object('combo_end_second')
+        self.util.combo_values(combo, minutes, 59)
+
+        if not APP_LIBO:
+            self._config('radio_ods', {'state': 'disabled'})
+        self._config('radio_json', {'state': 'disabled'})
+        self._config('button_select_template_json', {'state': 'disabled'})
+
         self._set('mail_port', 993)
         self._get_object('check_ssl').invoke()
         self._focus_set('text_rfc')
@@ -417,6 +439,7 @@ class Application(pygubu.TkApplication):
         profile.set_preference(
             'browser.download.animateNotifications', False)
         try:
+            pb = self._get_object('progressbar')
             browser = webdriver.Firefox(profile)
             self._set('msg_user', 'Conectando...', True)
             browser.get(self.g.SAT['page_init'])
@@ -428,7 +451,7 @@ class Application(pygubu.TkApplication):
             self.util.sleep(3)
             self._set('msg_user', 'Conectado...', True)
             browser.get(page_query)
-            self.util.sleep(3)
+            self.util.sleep(5)
             self._set('msg_user', 'Buscando...', True)
             if data['type_search'] == 1:
                 txt = browser.find_element_by_id(self.g.SAT['uuid'])
@@ -464,48 +487,28 @@ class Application(pygubu.TkApplication):
                     txt.send_keys(dates[1])
                 # Recibidas
                 else:
-                    #~ combos = browser.find_elements_by_class_name(
-                        #~ self.g.SAT['combos'])
-                    #~ combos[0].click()
-                    combo = browser.find_element_by_id(self.g.SAT['year'])
-                    combo = browser.find_element_by_id(
-                        'sbToggle_{}'.format(combo.get_attribute('sb')))
-                    combo.click()
-                    self.util.sleep(2)
-                    link = browser.find_element_by_link_text(
-                        data['search_year'])
-                    link.click()
-                    self.util.sleep(2)
-                    combo = browser.find_element_by_id(self.g.SAT['month'])
-                    combo = browser.find_element_by_id(
-                        'sbToggle_{}'.format(combo.get_attribute('sb')))
-                    combo.click()
-                    self.util.sleep(2)
-                    link = browser.find_element_by_link_text(
-                        data['search_month'])
-                    link.click()
-                    self.util.sleep(2)
+                    arg = "document.getElementById('{}').value={};".format(
+                        self.g.SAT['year'], data['search_year'])
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}').value={};".format(
+                        self.g.SAT['month'], data['search_month'])
+                    browser.execute_script(arg)
+
                     if data['search_day'] != '00':
-                        combo = browser.find_element_by_id(self.g.SAT['day'])
-                        sb = combo.get_attribute('sb')
-                        combo = browser.find_element_by_id(
-                            'sbToggle_{}'.format(sb))
-                        combo.click()
+                        arg = "document.getElementById('{}').value='{}';".format(
+                            self.g.SAT['day'], data['search_day'])
+                        browser.execute_script(arg)
                         self.util.sleep()
-                        if data['search_month'] == data['search_day']:
-                            links = browser.find_elements_by_link_text(
-                                data['search_day'])
-                            for l in links:
-                                p = l.find_element_by_xpath(
-                                    '..').find_element_by_xpath('..')
-                                sb2 = p.get_attribute('id')
-                                if sb in sb2:
-                                    link = l
-                                    break
-                        else:
-                            link = browser.find_element_by_link_text(
-                                data['search_day'])
-                        link.click()
+
+                        #Establece hora de inicio y fin
+                        values = (
+                            'start_hour', 'start_minute', 'start_second',
+                            'end_hour', 'end_minute', 'end_second'
+                        )
+                        for v in values:
+                            arg = "document.getElementById('{}').value={};".format(
+                                self.g.SAT[v], data[v])
+                            browser.execute_script(arg)
                         self.util.sleep()
 
             browser.find_element_by_id(self.g.SAT['submit']).click()
@@ -515,26 +518,9 @@ class Application(pygubu.TkApplication):
             self.util.sleep(sec)
             # Bug del SAT
             if data['type_invoice'] != 1 and data['search_day'] != '00':
-                combo = browser.find_element_by_id(self.g.SAT['day'])
-                sb = combo.get_attribute('sb')
-                combo = browser.find_element_by_id(
-                    'sbToggle_{}'.format(sb))
-                combo.click()
-                self.util.sleep(2)
-                if data['search_month'] == data['search_day']:
-                    links = browser.find_elements_by_link_text(
-                        data['search_day'])
-                    for l in links:
-                        p = l.find_element_by_xpath(
-                            '..').find_element_by_xpath('..')
-                        sb2 = p.get_attribute('id')
-                        if sb in sb2:
-                            link = l
-                            break
-                else:
-                    link = browser.find_element_by_link_text(
-                        data['search_day'])
-                link.click()
+                arg = "document.getElementById('{}').value='{}';".format(
+                    self.g.SAT['day'], data['search_day'])
+                browser.execute_script(arg)
                 self.util.sleep(2)
                 browser.find_element_by_id(self.g.SAT['submit']).click()
                 self.util.sleep(sec)
@@ -556,7 +542,6 @@ class Application(pygubu.TkApplication):
             if found:
                 docs = browser.find_elements_by_name(self.g.SAT['download'])
                 t = len(docs)
-                pb = self._get_object('progressbar')
                 pb['maximum'] = t
                 pb.start()
                 for i, v in enumerate(docs):
@@ -574,6 +559,8 @@ class Application(pygubu.TkApplication):
         except Exception as e:
             print (e)
         finally:
+            pb['value'] = 0
+            pb.stop()
             try:
                 self._set('msg_user', 'Desconectando...', True)
                 link = browser.find_element_by_partial_link_text('Cerrar Sesi')
@@ -678,6 +665,12 @@ class Application(pygubu.TkApplication):
             'search_month': self._get('search_month'),
             'search_day': search_day,
             'sat_month': sat_month,
+            'start_hour': self._get('start_hour'),
+            'start_minute': self._get('start_minute'),
+            'start_second': self._get('start_second'),
+            'end_hour': self._get('end_hour'),
+            'end_minute': self._get('end_minute'),
+            'end_second': self._get('end_second'),
         }
 
         return True, data
