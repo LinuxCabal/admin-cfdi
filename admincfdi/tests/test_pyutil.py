@@ -1,6 +1,45 @@
 import unittest
 
 
+class LeeCredenciales(unittest.TestCase):
+
+    def setUp(self):
+        from unittest.mock import Mock
+        from admincfdi import pyutil
+
+        self.onefile = Mock()
+        self.onefile.readline.return_value = 'rfc pwd'
+        pyutil.open = Mock(return_value=self.onefile)
+
+    def tearDown(self):
+        from admincfdi import pyutil
+
+        del pyutil.open
+
+    def test_file_not_found(self):
+        from admincfdi import pyutil
+
+        pyutil.open.side_effect = FileNotFoundError
+        util = pyutil.Util()
+        status, rfc, pwd = util.lee_credenciales('ruta')
+        self.assertEqual('Archivo no encontrado: ruta', status)
+
+    def test_not_two_fields(self):
+        from admincfdi import pyutil
+
+        self.onefile.readline.return_value = ''
+        util = pyutil.Util()
+        status, rfc, pwd = util.lee_credenciales('ruta')
+        self.assertEqual('No contiene dos campos: ruta', status)
+
+    def test_success(self):
+        from admincfdi import pyutil
+
+        util = pyutil.Util()
+        status, rfc, pwd = util.lee_credenciales('ruta')
+        self.assertEqual('Ok', status)
+
+
 class DescargaSAT(unittest.TestCase):
 
     def setUp(self):
