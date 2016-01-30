@@ -17,8 +17,10 @@ import time
 import datetime
 import os
 import getpass
+import sys
 
 from admincfdi.pyutil import DescargaSAT
+from admincfdi.pyutil import Util
 
 
 def process_command_line_arguments():
@@ -90,7 +92,11 @@ def main():
         rfc = input('RFC: ')
         pwd = getpass.getpass('CIEC: ')
     else:
-        rfc, pwd = open(args.archivo_de_credenciales).readline()[:-1].split()
+        util = Util()
+        status, rfc, pwd = util.lee_credenciales(args.archivo_de_credenciales)
+        if status != 'Ok':
+            print(status)
+            sys.exit(1)
     descarga = DescargaSAT()
     profile = descarga.get_firefox_profile(args.carpeta_destino)
     try:
