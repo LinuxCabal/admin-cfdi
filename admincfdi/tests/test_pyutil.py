@@ -39,6 +39,15 @@ class LeeCredenciales(unittest.TestCase):
         status, rfc, pwd = util.lee_credenciales('ruta')
         self.assertEqual('Ok', status)
 
+    def test_surplus_whitespace_is_ok(self):
+        from admincfdi import pyutil
+
+        self.onefile.readline.return_value = ' \t rfc \t  pwd  \r\n'
+        util = pyutil.Util()
+        status, rfc, pwd = util.lee_credenciales('ruta')
+        self.assertEqual('rfc', rfc)
+        self.assertEqual('pwd', pwd)
+
 
 class DescargaSAT(unittest.TestCase):
 
