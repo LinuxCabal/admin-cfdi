@@ -4,7 +4,7 @@ Introducción
 
 :term:`admin-cfdi` es una aplicación de escritorio desarrollada en `Python`_ para descargar
 documentos :term:`CFDI` (facturas electrónicas) directamente del :term:`SAT`,
-permite también, descargar desde correos electrónicos, validarlos y administrarlos.
+permite también, descargar CFDIs desde correos electrónicos, validarlos y administrarlos.
 
 .. _Python: http://python.org/
 
@@ -15,8 +15,13 @@ permite también, descargar desde correos electrónicos, validarlos y administra
 	   :scale: 50 %
 	   :alt: Haz clic para agrandar
 
+`admin-cfdi` es `software libre`_ bajo la licencia `GNU GPL 3`_ y corre en GNU/Linux y
+otros sistemas operativos.
 Se tienen también dos aplicaciones de línea de comando que permiten
 automatizar operaciones mediante un script:
+
+.. _software libre: https://www.gnu.org/philosophy/free-sw.es.html
+.. _GNU GPL 3: https://www.gnu.org/licenses/gpl.html
 
 ``descarga-cfdi`` descarga CFDIs que cumplan determinado criterio, por
 ejemplo todos los CFDIs recibidos en el mes de enero de 2015::
@@ -65,9 +70,11 @@ Los CFDIs se guardan por omisión en la carpeta `cfdi-descarga`::
   Generando: ../cfdi-descarga/5A5108B2-2171-49B0-86D4-539DD205786A.xml
   Generando: ../cfdi-descarga/12FB2D4B-CAE0-41CF-B344-13FE5135C773.xml
 
-Los archivos PDF generados se guardan en la carpeta de destino::
+Un ejemplo de los archivos PDF generados:
 
-  12FB2D4B-CAE0-41CF-B344-13FE5135C773.pdf  5A5108B2-2171-49B0-86D4-539DD205786A.pdf  F1ABE4CE-9444-4F77-A3E5-57A6559F6CB3.pdf
-  1FBFA93D-F171-0B0E-CF71-4216C214E66F.pdf  61F50926-7C47-4269-B612-3777881050A4.pdf  FF31423C-E1BC-4A3D-9A7B-472FFE9988F9.pdf
-  2968F314-90D6-4000-BBA5-E17988F2870F.pdf  79FE35B0-636E-4163-8BA2-38E053E97E4C.pdf
-  2CF33F44-2E2A-4F4C-904C-6213D3E8F12C.pdf  CB969AF4-0E13-441B-9CC7-0AA11831317F.pdf
+.. image:: img/ejemplo-pdf.png
+           :align: center
+           :width: 1366
+	   :height: 768
+	   :scale: 50 %
+	   :alt: Haz clic para agrandar
