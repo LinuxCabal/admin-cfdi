@@ -2091,8 +2091,8 @@ class CSVPDF(FPDF):
                 decimales = len(self.xml.attrib['total'].split('.')[1])
             except IndexError:
                 decimales = self.DECIMALES
-             if decimales == 1:
-                 decimales = self.DECIMALES
+            if decimales == 1:
+                decimales = self.DECIMALES
 
         self.currency = '{0:,.%sf}' % decimales
         self.monedas = {
