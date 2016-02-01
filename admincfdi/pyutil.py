@@ -437,6 +437,22 @@ class Util(object):
         time.sleep(sec)
         return
 
+    def lee_credenciales(self, ruta_archivo):
+        '''Lee un renglón de ruta_archivo, regresa status, rfc, pwd
+
+        status es 'Ok', o un mensaje de error'''
+
+        try:
+            f = open(ruta_archivo)
+        except FileNotFoundError:
+            return 'Archivo no encontrado: ' + ruta_archivo, '', ''
+        row = f.readline().strip()
+        fields = row.split()
+        if not len(fields) == 2:
+            return 'No contiene dos campos: ' + ruta_archivo, '', ''
+        rfc, pwd = fields
+        return 'Ok', rfc, pwd
+
     def load_config(self, path):
         data = {}
         try:

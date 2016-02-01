@@ -5,11 +5,14 @@ class DescargaSAT(unittest.TestCase):
 
     def setUp(self):
         import configparser
+        from admincfdi.pyutil import Util
 
         self.config = configparser.ConfigParser()
         self.config.read('functional_DescargaSAT.conf' )
 
-        self.rfc, self.ciec = open('credenciales.conf').readline()[:-1].split()
+        util = Util()
+        status, self.rfc, self.ciec = util.lee_credenciales('credenciales.conf')
+        self.assertEqual('Ok', status)
 
     def test_connect_disconnect(self):
         from admincfdi.pyutil import DescargaSAT
