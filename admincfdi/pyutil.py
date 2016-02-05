@@ -39,6 +39,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from fpdf import FPDF
 from admincfdi.values import Global
 
@@ -1796,12 +1797,13 @@ class DescargaSAT(object):
         txt.send_keys(ciec)
         txt.submit()
         wait = WebDriverWait(browser, 10)
-        wait.until(EC.title_contains('NetIQ Access'))
-        iframe = browser.find_element(By.ID, 'content')
-        browser.switch_to.frame(iframe)
-        wait.until(EC.text_to_be_present_in_element(
-            (By.CLASS_NAME, 'messagetext'), 'session has been authenticated'))
-        self.status('Conectado...')
+        try:
+            wait.until(EC.title_contains('NetIQ Access'))
+            self.status('Conectado')
+            return True
+        except TimeoutException:
+            self.status('No conectado')
+            return False
 
     def disconnect(self):
         'Cierra la sesión y el navegador'
