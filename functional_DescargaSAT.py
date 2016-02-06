@@ -24,8 +24,23 @@ class DescargaSAT(unittest.TestCase):
             pass
 
         descarga = DescargaSAT(status_callback=no_op)
-        descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+        status = descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+        self.assertTrue(status)
         descarga.disconnect()
+
+    def test_connect_fail(self):
+        from admincfdi.pyutil import DescargaSAT
+        from selenium import webdriver
+
+        profile = webdriver.FirefoxProfile()
+
+        def no_op(*args):
+            pass
+
+        descarga = DescargaSAT(status_callback=no_op)
+        status = descarga.connect(profile, rfc='x', ciec='y')
+        self.assertFalse(status)
+        descarga.browser.close()
 
     def test_search_uuid(self):
         import os
