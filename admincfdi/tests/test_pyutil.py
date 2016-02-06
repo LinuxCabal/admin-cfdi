@@ -62,7 +62,8 @@ class DescargaSAT(unittest.TestCase):
         pyutil.webdriver.FirefoxProfile = webdriver.FirefoxProfile
 
         self.WebDriverWait = pyutil.WebDriverWait
-        pyutil.WebDriverWait = Mock()
+        self.wait = Mock()
+        pyutil.WebDriverWait = Mock(return_value=self.wait)
 
         self.sleep = time.sleep
         time.sleep = Mock()
@@ -97,6 +98,19 @@ class DescargaSAT(unittest.TestCase):
         descarga = DescargaSAT(status_callback=self.status)
         profile = descarga.connect(profile, rfc='x', ciec='y')
         self.assertEqual(3, self.status.call_count)
+
+    def test_connect_fail(self):
+        from unittest.mock import Mock
+        from admincfdi.pyutil import DescargaSAT
+        from admincfdi.pyutil import WebDriverWait
+        from selenium import webdriver
+        from selenium.common.exceptions import TimeoutException
+
+        self.wait.until.side_effect = TimeoutException
+        profile = webdriver.FirefoxProfile()
+        descarga = DescargaSAT(status_callback=self.status)
+        profile = descarga.connect(profile, rfc='x', ciec='y')
+        self.assertRaises(TimeoutException)
 
     def test_disconnect_not_connected(self):
         from admincfdi.pyutil import DescargaSAT
