@@ -54,12 +54,11 @@ Los detalles de cada paso:
      - Llenar el usuario y la contraseña (RFC y CIEC)
      - Enviar los datos al servidor
      - Esperar la respuesta
-     - El título de la página cambia a *NetIQ Access Manager*
-     - Hay un elemento iframe con id ``content``, el cual contiene:
-        - En caso de éxito, el elemento con clase ``messagetext``
-          con el texto *session has been authenticated*.
-        - En caso de falla, un pop up con el elemento con id ``xacerror``
-          que contiene el texto *Login failed*
+     - En caso de éxito, se carga una página con el título
+       *NetIQ Access Manager*
+     - En caso de falla, un elemento ``div`` con id ``xacerror``
+       deja de estar oculto y muestra su texto que empieza
+       con *El RFC o contraseña son incorrectos.*
 
 #. Buscar
 
