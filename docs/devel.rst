@@ -89,7 +89,11 @@ Los detalles de cada paso:
                     - ``ctl00_MainContent_CldFechaFinal2_DdlMinuto``
                     - ``ctl00_MainContent_CldFechaFinal2_DdlSegundo``
 
-                  las cadenas 23, 59 y 59
+                  una cadena con un valor en el rango que corresponde
+                  respectivamente: 1 a 23, 1 a 59 y 1 a 59.
+                  No usar ceros a la izquierda para valores menores
+                  a 10: usar 5, no 05.  Por omisión hay que llenar cada
+                  select con el valor máximo correspondiente.
             - Se se buscan facturas recibidas:
                 - Asignar a los selects no visibles con ids
 

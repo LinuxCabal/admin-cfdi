@@ -78,6 +78,14 @@ def process_command_line_arguments():
     parser.add_argument('--día',
                         help=help, default='00')
 
+    help = 'Hora final. Por omisión es 23.'
+    parser.add_argument('--hora-final',
+                        help=help, default='23')
+
+    help = 'Minuto final. Por omisión es 59.'
+    parser.add_argument('--minuto-final',
+                        help=help, default='59')
+
     help = 'Mes completo por día. Por omisión no se usa en la búsqueda.'
     parser.add_argument('--mes-completo-por-día', action='store_const', const=True,
                         help=help, default=False)
@@ -107,6 +115,8 @@ def main():
                 año=args.año,
                 mes=args.mes,
                 día=args.día,
+                hora_final=args.hora_final,
+                minuto_final=args.minuto_final,
                 mes_completo_por_día=args.mes_completo_por_día)
         descarga.download(docs)
     except Exception as e:

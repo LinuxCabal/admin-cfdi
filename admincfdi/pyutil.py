@@ -1827,6 +1827,8 @@ class DescargaSAT(object):
         año=None,
         mes=None,
         día='00',
+        hora_final='23',
+        minuto_final='59',
         mes_completo_por_día=False):
         'Busca y regresa los resultados'
 
@@ -1858,6 +1860,10 @@ class DescargaSAT(object):
                                         (By.ID, self.g.SAT['emisor'])))
                 if rfc_emisor:
                     txt.send_keys(rfc_emisor)
+
+                hora_final = hora_final.lstrip('0')
+                minuto_final = minuto_final.lstrip('0')
+
                 # Emitidas
                 if facturas_emitidas:
                     year = int(año)
@@ -1883,11 +1889,11 @@ class DescargaSAT(object):
                     # Hay que seleccionar también la hora, minuto y segundo
                     arg = "document.getElementById('{}')." \
                         "value={};".format(
-                        self.g.SAT['hour'], '23')
+                            self.g.SAT['hour'], hora_final)
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value={};".format(
-                        self.g.SAT['minute'], '59')
+                            self.g.SAT['minute'], minuto_final)
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value={};".format(
@@ -1908,6 +1914,14 @@ class DescargaSAT(object):
                     arg = "document.getElementById('{}')." \
                         "value='{}';".format(
                         self.g.SAT['day'], día)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_hour'], hora_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_minute'], minuto_final)
                     browser.execute_script(arg)
 
             results_table = browser.find_element_by_id(
