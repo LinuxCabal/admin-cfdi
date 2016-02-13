@@ -120,6 +120,27 @@ class Application(pygubu.TkApplication):
         days_month = self.util.get_days(now.year, now.month) + 1
         days = ['%02d' % x for x in range(0, days_month)]
         self.util.combo_values(combo, days, 0)
+
+        hours = ['%02d' % x for x in range(24)]
+        combo = self._get_object('combo_start_hour')
+        self.util.combo_values(combo, hours, 0)
+        combo = self._get_object('combo_end_hour')
+        self.util.combo_values(combo, hours, 23)
+        minutes = ['%02d' % x for x in range(60)]
+        combo = self._get_object('combo_start_minute')
+        self.util.combo_values(combo, minutes, 0)
+        combo = self._get_object('combo_start_second')
+        self.util.combo_values(combo, minutes, 0)
+        combo = self._get_object('combo_end_minute')
+        self.util.combo_values(combo, minutes, 59)
+        combo = self._get_object('combo_end_second')
+        self.util.combo_values(combo, minutes, 59)
+
+        if not APP_LIBO:
+            self._config('radio_ods', {'state': 'disabled'})
+        self._config('radio_json', {'state': 'disabled'})
+        self._config('button_select_template_json', {'state': 'disabled'})
+
         self._set('mail_port', 993)
         self._get_object('check_ssl').invoke()
         self._focus_set('text_rfc')
@@ -496,6 +517,12 @@ class Application(pygubu.TkApplication):
             'mes': self._get('search_month'),
             'día': search_day,
             'mes_completo_por_día': sat_month,
+            'start_hour': self._get('start_hour'),
+            'start_minute': self._get('start_minute'),
+            'start_second': self._get('start_second'),
+            'end_hour': self._get('end_hour'),
+            'end_minute': self._get('end_minute'),
+            'end_second': self._get('end_second'),
         }
 
         return True, data
