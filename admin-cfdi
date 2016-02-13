@@ -136,11 +136,6 @@ class Application(pygubu.TkApplication):
         combo = self._get_object('combo_end_second')
         self.util.combo_values(combo, minutes, 59)
 
-        if not APP_LIBO:
-            self._config('radio_ods', {'state': 'disabled'})
-        self._config('radio_json', {'state': 'disabled'})
-        self._config('button_select_template_json', {'state': 'disabled'})
-
         self._set('mail_port', 993)
         self._get_object('check_ssl').invoke()
         self._focus_set('text_rfc')
