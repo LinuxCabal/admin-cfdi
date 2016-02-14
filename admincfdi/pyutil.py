@@ -1827,6 +1827,8 @@ class DescargaSAT(object):
         año=None,
         mes=None,
         día='00',
+        hora_inicial='0',
+        minuto_inicial='0',
         hora_final='23',
         minuto_final='59',
         mes_completo_por_día=False):
@@ -1861,6 +1863,8 @@ class DescargaSAT(object):
                 if rfc_emisor:
                     txt.send_keys(rfc_emisor)
 
+                hora_inicial = hora_inicial.lstrip('0')
+                minuto_inicial = minuto_inicial.lstrip('0')
                 hora_final = hora_final.lstrip('0')
                 minuto_final = minuto_final.lstrip('0')
 
@@ -1914,6 +1918,14 @@ class DescargaSAT(object):
                     arg = "document.getElementById('{}')." \
                         "value='{}';".format(
                         self.g.SAT['day'], día)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_hour'], hora_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_minute'], minuto_inicial)
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value='{}';".format(
