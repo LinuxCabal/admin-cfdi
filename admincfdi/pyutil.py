@@ -1865,12 +1865,12 @@ class DescargaSAT(object):
                 if rfc_emisor:
                     txt.send_keys(rfc_emisor)
 
-                hora_inicial = hora_inicial.lstrip('0')
-                minuto_inicial = minuto_inicial.lstrip('0')
-                segundo_inicial = segundo_inicial.lstrip('0')
-                hora_final = hora_final.lstrip('0')
-                minuto_final = minuto_final.lstrip('0')
-                segundo_final = segundo_final.lstrip('0')
+                hora_inicial = int(hora_inicial)
+                minuto_inicial = int(minuto_inicial)
+                segundo_inicial = int(segundo_inicial)
+                hora_final = int(hora_final)
+                minuto_final = int(minuto_final)
+                segundo_final = int(segundo_final)
 
                 # Emitidas
                 if facturas_emitidas:
