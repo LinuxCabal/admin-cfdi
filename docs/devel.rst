@@ -100,8 +100,21 @@ Los detalles de cada paso:
                     - ``DdlAnio``
                     - ``ctl00_MainContent_CldFecha_DdlMes``
                     - ``ctl00_MainContent_CldFecha_DdlDia``
+                    - ``ctl00_MainContent_CldFecha_DdlHora``
+                    - ``ctl00_MainContent_CldFecha_DdlMinuto``
+                    - ``ctl00_MainContent_CldFecha_DdlSegundo``
+                    - ``ctl00_MainContent_CldFecha_DdlHoraFin``
+                    - ``ctl00_MainContent_CldFecha_DdlMinutoFin``
+                    - ``ctl00_MainContent_CldFecha_DdlSegundoFin``
 
-                  los valores de los parámetros año, mes y día
+                  los valores de los parámetros año, mes, día,
+                  hora_inicial, minuto_inicial, segundo_inicial,
+                  hora_final, minuto_final y segundo_final respectivamente.
+                  Los valores de horas, minutos y segundos
+                  no deben llevar 0 a la izquierda.  El valor de
+                  día requiere 0 a la izquierda para valores menores
+                  a 10.
+
      - Enviar la forma de búsqueda al servidor mediante método POST, los
        datos que se envían se muestran más bajo.
 
