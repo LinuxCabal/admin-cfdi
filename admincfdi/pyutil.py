@@ -1829,8 +1829,10 @@ class DescargaSAT(object):
         día='00',
         hora_inicial='0',
         minuto_inicial='0',
+        segundo_inicial='0',
         hora_final='23',
         minuto_final='59',
+        segundo_final='59',
         mes_completo_por_día=False):
         'Busca y regresa los resultados'
 
@@ -1865,8 +1867,10 @@ class DescargaSAT(object):
 
                 hora_inicial = hora_inicial.lstrip('0')
                 minuto_inicial = minuto_inicial.lstrip('0')
+                segundo_inicial = segundo_inicial.lstrip('0')
                 hora_final = hora_final.lstrip('0')
                 minuto_final = minuto_final.lstrip('0')
+                segundo_final = segundo_final.lstrip('0')
 
                 # Emitidas
                 if facturas_emitidas:
@@ -1901,7 +1905,7 @@ class DescargaSAT(object):
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value={};".format(
-                        self.g.SAT['second'], '59')
+                            self.g.SAT['second'], segundo_final)
                     browser.execute_script(arg)
                     if mes_completo_por_día:
                         return self._download_sat_month_emitidas(dates[1], day)
@@ -1929,11 +1933,19 @@ class DescargaSAT(object):
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value='{}';".format(
+                            self.g.SAT['start_second'], segundo_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
                             self.g.SAT['end_hour'], hora_final)
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value='{}';".format(
                             self.g.SAT['end_minute'], minuto_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_second'], segundo_final)
                     browser.execute_script(arg)
 
             results_table = browser.find_element_by_id(

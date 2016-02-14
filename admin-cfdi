@@ -412,8 +412,10 @@ class Application(pygubu.TkApplication):
                 día=data['día'],
                 hora_inicial=data['start_hour'],
                 minuto_inicial=data['start_minute'],
+                segundo_inicial=data['start_second'],
                 hora_final=data['end_hour'],
                 minuto_final=data['end_minute'],
+                segundo_final=data['end_second'],
                 mes_completo_por_día=data['mes_completo_por_día'])
             descarga.download(docs)
         except Exception as e:
