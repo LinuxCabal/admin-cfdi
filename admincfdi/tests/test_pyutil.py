@@ -220,6 +220,19 @@ class DescargaSAT(unittest.TestCase):
         results = descarga.search(día='01', mes='01')
         self.assertEqual(0, len(results))
 
+    def test_search_minuto_final_cero(self):
+        from unittest.mock import MagicMock
+        from admincfdi.pyutil import DescargaSAT
+        from selenium import webdriver
+
+        profile = webdriver.FirefoxProfile()
+        descarga = DescargaSAT(status_callback=self.status)
+        descarga.browser = MagicMock()
+        results = descarga.search(día='01', mes='02', minuto_final='0')
+
+        expected = "document.getElementById('ctl00_MainContent_CldFecha_DdlMinutoFin').value='0';"
+        descarga.browser.execute_script.assert_any_call(expected)
+
     def test_search_mes_completo_por_día(self):
         from unittest.mock import MagicMock, Mock
         from admincfdi.pyutil import DescargaSAT

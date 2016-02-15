@@ -1827,6 +1827,12 @@ class DescargaSAT(object):
         año=None,
         mes=None,
         día='00',
+        hora_inicial='0',
+        minuto_inicial='0',
+        segundo_inicial='0',
+        hora_final='23',
+        minuto_final='59',
+        segundo_final='59',
         mes_completo_por_día=False):
         'Busca y regresa los resultados'
 
@@ -1858,6 +1864,14 @@ class DescargaSAT(object):
                                         (By.ID, self.g.SAT['emisor'])))
                 if rfc_emisor:
                     txt.send_keys(rfc_emisor)
+
+                hora_inicial = int(hora_inicial)
+                minuto_inicial = int(minuto_inicial)
+                segundo_inicial = int(segundo_inicial)
+                hora_final = int(hora_final)
+                minuto_final = int(minuto_final)
+                segundo_final = int(segundo_final)
+
                 # Emitidas
                 if facturas_emitidas:
                     year = int(año)
@@ -1883,15 +1897,15 @@ class DescargaSAT(object):
                     # Hay que seleccionar también la hora, minuto y segundo
                     arg = "document.getElementById('{}')." \
                         "value={};".format(
-                        self.g.SAT['hour'], '23')
+                            self.g.SAT['hour'], hora_final)
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value={};".format(
-                        self.g.SAT['minute'], '59')
+                            self.g.SAT['minute'], minuto_final)
                     browser.execute_script(arg)
                     arg = "document.getElementById('{}')." \
                         "value={};".format(
-                        self.g.SAT['second'], '59')
+                            self.g.SAT['second'], segundo_final)
                     browser.execute_script(arg)
                     if mes_completo_por_día:
                         return self._download_sat_month_emitidas(dates[1], day)
@@ -1908,6 +1922,30 @@ class DescargaSAT(object):
                     arg = "document.getElementById('{}')." \
                         "value='{}';".format(
                         self.g.SAT['day'], día)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_hour'], hora_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_minute'], minuto_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_second'], segundo_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_hour'], hora_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_minute'], minuto_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_second'], segundo_final)
                     browser.execute_script(arg)
 
             results_table = browser.find_element_by_id(

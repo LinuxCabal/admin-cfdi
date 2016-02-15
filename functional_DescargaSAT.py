@@ -134,6 +134,95 @@ class DescargaSAT(unittest.TestCase):
             descarga.disconnect()
             self.assertEqual(expected, len(os.listdir(destino)))
 
+    def test_hora_minuto_inicial(self):
+        import os
+        import tempfile
+        from admincfdi.pyutil import DescargaSAT
+
+        def no_op(*args):
+            pass
+
+        seccion = self.config['hora_minuto_inicial']
+        año = seccion['año']
+        mes = seccion['mes']
+        día = seccion['día']
+        hora_inicial =  seccion['hora_inicial']
+        minuto_inicial = seccion['minuto_inicial']
+        expected = int(seccion['expected'])
+        descarga = DescargaSAT(status_callback=no_op,
+                               download_callback=no_op)
+        with tempfile.TemporaryDirectory() as tempdir:
+            destino = os.path.join(tempdir, 'cfdi-descarga')
+            profile = descarga.get_firefox_profile(destino)
+            descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+            docs = descarga.search(año=año, mes=mes, día=día,
+                                   hora_inicial=hora_inicial,
+                                   minuto_inicial=minuto_inicial)
+            descarga.download(docs)
+            descarga.disconnect()
+            self.assertEqual(expected, len(os.listdir(destino)))
+
+    def test_hora_minuto_final(self):
+        import os
+        import tempfile
+        from admincfdi.pyutil import DescargaSAT
+
+        def no_op(*args):
+            pass
+
+        seccion = self.config['hora_minuto_final']
+        año = seccion['año']
+        mes = seccion['mes']
+        día = seccion['día']
+        hora_final =  seccion['hora_final']
+        minuto_final = seccion['minuto_final']
+        expected = int(seccion['expected'])
+        descarga = DescargaSAT(status_callback=no_op,
+                               download_callback=no_op)
+        with tempfile.TemporaryDirectory() as tempdir:
+            destino = os.path.join(tempdir, 'cfdi-descarga')
+            profile = descarga.get_firefox_profile(destino)
+            descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+            docs = descarga.search(año=año, mes=mes, día=día,
+                                   hora_final=hora_final, minuto_final=minuto_final)
+            descarga.download(docs)
+            descarga.disconnect()
+            self.assertEqual(expected, len(os.listdir(destino)))
+
+    def test_segundo_inicial_final(self):
+        import os
+        import tempfile
+        from admincfdi.pyutil import DescargaSAT
+
+        def no_op(*args):
+            pass
+
+        seccion = self.config['segundo_inicial_final']
+        año = seccion['año']
+        mes = seccion['mes']
+        día = seccion['día']
+        hora_inicial =  seccion['hora_inicial']
+        minuto_inicial = seccion['minuto_inicial']
+        segundo_inicial = seccion['segundo_inicial']
+        hora_final =  seccion['hora_final']
+        minuto_final = seccion['minuto_final']
+        segundo_final = seccion['segundo_final']
+        expected = int(seccion['expected'])
+        descarga = DescargaSAT(status_callback=no_op,
+                               download_callback=no_op)
+        with tempfile.TemporaryDirectory() as tempdir:
+            destino = os.path.join(tempdir, 'cfdi-descarga')
+            profile = descarga.get_firefox_profile(destino)
+            descarga.connect(profile, rfc=self.rfc, ciec=self.ciec)
+            docs = descarga.search(año=año, mes=mes, día=día,
+                                   hora_inicial=hora_inicial, minuto_inicial=minuto_inicial,
+                                   segundo_inicial=segundo_inicial,
+                                   hora_final=hora_final, minuto_final=minuto_final,
+                                   segundo_final=segundo_final)
+            descarga.download(docs)
+            descarga.disconnect()
+            self.assertEqual(expected, len(os.listdir(destino)))
+
     def test_mes_completo(self):
         import os
         import tempfile
