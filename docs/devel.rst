@@ -89,15 +89,32 @@ Los detalles de cada paso:
                     - ``ctl00_MainContent_CldFechaFinal2_DdlMinuto``
                     - ``ctl00_MainContent_CldFechaFinal2_DdlSegundo``
 
-                  las cadenas 23, 59 y 59
+                  una cadena con un valor en el rango que corresponde
+                  respectivamente: 1 a 23, 1 a 59 y 1 a 59.
+                  No usar ceros a la izquierda para valores menores
+                  a 10: usar 5, no 05.  Por omisión hay que llenar cada
+                  select con el valor máximo correspondiente.
             - Se se buscan facturas recibidas:
                 - Asignar a los selects no visibles con ids
 
                     - ``DdlAnio``
                     - ``ctl00_MainContent_CldFecha_DdlMes``
                     - ``ctl00_MainContent_CldFecha_DdlDia``
+                    - ``ctl00_MainContent_CldFecha_DdlHora``
+                    - ``ctl00_MainContent_CldFecha_DdlMinuto``
+                    - ``ctl00_MainContent_CldFecha_DdlSegundo``
+                    - ``ctl00_MainContent_CldFecha_DdlHoraFin``
+                    - ``ctl00_MainContent_CldFecha_DdlMinutoFin``
+                    - ``ctl00_MainContent_CldFecha_DdlSegundoFin``
 
-                  los valores de los parámetros año, mes y día
+                  los valores de los parámetros año, mes, día,
+                  hora_inicial, minuto_inicial, segundo_inicial,
+                  hora_final, minuto_final y segundo_final respectivamente.
+                  Los valores de horas, minutos y segundos
+                  no deben llevar 0 a la izquierda.  El valor de
+                  día requiere 0 a la izquierda para valores menores
+                  a 10.
+
      - Enviar la forma de búsqueda al servidor mediante método POST, los
        datos que se envían se muestran más bajo.
 
