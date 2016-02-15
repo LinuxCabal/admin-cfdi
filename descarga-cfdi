@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+#! coding: utf-8
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTIBILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+
+
+import argparse
+import time
+import datetime
+import os
+import getpass
+import sys
+
+from admincfdi.pyutil import DescargaSAT
+from admincfdi.pyutil import Util
+
+
+def process_command_line_arguments():
+    parser = argparse.ArgumentParser(description='Descarga CFDIs del SAT a una carpeta local')
+
+    default_archivo_credenciales = 'credenciales.conf'
+    help = 'Archivo con credenciales para el SAT. ' \
+           'RFC y CIEC en el primer renglón y ' \
+           'separadas por un espacio. ' \
+           'El predeterminado es %(default)s'
+    parser.add_argument('--archivo-de-credenciales',
+                        help=help, default=default_archivo_credenciales)
+
+    help = 'Solicitar credenciales para el SAT al inicio. '
+    parser.add_argument('--solicitar-credenciales',
+                        action='store_const', const=True,
+                        help=help, default=False)
+
+    home_path = os.environ.get('HOME')
+    if not home_path:
+        home_path = os.environ.get('HOMEPATH', '')
+    default_carpeta_destino = os.path.join(
+            home_path, 'cfdi-descarga')
+    help = 'Carpeta local para guardar los CFDIs descargados ' \
+           'El predeterminado es %(default)s'
+    parser.add_argument('--carpeta-destino',
+                        help=help, default=default_carpeta_destino)
+
+    help = 'Descargar facturas emitidas. ' \
+           'Por omisión se descargan facturas recibidas'
+    parser.add_argument('--facturas-emitidas',
+                        action='store_const', const=True,
+                        help=help, default=False)
+
+    help = 'UUID. Por omisión no se usa en la búsqueda. ' \
+           'Esta opción tiene precedencia sobre las demás ' \
+           'opciones de búsqueda.'
+    parser.add_argument('--uuid',
+                        help=help, default='')
+
+    help = 'RFC del emisor. Por omisión no se usa en la búsqueda.'
+    parser.add_argument('--rfc-emisor',
+                        help=help, default='')
+
+    today = datetime.date.today()
+    help = 'Año. El valor por omisión es el año en curso'
+    parser.add_argument('--año',
+                        help=help, default=str(today.year))
+
+    help = 'Mes. El valor por omisión es el mes en curso'
+    parser.add_argument('--mes',
+                        help=help, default='{:02d}'.format(today.month))
+
+    help = 'Día. Por omisión no se usa en la búsqueda.'
+    parser.add_argument('--día',
+                        help=help, default='00')
+
+    help = 'Hora inicial. Por omisión es 0.'
+    parser.add_argument('--hora-inicial',
+                        help=help, default='0')
+
+    help = 'Minuto inicial. Por omisión es 0.'
+    parser.add_argument('--minuto-inicial',
+                        help=help, default='0')
+
+    help = 'Segundo inicial. Por omisión es 0.'
+    parser.add_argument('--segundo-inicial',
+                        help=help, default='0')
+
+    help = 'Hora final. Por omisión es 23.'
+    parser.add_argument('--hora-final',
+                        help=help, default='23')
+
+    help = 'Minuto final. Por omisión es 59.'
+    parser.add_argument('--minuto-final',
+                        help=help, default='59')
+
+    help = 'Segundo final. Por omisión es 59.'
+    parser.add_argument('--segundo-final',
+                        help=help, default='59')
+
+    help = 'Mes completo por día. Por omisión no se usa en la búsqueda.'
+    parser.add_argument('--mes-completo-por-día', action='store_const', const=True,
+                        help=help, default=False)
+
+    args=parser.parse_args()
+    return args
+
+def main():
+
+    args = process_command_line_arguments()
+    if args.solicitar_credenciales:
+        rfc = input('RFC: ')
+        pwd = getpass.getpass('CIEC: ')
+    else:
+        util = Util()
+        status, rfc, pwd = util.lee_credenciales(args.archivo_de_credenciales)
+        if status != 'Ok':
+            print(status)
+            sys.exit(1)
+    descarga = DescargaSAT()
+    profile = descarga.get_firefox_profile(args.carpeta_destino)
+    try:
+        descarga.connect(profile, rfc=rfc, ciec=pwd)
+        docs = descarga.search(facturas_emitidas= args.facturas_emitidas,
+                uuid=args.uuid,
+                rfc_emisor=args.rfc_emisor,
+                año=args.año,
+                mes=args.mes,
+                día=args.día,
+                hora_inicial=args.hora_inicial,
+                minuto_inicial=args.minuto_inicial,
+                segundo_inicial=args.segundo_inicial,
+                hora_final=args.hora_final,
+                minuto_final=args.minuto_final,
+                segundo_final=args.segundo_final,
+                mes_completo_por_día=args.mes_completo_por_día)
+        descarga.download(docs)
+    except Exception as e:
+        print (e)
+    finally:
+        descarga.disconnect()
+
+
+if __name__ == '__main__':
+	main()

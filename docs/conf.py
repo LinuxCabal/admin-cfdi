@@ -19,7 +19,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
 
@@ -29,7 +29,7 @@ import os
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'admin-cfdi'
-copyright = '2015, Mauricio Baeza'
+copyright = '2015, Python Cabal'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -111,7 +111,7 @@ html_theme = 'default'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "Documentación de {} v{}".format(project, release)
+html_title = "Documentacion de {} v{}".format(project, release)
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 html_short_title = html_title

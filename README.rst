@@ -2,13 +2,13 @@ admin-cfdi
 ==========
 
 :Autores:
-    Universo Libre A.C., Python Cabal
+    Ver archivo contributors.txt
 
 :Fecha:
     07/12/2015
 
-:Versión:
-    0.2.8
+:Ultima Versión:
+    0.3.0
 
 
 Descripción
@@ -27,7 +27,7 @@ Pequeño sistema para administrar CFDIs; facturas electrónicas de México. Entr
 
 Requerimientos
 --------------
-* Python 3.4
+* Python 3.2+
 * Tk si usas Linux. Si usas Windows, ya lo integra Python.
 * Firefox para la automatización de la descarga del SAT.
 * Selenium para la automatización de la descarga del SAT.
@@ -37,23 +37,16 @@ Requerimientos
 
 Instalación
 -----------
-Si tienes instalado correctamente Python 3.4, puedes instalar con Pip.
+Si tienes instalado correctamente Python 3.2+, puedes instalar con Pip.
 
 GNU & LInux
 ###########
 
 ::
 
-    sudo pip install selenium pygubu
-    python admincfdi.py
+    sudo python setup.py install
+    admin-cfdi
 
-ArchLinux
-_________
-
-::
-
-    sudo pip install selenium pygubu
-    python admincfdi.py
 
 Linux Mint
 __________
@@ -61,8 +54,8 @@ __________
 ::
 
     sudo apt-get install python3-pip python3-tk
-    sudo pip3 install selenium pygubu
-    python3 admincfdi.py
+    sudo python setup.py install
+    admin-cfdi
 
 
 Windows
@@ -72,7 +65,7 @@ Si usas Windows, asegúrate de abrir el script con el ejecutable pythonw.exe loc
 
 ::
 
-    pip install selenium pygubu
+    python setup.py install
 
 
 Ligas

@@ -23,7 +23,7 @@ class Global(object):
     OS = sys.platform
     MAIN = 'mainwindow'
     TITLE = 'Admin CFDI - Factura Libre'
-    CWD = os.getcwd()
+    CWD = os.path.dirname(__file__)
     PATHS = {
         'current': CWD,
         'img': os.path.join(CWD, 'img'),
@@ -37,6 +37,11 @@ class Global(object):
         'XSLT_SELLO_SAT': os.path.join(CWD, 'bin', 'get_sello_sat.xslt'),
         'XSLT_CADENA': os.path.join(CWD, 'bin', 'cfdi_{}.xslt'),
         'XSLT_TIMBRE': os.path.join(CWD, 'bin', 'timbre_1.0.xslt'),
+        'TEMPLATE': os.path.join(CWD, 'template'),
+        'USER': os.path.expanduser('~')
+    }
+    SCRIPTS = {
+        'CFDI2PDF': os.path.abspath(os.path.join(CWD, '..', 'cfdi2pdf')),
     }
     EXT_XML = '.xml'
     EXT_ODS = '.ods'
@@ -53,7 +58,7 @@ class Global(object):
     FILES = {
         'main': os.path.join(PATHS['ui'], 'mainwindow.ui'),
         'config': os.path.join(PATHS['ui'], 'config.ini'),
-        'log': os.path.join(CWD, 'admincfdi.log'),
+        'log': os.path.join(PATHS['USER'], 'admincfdi.log'),
     }
     FILE_NAME = '{serie}{folio:06d}_{fecha}_{receptor_rfc}'
     CADENA = '||{version}|{UUID}|{FechaTimbrado}|{selloCFD}|{noCertificadoSAT}||'
@@ -147,6 +152,7 @@ class Global(object):
         'IMP_LOCAL': '{http://www.sat.gob.mx/implocal}',
         'IEDU': '{http://www.sat.gob.mx/iedu}',
         'DONATARIA': '{http://www.sat.gob.mx/donat}',
+        'LEYENDAS': '{http://www.sat.gob.mx/leyendasFiscales}',
     }
     page_init = 'https://cfdiau.sat.gob.mx/nidp/app/login?id=SATUPCFDiCon&' \
         'sid=0&option=credential&sid=0'
@@ -165,18 +171,23 @@ class Global(object):
         'year': 'DdlAnio',
         'month': 'ctl00_MainContent_CldFecha_DdlMes',
         'day': 'ctl00_MainContent_CldFecha_DdlDia',
+        'hour': 'ctl00_MainContent_CldFechaFinal2_DdlHora',
+        'minute': 'ctl00_MainContent_CldFechaFinal2_DdlMinuto',
+        'second': 'ctl00_MainContent_CldFechaFinal2_DdlSegundo',
         'submit': 'ctl00_MainContent_BtnBusqueda',
         'download': 'BtnDescarga',
         'emisor': 'ctl00_MainContent_TxtRfcReceptor',
         'receptor': 'ctl00_MainContent_TxtRfcReceptor',
         'uuid': 'ctl00_MainContent_TxtUUID',
-        'combos': 'sbToggle',
+        'combos': 'sbToggle_{}',
         'found': 'No existen registros que cumplan con los criterios de',
         'subtitle': 'subtitle',
         'page_init': page_init,
         'page_cfdi': page_cfdi,
         'page_receptor': page_cfdi.format('ConsultaReceptor.aspx'),
         'page_emisor': page_cfdi.format('ConsultaEmisor.aspx'),
+        'resultados': 'ctl00_MainContent_PnlResultados',
+        'noresultados': 'ctl00_MainContent_PnlNoResultados',
         'start_hour': 'ctl00_MainContent_CldFecha_DdlHora',
         'start_minute': 'ctl00_MainContent_CldFecha_DdlMinuto',
         'start_second': 'ctl00_MainContent_CldFecha_DdlSegundo',

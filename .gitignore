@@ -1,5 +1,9 @@
 *.pyc
 *.ini
 *.log
+*.swp
 =======
 docs/_build
+build
+dist
+Admin_CFDI.egg-info

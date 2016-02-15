@@ -12,8 +12,10 @@ Contents:
    :maxdepth: 2
 
    intro
+   install
    uso
    devel
+   reference
    glosario
 
 

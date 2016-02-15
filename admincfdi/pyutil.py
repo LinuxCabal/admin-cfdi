@@ -15,7 +15,6 @@ import os
 import sys
 import re
 import csv
-import glob
 import json
 import ftplib
 import time
@@ -35,7 +34,16 @@ import tkinter as tk
 from tkinter.filedialog import askdirectory
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
-from pysimplesoap.client import SoapClient, SoapFault
+from requests import Request, Session
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from fpdf import FPDF
+from admincfdi.values import Global
+
+
 try:
     from subprocess import DEVNULL
 except ImportError:
@@ -45,40 +53,63 @@ except ImportError:
 WIN = 'win32'
 MAC = 'darwin'
 LINUX = 'linux'
-APP_LIBO = True
+LIBO = True
 
 if sys.platform == WIN:
     try:
         from win32com.client import Dispatch
-    except ImportError as e:
-        APP_LIBO = False
+    except ImportError:
+        LIBO = False
 elif sys.platform == LINUX:
-    import uno
-    from com.sun.star.beans import PropertyValue
-    from com.sun.star.beans.PropertyState import DIRECT_VALUE
-    from com.sun.star.awt import Size
+    try:
+        import uno
+        from com.sun.star.beans import PropertyValue
+        from com.sun.star.beans.PropertyState import DIRECT_VALUE
+        from com.sun.star.awt import Size
+    except ImportError:
+        LIBO = False
 
 
 class SAT(object):
     _webservice = 'https://consultaqr.facturaelectronica.sat.gob.mx/' \
-        'consultacfdiservice.svc?wsdl'
+        'consultacfdiservice.svc'
+    _soap = """<?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope
+        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <soap:Header/>
+        <soap:Body>
+        <Consulta xmlns="http://tempuri.org/">
+            <expresionImpresa>
+                ?re={emisor_rfc}&amp;rr={receptor_rfc}&amp;tt={total}&amp;id={uuid}
+            </expresionImpresa>
+        </Consulta>
+        </soap:Body>
+    </soap:Envelope>"""
 
-    def __init__(self):
+    def __init__(self, log):
+        self.log = log
         self.error = ''
         self.msg = ''
 
     def get_estatus(self, data):
+        data = self._soap.format(**data).encode('utf-8')
+        headers = {
+            'SOAPAction': '"http://tempuri.org/IConsultaCFDIService/Consulta"',
+            'Content-length': len(data),
+            'Content-type': 'text/xml; charset="UTF-8"'
+        }
+        s = Session()
+        req = Request('POST', self._webservice, data=data, headers=headers)
+        prepped = req.prepare()
         try:
-            args = '?re={emisor_rfc}&rr={receptor_rfc}&tt={total}&id={uuid}'
-            client = SoapClient(wsdl = self._webservice)
-            fac = args.format(**data)
-            res = client.Consulta(fac)
-            if 'ConsultaResult' in res:
-                self.msg = res['ConsultaResult']['Estado']
-                return True
-            return False
-        except SoapFault as sf:
-            self.error = sf.faultstring
+            response = s.send(prepped, timeout=5)
+            tree = ET.fromstring(response.text)
+            self.msg = tree[0][0][0][1].text
+            return True
+        except Exception as e:
+            self.log.error(str(e))
             return False
 
 
@@ -311,6 +342,9 @@ class Util(object):
     def __init__(self):
         self.OS = sys.platform
 
+    def call(self, *arg):
+        return subprocess.call(*arg)
+
     def get_folder(self, parent):
         return askdirectory(parent=parent)
 
@@ -334,6 +368,10 @@ class Util(object):
         else:
             return data[index]
 
+    def replace_extension(self, path, new_ext):
+        path, _, name, _ = self.get_path_info(path)
+        return self.join(path, name + new_ext)
+
     def path_join(self, *paths):
         return os.path.join(*paths)
 
@@ -343,11 +381,12 @@ class Util(object):
             target = path.replace('/', '\\')
         return target
 
-    def get_files(self, path, ext='*.xml'):
-        files = []
-        for folder,_,_ in os.walk(path):
-            files.extend(glob.glob(os.path.join(folder, ext.lower())))
-        return tuple(files)
+    def get_files(self, path, ext='xml'):
+        xmls = []
+        for folder, _, files in os.walk(path):
+            pattern = re.compile('\.{}'.format(ext), re.IGNORECASE)
+            xmls += [os.path.join(folder,f) for f in files if pattern.search(f)]
+        return tuple(xmls)
 
     def join(self, *paths):
         return os.path.join(*paths)
@@ -399,6 +438,22 @@ class Util(object):
         time.sleep(sec)
         return
 
+    def lee_credenciales(self, ruta_archivo):
+        '''Lee un renglón de ruta_archivo, regresa status, rfc, pwd
+
+        status es 'Ok', o un mensaje de error'''
+
+        try:
+            f = open(ruta_archivo)
+        except FileNotFoundError:
+            return 'Archivo no encontrado: ' + ruta_archivo, '', ''
+        row = f.readline().strip()
+        fields = row.split()
+        if not len(fields) == 2:
+            return 'No contiene dos campos: ' + ruta_archivo, '', ''
+        rfc, pwd = fields
+        return 'Ok', rfc, pwd
+
     def load_config(self, path):
         data = {}
         try:
@@ -422,10 +477,13 @@ class Util(object):
     def now(self):
         return datetime.now()
 
-    def get_dates(self, year, month):
-        days = calendar.monthrange(year, month)[1]
-        d1 = '01/{:02d}/{}'.format(month, year)
-        d2 = '{}/{:02d}/{}'.format(days, month, year)
+    def get_dates(self, year, month, day=0):
+        if day:
+            d1 = d2 = '{:02d}/{:02d}/{}'.format(day, month, year)
+        else:
+            days = calendar.monthrange(year, month)[1]
+            d1 = '01/{:02d}/{}'.format(month, year)
+            d2 = '{}/{:02d}/{}'.format(days, month, year)
         return d1, d2
 
     def get_days(self, year, month):
@@ -509,9 +567,7 @@ class Util(object):
         if not 'serie' in data:
             data['serie'] = ''
         data['fecha'] = data['fecha'].partition('T')[0]
-        if 'folio' in data:
-            data['folio'] = int(data['folio'])
-        else:
+        if not 'folio' in data:
             data['folio'] = 0
         node = xml.find('{}Emisor'.format(pre))
         data['emisor_rfc'] = node.attrib['rfc']
@@ -671,7 +727,7 @@ class Util(object):
                 'total': data['total'],
                 'uuid': data['UUID']
             }
-            sat = SAT()
+            sat = SAT(g.LOG)
             if sat.get_estatus(data_sat):
                 info.append(sat.msg)
             else:
@@ -1652,4 +1708,1125 @@ class CFDIPDF(object):
         date = datetime.strptime(date_string, '%Y-%m-%d')
         return date.strftime('{}, %d de {} de %Y'.format(
             d[date.weekday()], m[date.month]))
+
+class visibility_of_either(object):
+    """ An expectation for checking that one of two elements,
+    located by locator 1 and locator2, is visible.
+    Visibility means that the element is not only
+    displayed but also has a height and width that is
+    greater than 0.
+    returns the WebElement that is visible.
+    """
+    def __init__(self, locator1, locator2):
+        self.locator1 = locator1
+        self.locator2 = locator2
+
+    def __call__(self, driver):
+        element1 = driver.find_element(*self.locator1)
+        element2 = driver.find_element(*self.locator2)
+        return _element_if_visible(element1) or \
+               _element_if_visible(element2)
+
+def _element_if_visible(element):
+    return element if element.is_displayed() else False
+
+
+class DescargaSAT(object):
+
+    def __init__(self, status_callback=print,
+                 download_callback=print):
+        self.g = Global()
+        self.util = Util()
+        self.status = status_callback
+        self.progress = download_callback
+        self.browser = None
+
+    def get_firefox_profile(self, carpeta_destino):
+        'Devuelve un perfil para Firefox'
+
+        # To prevent download dialog
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference(
+            'browser.download.folderList', 2)
+        profile.set_preference(
+            'browser.download.manager.showWhenStarting', False)
+        profile.set_preference(
+            'browser.helperApps.alwaysAsk.force', False)
+        profile.set_preference(
+            'browser.helperApps.neverAsk.saveToDisk',
+            'text/xml, application/octet-stream, application/xml')
+        profile.set_preference(
+            'browser.download.dir', carpeta_destino)
+        # mrE - desactivar telemetry
+        profile.set_preference(
+            'toolkit.telemetry.prompted', 2)
+        profile.set_preference(
+            'toolkit.telemetry.rejected', True)
+        profile.set_preference(
+            'toolkit.telemetry.enabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.service.enabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.uploadEnabled', False)
+        profile.set_preference(
+            'datareporting.healthreport.service.firstRun', False)
+        profile.set_preference(
+            'datareporting.healthreport.logging.consoleEnabled', False)
+        profile.set_preference(
+            'datareporting.policy.dataSubmissionEnabled', False)
+        profile.set_preference(
+            'datareporting.policy.dataSubmissionPolicyResponseType', 'accepted-info-bar-dismissed')
+        #profile.set_preference(
+        #    'datareporting.policy.dataSubmissionPolicyAccepted'; False) # este me marca error, why?
+        #oculta la gran flecha animada al descargar
+        profile.set_preference(
+            'browser.download.animateNotifications', False)
+        return profile
+
+    def connect(self, profile, rfc='', ciec=''):
+        'Lanza navegador y hace login en el portal del SAT'
+
+        self.status('Abriendo Firefox...')
+        browser = webdriver.Firefox(profile)
+        self.browser = browser
+        self.status('Conectando...')
+        browser.get(self.g.SAT['page_init'])
+        txt = browser.find_element_by_name(self.g.SAT['user'])
+        txt.send_keys(rfc)
+        txt = browser.find_element_by_name(self.g.SAT['password'])
+        txt.send_keys(ciec)
+        txt.submit()
+        wait = WebDriverWait(browser, 10)
+        try:
+            wait.until(EC.title_contains('NetIQ Access'))
+            self.status('Conectado')
+            return True
+        except TimeoutException:
+            self.status('No conectado')
+            return False
+
+    def disconnect(self):
+        'Cierra la sesión y el navegador'
+
+        if self.browser:
+            try:
+                self.status('Desconectando...')
+                link = self.browser.find_element_by_partial_link_text('Cerrar Sesi')
+                link.click()
+            except:
+                pass
+            finally:
+                self.browser.close()
+            self.status('Desconectado...')
+            self.browser = None
+
+    def search(self,
+        facturas_emitidas=False,
+        uuid='',
+        rfc_emisor='',
+        año=None,
+        mes=None,
+        día='00',
+        hora_inicial='0',
+        minuto_inicial='0',
+        segundo_inicial='0',
+        hora_final='23',
+        minuto_final='59',
+        segundo_final='59',
+        mes_completo_por_día=False):
+        'Busca y regresa los resultados'
+
+        if self.browser:
+            browser = self.browser
+
+            page_query = self.g.SAT['page_receptor']
+            if facturas_emitidas:
+                page_query = self.g.SAT['page_emisor']
+
+            browser.get(page_query)
+            wait = WebDriverWait(browser, 15)
+            wait.until(EC.title_contains('Buscar CFDI'))
+            self.status('Buscando...')
+            if uuid:
+                txt = browser.find_element_by_id(self.g.SAT['uuid'])
+                txt.click()
+                txt.send_keys(uuid)
+            else:
+                # Descargar por fecha
+                opt = browser.find_element_by_id(self.g.SAT['date'])
+                opt.click()
+                wait.until(EC.staleness_of(opt))
+                if facturas_emitidas:
+                    txt = wait.until(EC.element_to_be_clickable(
+                                        (By.ID, self.g.SAT['receptor'])))
+                else:
+                    txt = wait.until(EC.element_to_be_clickable(
+                                        (By.ID, self.g.SAT['emisor'])))
+                if rfc_emisor:
+                    txt.send_keys(rfc_emisor)
+
+                hora_inicial = int(hora_inicial)
+                minuto_inicial = int(minuto_inicial)
+                segundo_inicial = int(segundo_inicial)
+                hora_final = int(hora_final)
+                minuto_final = int(minuto_final)
+                segundo_final = int(segundo_final)
+
+                # Emitidas
+                if facturas_emitidas:
+                    year = int(año)
+                    month = int(mes)
+                    day = int(día)
+                    if not mes_completo_por_día and day:
+                        dates = self.util.get_dates(year, month, day)
+                    else:
+                        dates = self.util.get_dates(year, month)
+                    txt = browser.find_element_by_id(self.g.SAT['date_from'])
+                    arg = "document.getElementsByName('{}')[0]." \
+                        "removeAttribute('disabled');".format(
+                        self.g.SAT['date_from_name'])
+                    browser.execute_script(arg)
+                    txt.send_keys(dates[0])
+                    txt = browser.find_element_by_id(self.g.SAT['date_to'])
+                    arg = "document.getElementsByName('{}')[0]." \
+                        "removeAttribute('disabled');".format(
+                        self.g.SAT['date_to_name'])
+                    browser.execute_script(arg)
+                    txt.send_keys(dates[1])
+
+                    # Hay que seleccionar también la hora, minuto y segundo
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                            self.g.SAT['hour'], hora_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                            self.g.SAT['minute'], minuto_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                            self.g.SAT['second'], segundo_final)
+                    browser.execute_script(arg)
+                    if mes_completo_por_día:
+                        return self._download_sat_month_emitidas(dates[1], day)
+                # Recibidas
+                else:
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                        self.g.SAT['year'], año)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value={};".format(
+                        self.g.SAT['month'], mes)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                        self.g.SAT['day'], día)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_hour'], hora_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_minute'], minuto_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['start_second'], segundo_inicial)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_hour'], hora_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_minute'], minuto_final)
+                    browser.execute_script(arg)
+                    arg = "document.getElementById('{}')." \
+                        "value='{}';".format(
+                            self.g.SAT['end_second'], segundo_final)
+                    browser.execute_script(arg)
+
+            results_table = browser.find_element_by_id(
+                self.g.SAT['resultados'])
+            browser.find_element_by_id(self.g.SAT['submit']).click()
+            wait.until(EC.staleness_of(results_table))
+            wait.until(visibility_of_either(
+                (By.ID, self.g.SAT['resultados']),
+                (By.ID, self.g.SAT['noresultados'])))
+            if not facturas_emitidas and mes_completo_por_día:
+                return self._download_sat_month(año, mes, browser)
+
+            results = wait.until(visibility_of_either(
+                (By.ID, self.g.SAT['resultados']),
+                (By.ID, self.g.SAT['noresultados'])))
+            if results.get_attribute('id') == self.g.SAT['resultados']:
+                wait.until(EC.element_to_be_clickable(
+                    (By.NAME, self.g.SAT['download'])))
+                docs = browser.find_elements_by_name(self.g.SAT['download'])
+                return docs
+            else:
+                self.status('Sin facturas...')
+        return []
+
+    def download(self, docs):
+        'Descarga los resultados'
+        if docs is None:
+            self.status('No se encontraron documentos')
+            return
+        if self.browser:
+            t = len(docs)
+            for i, v in enumerate(docs):
+                msg = 'Factura {} de {}'.format(i+1, t)
+                self.progress(i + 1, t)
+                self.status(msg)
+                download = self.g.SAT['page_cfdi'].format(
+                    v.get_attribute('onclick').split("'")[1])
+                self.browser.get(download)
+            self.progress(0, t)
+            self.util.sleep()
+        return
+
+    def _download_sat_month(self, año, mes, browser):
+        '''Descarga CFDIs del SAT a una carpeta local
+
+        Todos los CFDIs recibidos del mes selecionado'''
+
+        year = int(año)
+        month = int(mes)
+        days_month = self.util.get_days(year, month) + 1
+        days = ['%02d' % x for x in range(1, days_month)]
+        for d in days:
+            combo = browser.find_element_by_id(self.g.SAT['day'])
+            sb = combo.get_attribute('sb')
+            combo = browser.find_element_by_id('sbToggle_{}'.format(sb))
+            combo.click()
+            self.util.sleep(2)
+            if mes == d:
+                links = browser.find_elements_by_link_text(d)
+                for l in links:
+                    p = l.find_element_by_xpath(
+                        '..').find_element_by_xpath('..')
+                    sb2 = p.get_attribute('id')
+                    if sb in sb2:
+                        link = l
+                        break
+            else:
+                link = browser.find_element_by_link_text(d)
+            link.click()
+            self.util.sleep(2)
+            browser.find_element_by_id(self.g.SAT['submit']).click()
+            self.util.sleep(3)
+            docs = browser.find_elements_by_name(self.g.SAT['download'])
+            if docs:
+                t = len(docs)
+                for i, v in enumerate(docs):
+                    msg = 'Factura {} de {}'.format(i+1, t)
+                    self.progress(i + 1, t)
+                    self.status(msg)
+                    download = self.g.SAT['page_cfdi'].format(
+                        v.get_attribute('onclick').split("'")[1])
+                    browser.get(download)
+                    self.util.sleep()
+                self.progress(0, t)
+                self.util.sleep()
+        return
+
+    def _download_sat_month_emitidas(self, date_end, day_init):
+        '''Descarga CFDIs del SAT a una carpeta local
+
+        Todos los CFDIs emitidos del mes selecionado
+        La interfaz en el SAT para facturas emitidas es diferente que para las
+        recibidas, es necesario buscar otros controles.
+        '''
+        if day_init > 0:
+            day_init -= 1
+        last_day = int(date_end.split('/')[0])
+        for day in range(day_init, last_day):
+            current = '{:02d}'.format(day + 1) + date_end[2:]
+            print ("Día: ", current)
+            arg = "document.getElementsByName('{}')[0].removeAttribute(" \
+                "'disabled');".format(self.g.SAT['date_from_name'])
+            self.browser.execute_script(arg)
+            arg = "document.getElementsByName('{}')[0].removeAttribute(" \
+                "'disabled');".format(self.g.SAT['date_to_name'])
+            self.browser.execute_script(arg)
+            date_from = self.browser.find_element_by_id(self.g.SAT['date_from'])
+            date_to = self.browser.find_element_by_id(self.g.SAT['date_to'])
+            date_from.clear()
+            date_to.clear()
+            date_from.send_keys(current)
+            date_to.send_keys(current)
+            self.browser.find_element_by_id(self.g.SAT['submit']).click()
+            self.util.sleep(5)
+            docs = self.browser.find_elements_by_name(self.g.SAT['download'])
+            if docs:
+                print ("\tDocumentos: ", len(docs))
+            else:
+                print ("\tDocumentos: 0")
+            self.download(docs)
+        return
+
+
+class CSVPDF(FPDF):
+    """
+        Genera un PDF a partir de un CSV
+    """
+    G = Global()
+    TITULO1 = {
+        '2.0': 'Datos CFD',
+        '2.2': 'Datos CFD',
+        '3.0': 'Datos CFDI',
+        '3.2': 'Datos CFDI'
+    }
+    TITULO2 = {
+        '2.0': 'Año Aprobación:',
+        '2.2': 'Año Aprobación:',
+        '3.0': 'Serie CSD SAT:',
+        '3.2': 'Serie CSD SAT:'
+    }
+    TITULO3 = {
+        '2.0': 'N° Aprobación:',
+        '2.2': 'N° Aprobación:',
+        '3.0': 'Folio Fiscal:',
+        '3.2': 'Folio Fiscal:'
+    }
+    SPACE = 8
+    LIMIT_MARGIN = 260
+    DECIMALES = 2
+
+    def __init__(self, path_xml, path_template='', status_callback=print):
+        super().__init__(format='Letter')
+        self.status = status_callback
+        try:
+            self.xml = ET.parse(path_xml).getroot()
+            self.status('Generando: {}'.format(path_xml))
+        except Exception as e:
+            self.xml = None
+            self.status('Error al parsear: {}'.format(path_xml))
+            self.status(str(e))
+        self.compress = False
+        self.error = ''
+        self.set_auto_page_break(True, margin=15)
+        self.SetRightMargin = 15
+        self.SetTopMargin = 5
+        self.set_draw_color(50, 50, 50)
+        self.set_title('Factura Libre')
+        self.set_author('www.facturalibre.net')
+        self.line_width = 0.1
+        self.alias_nb_pages()
+        self.pos_size = {'x': 0, 'y': 0, 'w': 0, 'h': 0}
+        self.y_detalle = 80
+        self.data = {}
+        self.elements = {}
+        decimales = self.DECIMALES
+        self.COLOR_RED = self._color(255, 0, 0)
+        if self.xml:
+            self.version = self.xml.attrib['version']
+            #~ self.cadena = self._get_cadena(path_xml)
+            self._parse_csv(path_template)
+
+            try:
+                decimales = len(self.xml.attrib['total'].split('.')[1])
+            except IndexError:
+                decimales = self.DECIMALES
+            if decimales == 1:
+                decimales = self.DECIMALES
+
+        self.currency = '{0:,.%sf}' % decimales
+        self.monedas = {
+            'peso': ('peso', '$', 'm.n.'),
+            'pesos': ('peso', '$', 'm.n.'),
+            'mxn': ('peso', '$', 'm.n.'),
+            'mxp': ('peso', '$', 'm.n.'),
+            'euro': ('euro', '€', '€'),
+            'euros': ('euro', '€', '€'),
+            'dolar': ('dolar', '$', 'usd'),
+            'dolares': ('dolar', '$', 'usd'),
+            'usd': ('dolar', '$', 'usd'),
+        }
+        self.timbre = ''
+
+    def make_pdf(self):
+        self.add_page()
+        self._set_detalle(self.G.PREFIX[self.version])
+        self._set_totales(self.G.PREFIX[self.version])
+        self._set_comprobante2(self.G.PREFIX[self.version])
+        return
+
+    def header(self):
+        self._set_emisor(self.G.PREFIX[self.version])
+        self._set_receptor(self.G.PREFIX[self.version])
+        self._set_comprobante(self.G.PREFIX[self.version])
+        self._set_encabezados_detalle()
+        pass
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Helvetica', '', 8)
+        self.set_text_color(*self._rgb(0))
+        self.cell(0, 10, 'Página %s de {nb}' % self.page_no(), 0, 0, 'R')
+        self.set_x(10)
+        s = 'Factura elaborada con software libre '
+        self.cell(0, 10, s, 0, 0, 'L')
+        self.set_x(10 + self.get_string_width(s))
+        self.set_text_color(*self._rgb(6291456))
+        self.cell(0, 10, 'www.facturalibre.net', 0, 0, 'L',
+            link='www.facturalibre.net')
+
+    def _verify_margin(self, h=0):
+        mb = self.y + h
+        if mb > self.LIMIT_MARGIN:
+            self.add_page()
+            self.set_y(self.y_detalle)
+        return
+
+    def _set_leyendas(self, pre):
+        com = self.xml.find('%sComplemento' % pre)
+        if com is None:
+            return
+        nodo = com.find('%sLeyendasFiscales' % self.G.PREFIX['LEYENDAS'])
+        if nodo is None:
+            return
+        for leyenda in list(nodo):
+            if 'disposicionFiscal' in leyenda.attrib:
+                self.elements['fiscal1_titulo']['y'] = self.y
+                self.elements['fiscal1']['y'] = self.y
+                self._write_text('fiscal1_titulo')
+                self._write_text('fiscal1', leyenda.attrib['disposicionFiscal'])
+            if 'norma' in leyenda.attrib:
+                self.elements['fiscal2_titulo']['y'] = self.y
+                self.elements['fiscal2']['y'] = self.y
+                self._write_text('fiscal2_titulo')
+                self._write_text('fiscal2', leyenda.attrib['norma'])
+            self.elements['fiscal_leyenda']['y'] = self.y + 5
+            self._write_text('fiscal_leyenda', leyenda.attrib['textoLeyenda'])
+        self.ln(self.SPACE)
+        return
+
+    def _set_donataria(self, pre):
+        com = self.xml.find('%sComplemento' % pre)
+        if com is None: return
+        nodo = com.find('%sDonatarias' % self.G.PREFIX['DONATARIA'])
+        if nodo is None: return
+        self.elements['dona_aut_titulo']['y'] = self.y
+        self.elements['dona_aut']['y'] = self.y
+        self._write_text('dona_aut_titulo')
+        self._write_text('dona_aut', nodo.attrib['noAutorizacion'])
+        self.elements['dona_fecha_titulo']['y'] = self.y
+        self.elements['dona_fecha']['y'] = self.y
+        self._write_text('dona_fecha_titulo')
+        self._write_text('dona_fecha', nodo.attrib['fechaAutorizacion'])
+        self.elements['dona_leyenda']['y'] = self.y + 5
+        self._write_text('dona_leyenda', nodo.attrib['leyenda'])
+        self.ln(self.SPACE)
+        return
+
+    def _set_comprobante2(self, pre):
+        fields = (
+            ('Moneda', 'Moneda'),
+            ('TipoCambio', u'Tipo de cambio'),
+            ('formaDePago', u'Forma de pago'),
+            ('condicionesDePago', u'Condiciones de pago'),
+            ('metodoDePago', u'Método de pago'),
+            ('NumCtaPago', u'Cuenta de pago'),
+        )
+        self._verify_margin(20)
+        self._set_donataria(pre)
+        self._verify_margin(20)
+        self._set_leyendas(pre)
+        self._verify_margin(20)
+        for f in fields:
+            if f[0] in self.xml.attrib:
+                self._write_otros(f[1], self.xml.attrib[f[0]])
+        self.ln(self.SPACE)
+        if self.timbre:
+            qr_data = '?re=%s&rr=%s&tt=%s&id=%s' % (
+                self.data['emisor_rfc'],
+                self.data['receptor_rfc'],
+                '%017.06f' % float(self.xml.attrib['total']),
+                self.timbre['UUID']
+            )
+            path = self._get_cbb(qr_data)
+            if os.path.exists(path):
+                self._verify_margin(self.elements['qr_cbb']['h'])
+                self.image(
+                    path,
+                    self.elements['qr_cbb']['x'],
+                    self.y,
+                    self.elements['qr_cbb']['w'],
+                    self.elements['qr_cbb']['h']
+                )
+                os.unlink(path)
+            sello_emisor = self.timbre['selloCFD']
+            sello_sat = self.timbre['selloSAT']
+            self.elements['sello_cfd_titulo']['y'] = self.y
+            self.elements['sello_cfd_titulo']['text'] += 'I'
+            self._write_text('sello_cfd_titulo')
+            self.elements['sello_cfd']['y'] = self.y + 4
+            self._write_text('sello_cfd', sello_emisor)
+            self.elements['sello_sat_titulo']['y'] = self.y + 1
+            self._write_text('sello_sat_titulo')
+            self.elements['sello_sat']['y'] = self.y + 4
+            self._write_text('sello_sat', sello_sat)
+            self.elements['fecha_titulo']['y'] = self.y + 1
+            self._write_text('fecha_titulo')
+            self.elements['fecha']['y'] = self.y
+            self._write_text('fecha', self.timbre['FechaTimbrado'])
+            self.elements['leyenda']['text'] += 'I'
+        else:
+            sello_emisor = self.xml.attrib['sello']
+            self.elements['sello_cfd_titulo']['x'] = 10
+            self.elements['sello_cfd_titulo']['y'] = self.y
+            self._write_text('sello_cfd_titulo')
+            self.elements['sello_cfd']['x'] = 10
+            self.elements['sello_cfd']['y'] = self.y + 4
+            self.elements['sello_cfd']['w'] = 195
+            self.elements['sello_cfd']['multiline'] = 0
+            self._write_text('sello_cfd', sello_emisor)
+            self.elements['cadena_titulo']['text'] = 'Cadena original del CFD'
+        self._verify_margin(10)
+        self.elements['cadena_titulo']['y'] = self.y + 5
+        self._write_text('cadena_titulo')
+        self.elements['cadena']['y'] = self.y + 4
+        self._write_text('cadena', self._get_cadena())
+        #~ self._verify_margin(10)
+        self.elements['leyenda']['y'] = self.y + 5
+        self._write_text('leyenda')
+        return
+
+    def _get_cbb(self, data):
+        scale = 10
+        f = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
+        path = f.name
+        code = pyqrcode.QRCode(data, mode='binary')
+        code.png(path, scale)
+        return path
+
+    def _set_totales(self, pre):
+        moneda = ('peso', '$', 'm.n.')
+        if 'Moneda' in self.xml.attrib:
+            if self.xml.attrib['Moneda'].lower() in self.monedas:
+                moneda = self.monedas[self.xml.attrib['Moneda'].lower()]
+            else:
+                moneda = (self.xml.attrib['Moneda'], '', '')
+        importe = '%s %s' % (
+            moneda[1],
+            self.currency.format(float(self.xml.attrib['subTotal']))
+        )
+        self._verify_margin(20)
+        self._write_importe('Subtotal', importe)
+
+        if 'descuento' in self.xml.attrib:
+            if 'motivoDescuento' in self.xml.attrib:
+                self.elements['motivo_descuento']['y'] = self.y
+                self.elements['motivo_titulo']['y'] = self.y
+                self._write_text('motivo_titulo')
+                self._write_text(
+                    'motivo_descuento', self.xml.attrib['motivoDescuento'])
+            importe = '%s %s' % (
+                moneda[1],
+                self.currency.format(float(self.xml.attrib['descuento']))
+            )
+            self._write_importe('Descuento', importe)
+
+        imp = self.xml.find('%sImpuestos' % pre)
+        if imp is not None:
+            nodo = imp.find('%sTraslados' % pre)
+            if nodo is not None:
+                for n in list(nodo):
+                    title = '%s %s %%' % (n.attrib['impuesto'], n.attrib['tasa'])
+                    importe = '%s %s' % (
+                        moneda[1],
+                        self.currency.format(float(n.attrib['importe']))
+                    )
+                    self._write_importe(title, importe)
+            nodo = imp.find('%sRetenciones' % pre)
+            if nodo is not None:
+                for n in list(nodo):
+                    title = u'Retención %s' % n.attrib['impuesto']
+                    importe = '%s %s' % (
+                        moneda[1],
+                        self.currency.format(float(n.attrib['importe']))
+                    )
+                    self._write_importe(title, importe)
+
+        com = self.xml.find('%sComplemento' % pre)
+        if com is not None:
+            otros = com.find('%sImpuestosLocales' % self.G.PREFIX['IMP_LOCAL'])
+            if otros is not None:
+                for otro in list(otros):
+                    if otro.tag == '%sRetencionesLocales' % self.G.PREFIX['IMP_LOCAL']:
+                        name = 'ImpLocRetenido'
+                        tasa = 'TasadeRetencion'
+                    else:
+                        name = 'ImpLocTrasladado'
+                        tasa = 'TasadeTraslado'
+                    title = u'%s %s %%' % (otro.attrib[name], otro.attrib[tasa])
+                    importe = '%s %s' % (
+                        moneda[1],
+                        self.currency.format(float(otro.attrib['Importe']))
+                    )
+                    self._write_importe(title, importe)
+
+        if 'totalImpuestosTrasladados' in imp.attrib:
+            importe = '%s %s' % (
+                moneda[1],
+                self.currency.format(float(imp.attrib['totalImpuestosTrasladados']))
+            )
+            self.elements['imp_tras_titulo']['y'] = self.y
+            self.elements['imp_trasladado']['y'] = self.y
+            self._write_text('imp_tras_titulo')
+            self._write_text('imp_trasladado', importe)
+        if 'totalImpuestosRetenidos' in imp.attrib:
+            importe = '%s %s' % (
+                moneda[1],
+                self.currency.format(float(imp.attrib['totalImpuestosRetenidos']))
+            )
+            self.elements['imp_rete_titulo']['y'] = self.y
+            self.elements['imp_retenido']['y'] = self.y
+            self._write_text('imp_rete_titulo')
+            self._write_text('imp_retenido', importe)
+
+        total = float(self.xml.attrib['total'])
+        importe = '%s %s' % (
+            moneda[1],
+            self.currency.format(total)
+        )
+        self._write_importe('Total', importe)
+        self.ln()
+        letras = '-(%s/100 %s)-' % (
+            NumerosLetras().to_letters(total, moneda[0]),
+            moneda[2]
+        )
+        self._verify_margin(20)
+        self.elements['en_letras']['y'] = self.y
+        self._write_text('en_letras', letras.upper())
+        self.ln(self.SPACE)
+        return
+
+    def _write_otros(self, title, value):
+        self.elements['otros_titulo']['text'] = title
+        self.elements['otros_titulo']['y'] = self.y
+        self.elements['otros']['y'] = self.y
+        self._write_text('otros_titulo')
+        self._write_text('otros', value)
+        self.y += 3
+        return
+
+    def _write_importe(self, title, importe):
+        self.elements['subtotal_titulo']['text'] = title
+        self.elements['subtotal_titulo']['y'] = self.y
+        self.elements['subtotal']['y'] = self.y
+        self._write_text('subtotal_titulo')
+        self._write_text('subtotal', importe)
+        self.y += 4.5
+        return
+
+    def _set_detalle(self, pre):
+        conceptos = self.xml.find('%sConceptos' % pre)
+        for c in list(conceptos):
+            clave = ''
+            if 'noIdentificacion' in c.attrib:
+                clave = c.attrib['noIdentificacion']
+            self._write_text('clave', clave)
+            unidad = 'No aplica'
+            if 'unidad' in c.attrib:
+                unidad = c.attrib['unidad']
+            self._write_text('unidad', unidad)
+            importe = self.currency.format(float(c.attrib['cantidad']))
+            self._write_text('cantidad', importe)
+            importe = self.currency.format(float(c.attrib['valorUnitario']))
+            if c.attrib['valorUnitario'].startswith('-'):
+                self.elements['pu']['foreground'] = self.COLOR_RED
+            else:
+                self.elements['pu']['foreground'] = 0
+            self._write_text('pu', importe)
+            importe = self.currency.format(float(c.attrib['importe']))
+            if c.attrib['importe'].startswith('-'):
+                self.elements['importe']['foreground'] = self.COLOR_RED
+            else:
+                self.elements['importe']['foreground'] = 0
+            self._write_text('importe', importe)
+            page = self.page_no()
+            descripcion = self._get_descripcion(c, pre)
+            self._write_text('descripcion', descripcion)
+            if self.page_no() > page:
+                new_y = self.y_detalle
+            else:
+                new_y = self.y
+            self.elements['clave']['y'] = new_y
+            self.elements['descripcion']['y'] = new_y
+            self.elements['unidad']['y'] = new_y
+            self.elements['cantidad']['y'] = new_y
+            self.elements['pu']['y'] = new_y
+            self.elements['importe']['y'] = new_y
+        self.line(10, self.y, 205, self.y)
+        self.ln()
+        return
+
+    def _get_descripcion(self, nodo, pre):
+        s = nodo.attrib['descripcion']
+        for n in list(nodo):
+            if n.tag == '%sInformacionAduanera' % pre:
+                s += u'\nAduana: %s\nFecha: %s    Número: %s' % (
+                    n.attrib['aduana'],
+                    n.attrib['fecha'],
+                    n.attrib['numero']
+                )
+            elif n.tag == '%sCuentaPredial' % pre:
+                s += u'\n\nCuenta Predial Número: %s' % n.attrib['numero']
+            elif n.tag == '%sParte' % pre:
+                serie = ''
+                if 'noIdentificacion' in n.attrib:
+                    serie = n.attrib['noIdentificacion']
+                s += u'\n\n    Cantidad: %s    Serie: %s\n    %s' % (
+                    n.attrib['cantidad'],
+                    serie,
+                    n.attrib['descripcion']
+                )
+                for n2 in list(n):
+                    if n2.tag == '%sInformacionAduanera' % pre:
+                        s += u'\n        Aduana: %s\n        Fecha: %s    Número: %s' % (
+                            n2.attrib['aduana'],
+                            n2.attrib['fecha'],
+                            n2.attrib['numero']
+                        )
+        info = nodo.find('%sComplementoConcepto' % pre)
+        if info is None:
+            return s
+        info = info.find('{}instEducativas'.format(self.G.PREFIX['IEDU']))
+        if info is not None:
+            s1 = ''
+            if 'nombreAlumno' in info.attrib:
+                s += '\n\nAlumno: %s' % info.attrib['nombreAlumno']
+            if 'CURP' in info.attrib:
+                s += '\nCURP: %s' % info.attrib['CURP']
+            if 'nivelEducativo' in info.attrib:
+                s1 = '\nAcuerdo de incorporación ante la SEP %s' % info.attrib['nivelEducativo']
+            if 'autRVOE' in info.attrib:
+                if s1:
+                    s1 = '%s %s' % (s1, info.attrib['autRVOE'])
+                else:
+                    s1 = '\nAcuerdo de incorporación ante la SEP No: %s' % info.attrib['autRVOE']
+                s += s1
+            if 'rfcPago' in info.attrib:
+                s += '\nRFC de pago: %s' % info.attrib['rfcPago']
+        return s
+
+    def _set_encabezados_detalle(self):
+        self._write_text('clave_titulo')
+        self._write_text('descripcion_titulo')
+        self._write_text('unidad_titulo')
+        self._write_text('cantidad_titulo')
+        self._write_text('pu_titulo')
+        self._write_text('importe_titulo')
+        self.ln()
+        return
+
+    def _set_comprobante(self, pre):
+        if 'LugarExpedicion' in self.xml.attrib:
+            lugar = '%s, ' % self.xml.attrib['LugarExpedicion']
+        else:
+            lugar = self.data['expedicion']
+        fecha = self.xml.attrib['fecha'].split('T')
+        date = datetime.strptime(fecha[0], '%Y-%m-%d')
+        lugar += date.strftime('%A, %d de %B del %Y')    # .decode('utf-8')
+        self._write_text('cfdi_fecha', lugar)
+        self._write_text('cfdi_hora', fecha[1])
+        self._write_text('cfdi_titulo1')
+        self._write_text('cfdi_titulo2', self.TITULO2[self.version])
+        self._write_text('cfdi_titulo3', self.TITULO3[self.version])
+        self._write_text('cfdi_titulo4')
+        self._write_text('cfdi_titulo5')
+        self._write_text('cfdi_titulo', self.TITULO1[self.version])
+        self._write_text('cfdi_regimen', self.data['regimen'])
+        self.timbre = self._get_timbre(self.G.PREFIX[self.version])
+        csdsat = ''
+        uuid = ''
+        if self.timbre:
+            csdsat = self.timbre['noCertificadoSAT']
+            uuid = self.timbre['UUID'].upper()
+        else:
+            if 'anoAprobacion' in self.xml.attrib:
+                csdsat = self.xml.attrib['anoAprobacion']
+            if 'noAprobacion' in self.xml.attrib:
+                uuid = self.xml.attrib['noAprobacion']
+        folio = ''
+        if 'serie' in self.xml.attrib:
+            folio += self.xml.attrib['serie']
+        if 'folio' in self.xml.attrib:
+            if folio:
+                folio += '-%s' % self.xml.attrib['folio']
+            else:
+                folio = self.xml.attrib['folio']
+        self._write_text('cfdi_csd', self.xml.attrib['noCertificado'])
+        self._write_text('cfdi_csdsat', csdsat)
+        self._write_text('cfdi_uuid', uuid)
+        self._write_text('cfdi_tipo', self.xml.attrib['tipoDeComprobante'].upper())
+        self._write_text('cfdi_folio', folio)
+        return
+
+    def _set_receptor(self, pre):
+        self._write_text('receptor_titulo')
+        receptor = self.xml.find('%sReceptor' % pre)
+        name_receptor = 'Sin nombre'
+        if 'nombre' in receptor.attrib:
+            name_receptor = receptor.attrib['nombre']
+        self._write_text('receptor_nombre', name_receptor)
+        self._write_text('receptor_rfc', receptor.attrib['rfc'])
+        self.data['receptor_rfc'] = receptor.attrib['rfc']
+        dir_fiscal = receptor.find('%sDomicilio' % pre)
+        domicilio1 = ''
+        if dir_fiscal is not None:
+            if 'calle' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['calle']
+            if 'noExterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noExterior']
+            if 'noInterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noInterior']
+            domicilio2 = ''
+            if 'colonia' in dir_fiscal.attrib:
+                if dir_fiscal.attrib['colonia'].strip().lower().startswith('col.'):
+                    domicilio2 += '%s, ' % dir_fiscal.attrib['colonia']
+                else:
+                    domicilio2 += 'Col. %s, ' % dir_fiscal.attrib['colonia']
+            if 'codigoPostal' in dir_fiscal.attrib:
+                domicilio2 += 'C.P. %s ' % dir_fiscal.attrib['codigoPostal']
+            domicilio3 =''
+            if 'municipio' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['municipio']
+            if 'estado' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['estado']
+            if 'pais' in dir_fiscal.attrib:
+                domicilio3 += '%s ' % dir_fiscal.attrib['pais']
+            domicilio4 = ''
+            if 'localidad' in dir_fiscal.attrib:
+                domicilio4 += 'Localidad: %s, ' % dir_fiscal.attrib['localidad']
+            if 'referencia' in dir_fiscal.attrib:
+                domicilio4 += 'Referencia: %s' % dir_fiscal.attrib['referencia']
+            self._write_text('receptor_direccion1', domicilio1)
+            self._write_text('receptor_direccion2', domicilio2)
+            self._write_text('receptor_direccion3', domicilio3)
+            self._write_text('receptor_direccion4', domicilio4)
+        return
+
+    def _set_emisor(self, pre):
+        emisor = self.xml.find('%sEmisor' % pre)
+        dir_fiscal = emisor.find('%sExpedidoEn' % pre)
+        lugar = ''
+        if dir_fiscal is not None:
+            self.elements['emisor_logo']['x'] = 10
+            self.elements['emisor_nombre']['x'] = 45
+            self.elements['emisor_rfc']['x'] = 45
+            self.elements['emisor_direccion1']['x'] = 45
+            self.elements['emisor_direccion2']['x'] = 45
+            self.elements['emisor_direccion3']['x'] = 45
+            self.elements['emisor_direccion4']['x'] = 45
+            self.elements['emisor_nombre']['w'] = 75
+            self.elements['emisor_rfc']['w'] = 75
+            self.elements['emisor_direccion1']['w'] = 75
+            self.elements['emisor_direccion2']['w'] = 75
+            self.elements['emisor_direccion3']['w'] = 75
+            self.elements['emisor_direccion4']['w'] = 75
+            domicilio1 = ''
+            if 'calle' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['calle']
+            if 'noExterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noExterior']
+            if 'noInterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noInterior']
+            domicilio2 = ''
+            if 'colonia' in dir_fiscal.attrib:
+                if dir_fiscal.attrib['colonia'].strip().lower().startswith('col.'):
+                    domicilio2 += '%s, ' % dir_fiscal.attrib['colonia']
+                else:
+                    domicilio2 += 'Col. %s, ' % dir_fiscal.attrib['colonia']
+            if 'codigoPostal' in dir_fiscal.attrib:
+                domicilio2 += 'C.P. %s ' % dir_fiscal.attrib['codigoPostal']
+            domicilio3 =''
+            if 'municipio' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['municipio']
+                lugar += '%s, ' % dir_fiscal.attrib['municipio']
+            if 'estado' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['estado']
+                lugar += '%s, ' % dir_fiscal.attrib['estado']
+            if 'pais' in dir_fiscal.attrib:
+                domicilio3 += '%s ' % dir_fiscal.attrib['pais']
+            domicilio4 = ''
+            if 'localidad' in dir_fiscal.attrib:
+                domicilio4 += '%s, ' % dir_fiscal.attrib['localidad']
+            if 'referencia' in dir_fiscal.attrib:
+                domicilio4 += '%s' % dir_fiscal.attrib['referencia']
+            self._write_text('expedido_titulo')
+            self._write_text('expedido_direccion1', domicilio1)
+            self._write_text('expedido_direccion2', domicilio2)
+            self._write_text('expedido_direccion3', domicilio3)
+            self._write_text('expedido_direccion4', domicilio4)
+
+        path_logo = 'logos/{}.png'.format(emisor.attrib['rfc'].lower())
+        self.data['emisor_rfc'] = emisor.attrib['rfc']
+        if os.path.exists(path_logo):
+            self.image(
+                path_logo,
+                self.elements['emisor_logo']['x'],
+                self.elements['emisor_logo']['y'],
+                self.elements['emisor_logo']['w'],
+                self.elements['emisor_logo']['h']
+            )
+        regimen = emisor.find('%sRegimenFiscal' % pre)
+        if regimen is None:
+            regimen = ''
+        else:
+            regimen = regimen.attrib['Regimen']
+        dir_fiscal = emisor.find('%sDomicilioFiscal' % pre)
+        lugar2 = ''
+        domicilio1 = ''
+        domicilio2 = ''
+        domicilio3 = ''
+        domicilio4 = ''
+        if not dir_fiscal is None:
+            if 'calle' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['calle']
+            if 'noExterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noExterior']
+            if 'noInterior' in dir_fiscal.attrib:
+                domicilio1 += '%s ' % dir_fiscal.attrib['noInterior']
+
+            if 'colonia' in dir_fiscal.attrib:
+                if dir_fiscal.attrib['colonia'].strip().lower().startswith('col.'):
+                    domicilio2 += '%s, ' % dir_fiscal.attrib['colonia']
+                else:
+                    domicilio2 += 'Col. %s, ' % dir_fiscal.attrib['colonia']
+            if 'codigoPostal' in dir_fiscal.attrib:
+                domicilio2 += 'C.P. %s ' % dir_fiscal.attrib['codigoPostal']
+
+            if 'municipio' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['municipio']
+                lugar2 += '%s, ' % dir_fiscal.attrib['municipio']
+            if 'estado' in dir_fiscal.attrib:
+                domicilio3 += '%s, ' % dir_fiscal.attrib['estado']
+                lugar2 += '%s, ' % dir_fiscal.attrib['estado']
+            if 'pais' in dir_fiscal.attrib:
+                domicilio3 += '%s ' % dir_fiscal.attrib['pais']
+
+            if 'localidad' in dir_fiscal.attrib:
+                domicilio4 += '%s, ' % dir_fiscal.attrib['localidad']
+            if 'referencia' in dir_fiscal.attrib:
+                domicilio4 += '%s' % dir_fiscal.attrib['referencia']
+        name_emisor = 'Sin nombre'
+        if 'nombre' in emisor.attrib:
+            name_emisor = emisor.attrib['nombre']
+        self._write_text('emisor_nombre', name_emisor)
+        self._write_text('emisor_rfc', emisor.attrib['rfc'])
+        self._write_text('emisor_direccion1', domicilio1)
+        self._write_text('emisor_direccion2', domicilio2)
+        self._write_text('emisor_direccion3', domicilio3)
+        self._write_text('emisor_direccion4', domicilio4)
+        if not lugar:
+            lugar = lugar2
+        self.data['expedicion'] = lugar
+        self.data['regimen'] = regimen
+        return
+
+    def _rgb(self, col):
+        return (col // 65536), (col // 256 % 256), (col % 256)
+
+    def _color(self, r, g, b):
+        return int('%02x%02x%02x' % (r, g, b), 16)
+
+    def _write_text(self, k, s=''):
+        if not k in self.elements: return
+        self.pos_size['x'] = self.elements[k]['x']
+        self.pos_size['y'] = self.elements[k]['y']
+        self.pos_size['w'] = self.elements[k]['w']
+        self.pos_size['h'] = self.elements[k]['h']
+        self.set_font(
+            self.elements[k]['font'],
+            self.elements[k]['style'],
+            self.elements[k]['size']
+        )
+        self.set_text_color(*self._rgb(self.elements[k]['foreground']))
+        self.set_fill_color(*self._rgb(self.elements[k]['background']))
+        self.set_xy(self.pos_size['x'], self.pos_size['y'])
+        if self.elements[k]['border'] == '0' or \
+            self.elements[k]['border'] == '1':
+            border = eval(self.elements[k]['border'])
+        else:
+            border = self.elements[k]['border']
+        if not s:
+            s = self.elements[k]['text']
+        if  self.elements[k]['multiline']:
+            self.multi_cell(
+                self.pos_size['w'],
+                self.pos_size['h'],
+                s,
+                border,
+                self.elements[k]['align'],
+                bool(self.elements[k]['background'])
+            )
+        else:
+            self._ajust_text(s, self.elements[k]['size'])
+            self.cell(
+                self.pos_size['w'],
+                self.pos_size['h'],
+                s,
+                border,
+                0,
+                self.elements[k]['align'],
+                bool(self.elements[k]['background'])
+            )
+        return
+
+    def _ajust_text(self, s, size):
+        if not isinstance(s, str):
+            s = str(s)
+        s = s.encode('ascii', 'replace')
+        while True:
+            if self.get_string_width(s) < (self.pos_size['w']-0.8):
+                break
+            else:
+                size -= 1
+                self.set_font_size(size)
+        return
+
+    def _get_timbre(self, pre):
+        com = self.xml.find('%sComplemento' % pre)
+        if com is None: return {}
+        timbre = com.find('%sTimbreFiscalDigital' % self.G.PREFIX['TIMBRE'])
+        if timbre is None:
+            return {}
+        else:
+            return timbre.attrib
+
+    def _get_cadena(self):
+        return self.G.CADENA.format(**self.timbre)
+
+    def _parse_csv(self, template='', emisor_rfc=''):
+        "Parse template format csv file and create elements dict"
+        keys = ('x', 'y', 'w', 'h', 'font', 'size', 'style', 'foreground',
+            'background', 'align', 'priority', 'multiline', 'border', 'text')
+        self.elements = {}
+        if template:
+            path_template = template
+        else:
+            path_template = '{}/{}.csv'.format(
+                self.G.PATHS['TEMPLATE'],
+                emisor_rfc.lower()
+            )
+        if not os.path.exists(path_template):
+            path_template = '{}/default.csv'.format(self.G.PATHS['TEMPLATE'])
+        reader = csv.reader(open(path_template, 'r'), delimiter=',')
+        for row in reader:
+            new_list = []
+            for v in row[1:]:
+                if v == (''):
+                    new_list.append('')
+                elif v.startswith("'"):
+                    new_list.append(v[1:-1])
+                else:
+                    new_list.append(eval(v.strip()))
+            self.elements[row[0][1:-1]] = dict(zip(keys, new_list))
+        return
 
